@@ -2,30 +2,42 @@ package ch.trick17.rolezapps.quicksort
 
 import rolez.util.Random
 
-main task Quicksort(args: readonly Array[pure String]): {
-    val n = the Int.parseInt(args.get(0));
-    val array = the RandomArrays.shuffledInts(n);
-    
-    // TODO: measure time
-    start SortTask(array);
-    
-    for(var i = 0; i < n; i += 1)
-        if(array.get(i) != i) {
-            the System.out.println("Error: array.get(" + i + ") = " + array.get(i));
-            the System.exit(1);
-        }
-    
-    the System.out.println("All sorted out!");
-}
-
-task SortTask(s: readwrite Slice[int]): {
-    new Sorter.sort(s);
-}
-
-class Sorter {
+object Quicksort {
     val minTaskSize: int = 1000
     
-    def pure sort(s: readwrite Slice[int]): {
+    task pure main(args: readonly Array[pure String]): {
+        val n = the Int.parseInt(args.get(0));
+        val array = this.shuffledInts(n);
+        
+        // TODO: measure time
+        this start sort(array);
+        
+        for(var i = 0; i < n; i += 1)
+            if(array.get(i) != i) {
+                the System.out.println("Error: array.get(" + i + ") = " + array.get(i));
+                the System.exit(1);
+            }
+        
+        the System.out.println("All sorted out!");
+    }
+    
+    def pure shuffledInts(n: int): readwrite Array[int] {
+        val array = new Array[int](n);
+        for(var i = 0; i < n; i += 1)
+            array.set(i, i);
+        
+        val random = new Random;
+        for(var i = n - 1; i > 0; i -= 1) {
+            val index: int = random.nextInt(i + 1);
+            
+            val t = array.get(index);
+            array.set(index, array.get(i));
+            array.set(i, t);
+        }
+        return array;
+    }
+    
+    task pure sort(s: readwrite Slice[int]): {
         var  left = s.range.begin;
         var right = s.range.end - 1;
         
@@ -45,14 +57,14 @@ class Sorter {
         if(s.range.begin < right) {
             val leftSlice = s.slice(s.range.begin, right + 1, 1);
             if(leftSlice.range.size > this.minTaskSize)
-                start SortTask(leftSlice);
+                this start sort(leftSlice);
             else
                 this.sort(leftSlice);
         }
         if(left < s.range.end) {
             val rightSlice = s.slice(left, s.range.end, 1);
             if(rightSlice.range.size > this.minTaskSize)
-                start SortTask(rightSlice);
+                this start sort(rightSlice);
             else
                 this.sort(rightSlice);
         }
@@ -72,23 +84,5 @@ class Sorter {
             else if(m < r) return r;
             else return m;
         }
-    }
-}
-
-object RandomArrays {
-    def pure shuffledInts(n: int): readwrite Array[int] {
-        val array = new Array[int](n);
-        for(var i = 0; i < n; i += 1)
-            array.set(i, i);
-        
-        val random = new Random;
-        for(var i = n - 1; i > 0; i -= 1) {
-            val index: int = random.nextInt(i + 1);
-            
-            val t = array.get(index);
-            array.set(index, array.get(i));
-            array.set(i, t);
-        }
-        return array;
     }
 }
