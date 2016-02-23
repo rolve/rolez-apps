@@ -2,6 +2,7 @@ package ch.trick17.rolezapps.quicksort;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.Param;
@@ -17,6 +18,7 @@ import rolez.lang.GuardedArray;
 import rolez.lang.TaskSystem;
 
 @BenchmarkMode(Mode.AverageTime)
+@Fork(1)
 @State(Scope.Thread)
 public class QuicksortBenchmark {
     
@@ -39,7 +41,7 @@ public class QuicksortBenchmark {
     
     public static void main(String[] args) throws RunnerException {
         Options options = new OptionsBuilder().include(QuicksortBenchmark.class.getSimpleName())
-                .forks(1).jvmArgs("-server").build();
+                .jvmArgs("-server").build();
         new Runner(options).run();
     }
 }

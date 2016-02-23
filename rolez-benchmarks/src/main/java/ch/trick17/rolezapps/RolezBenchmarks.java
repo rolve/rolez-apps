@@ -8,7 +8,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 public class RolezBenchmarks {
     
     public static void main(String[] args) throws RunnerException {
-        Options options = new OptionsBuilder().include(".*").forks(1).jvmArgs("-server").build();
+        Options options = new OptionsBuilder().include(".*").jvmArgs("-server").build();
         new Runner(options).run();
     }
 }
