@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>ch.trick17.rolez-apps</groupId>
-        <artifactId>parent</artifactId>
+        <artifactId>rolez-parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../parent/pom.xml</relativePath>
+        <relativePath>../rolez-parent/pom.xml</relativePath>
     </parent>
     <artifactId>quicksort</artifactId>
     
