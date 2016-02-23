@@ -59,10 +59,7 @@ class Quicksort {
         }
         if(left < s.range.end) {
             val rightSlice = s.slice(left, s.range.end, 1);
-            if(rightSlice.range.size > this.minTaskSize)
-                this start sort(rightSlice);
-            else
-                this.sort(rightSlice);
+            this.sort(rightSlice);
         }
     }
     
