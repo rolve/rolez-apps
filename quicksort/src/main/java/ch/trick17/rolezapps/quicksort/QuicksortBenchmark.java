@@ -1,9 +1,5 @@
 package ch.trick17.rolezapps.quicksort;
 
-import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
-
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
@@ -42,21 +38,8 @@ public class QuicksortBenchmark {
     }
     
     public static void main(String[] args) throws RunnerException {
-        /* When invoked from Maven, the java.class.path property, which JMH uses to start forked
-         * JVMs, does not include project dependencies */
-        System.setProperty("java.class.path", actualClasspath());
-        
         Options options = new OptionsBuilder().include(QuicksortBenchmark.class.getSimpleName())
                 .forks(1).jvmArgs("-server").build();
         new Runner(options).run();
-    }
-    
-    @SuppressWarnings("resource")
-    private static String actualClasspath() {
-        URLClassLoader classLoader = (URLClassLoader) QuicksortBenchmark.class.getClassLoader();
-        StringBuilder classpath = new StringBuilder();
-        for(URL url : classLoader.getURLs())
-            classpath.append(url.getPath()).append(File.pathSeparator);
-        return classpath.toString();
     }
 }
