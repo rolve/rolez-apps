@@ -8,4 +8,8 @@
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
     <artifactId>quicksort</artifactId>
+    
+    <properties>
+        <benchmarkClass>ch.trick17.rolezapps.quicksort.QuicksortBenchmark</benchmarkClass>
+    </properties>
 </project>

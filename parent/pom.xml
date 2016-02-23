@@ -7,18 +7,31 @@
     <packaging>pom</packaging>
     <name>Parent POM for Rolez projects</name>
     <description>Provides the necessary configuration for Rolez projects</description>
-    
+
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <rolezOutputDir>${project.build.directory}/rolez-gen</rolezOutputDir>
+        <rolezOutputDir>${project.build.directory}/generated-sources/rolez</rolezOutputDir>
+        <jmh.version>1.11.3</jmh.version>
     </properties>
-    
+
     <dependencies>
         <dependency>
             <groupId>ch.trick17.rolez</groupId>
             <artifactId>ch.trick17.rolez.lib</artifactId>
             <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>${jmh.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>${jmh.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -71,6 +84,14 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+                    <mainClass>${benchmarkClass}</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>
