@@ -4,7 +4,17 @@ import rolez.util.Random
 import rolez.util.StopWatch
 
 class Quicksort {
-    val minTaskSize: int = 500
+    val maxTasks: int = 4 // TODO: Use number of (real) CPUs
+    
+    def pure maxLevel: int { return this.log2(this.maxTasks); }
+    
+    def pure log2(i: int): int {
+        // TODO: Move this to Math once non-mapped methods are supported for mapped singletons
+        var log = 0;
+        for(var ii = i; ii > 1; ii /= 2)
+            log += 1;
+        return log;
+    }
     
     task pure main(args: readonly Array[pure String]): {
         val n = the Int.parseInt(args.get(0));
@@ -34,6 +44,10 @@ class Quicksort {
     }
     
     task pure sort(s: readwrite Slice[int]): {
+        this.doSort(s, 0);
+    }
+    
+    task pure doSort(s: readwrite Slice[int], level: int): {
         var  left = s.range.begin;
         var right = s.range.end - 1;
         
@@ -52,14 +66,14 @@ class Quicksort {
         
         if(s.range.begin < right) {
             val leftSlice = s.slice(s.range.begin, right + 1, 1);
-            if(leftSlice.range.size > this.minTaskSize)
-                this start sort(leftSlice);
+            if(level < this.maxLevel)
+                this start doSort(leftSlice, level + 1);
             else
-                this.sort(leftSlice);
+                this.doSort(leftSlice, level + 1);
         }
         if(left < s.range.end) {
             val rightSlice = s.slice(left, s.range.end, 1);
-            this.sort(rightSlice);
+            this.doSort(rightSlice, level + 1);
         }
     }
     

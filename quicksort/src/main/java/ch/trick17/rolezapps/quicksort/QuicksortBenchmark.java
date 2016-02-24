@@ -41,7 +41,7 @@ public class QuicksortBenchmark {
     
     public static void main(String[] args) throws RunnerException {
         Options options = new OptionsBuilder().include(QuicksortBenchmark.class.getSimpleName())
-                .jvmArgs("-server").build();
+                .warmupIterations(10).build();
         new Runner(options).run();
     }
 }
