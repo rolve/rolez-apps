@@ -10,10 +10,8 @@ class Quicksort {
     
     def pure log2(i: int): int {
         // TODO: Move this to Math once non-mapped methods are supported for mapped singletons
-        var log = 0;
-        for(var ii = i; ii > 1; ii /= 2)
-            log += 1;
-        return log;
+        if(i < 1) return -1;
+        else return 31 - the Int.numberOfLeadingZeros(i);
     }
     
     task pure main(args: readonly Array[pure String]): {
