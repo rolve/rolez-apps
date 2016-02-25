@@ -41,7 +41,12 @@ public class QuicksortBenchmark {
     
     @Benchmark
     public void quicksort() {
-        TaskSystem.getDefault().run(quicksort.$sortTask(data));
+        TaskSystem.getDefault().run(new Callable<Void>() {
+            public Void call() throws Exception {
+                quicksort.sort(data);
+                return null;
+            }
+        });
     }
     
     public static void main(String[] args) throws RunnerException {
