@@ -49,15 +49,14 @@ class Quicksort {
         return array;
     }
     
-    task pure sort(s: readwrite Slice[int]): {
-        this.doSort(s, 0);
+    task pure sort(s: readwrite Array[int]): {
+        this.doSort(s, s.range.begin, s.range.end, 0);
     }
     
-    task pure doSort(s: readwrite Slice[int], level: int): {
-        var  left = s.range.begin;
-        var right = s.range.end - 1;
-        
-        val pivot = this.pivot(s);
+    task pure doSort(s: readwrite Slice[int], begin: int, end: int, level: int): {
+        val pivot = this.pivot(s, begin, end);
+        var  left = begin;
+        var right = end - 1;
         while(left <= right) {
             while(s.get( left) < pivot)  left += 1;
             while(s.get(right) > pivot) right -= 1;
@@ -70,23 +69,21 @@ class Quicksort {
             }
         }
         
-        if(s.range.begin < right) {
-            val leftSlice = s.slice(s.range.begin, right + 1, 1);
+        if(begin < right) {
             if(level < this.maxLevel)
-                this start doSort(leftSlice, level + 1);
+                this start doSort(s.slice(begin, right + 1, 1), begin, right + 1, level + 1);
             else
-                this.doSort(leftSlice, level + 1);
+                this.doSort(s, begin, right + 1, level + 1);
         }
-        if(left < s.range.end) {
-            val rightSlice = s.slice(left, s.range.end, 1);
-            this.doSort(rightSlice, level + 1);
-        }
+        if(left < end)
+            this.doSort(s, left, end, level + 1);
     }
     
-    def pure pivot(s: readonly Slice[int]): int {
-        val l = s.get(s.range.begin);
-        val m = s.get(s.range.begin + s.range.size / 2);
-        val r = s.get(s.range.end - 1);
+    def pure pivot(s: readonly Slice[int], begin: int, end: int): int {
+        // TODO: Use "ninther" for large enough slices
+        val l = s.get(begin);
+        val m = s.get(begin + (end - begin) / 2);
+        val r = s.get(end - 1);
         if(l < m) {
             if(m < r) return m;
             else if(l < r) return l;
