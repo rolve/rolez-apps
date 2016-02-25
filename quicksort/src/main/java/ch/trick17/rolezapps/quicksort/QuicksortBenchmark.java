@@ -1,5 +1,7 @@
 package ch.trick17.rolezapps.quicksort;
 
+import java.util.concurrent.Callable;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -25,12 +27,15 @@ public class QuicksortBenchmark {
     @Param({"100", "1000", "10000", "100000"})
     int n;
     
+    @Param({"1", "2", "4", "8"})
+    int numTasks;
+    
     Quicksort quicksort;
     GuardedArray<int[]> data;
     
     @Setup(Level.Invocation)
     public void setup() {
-        quicksort = new Quicksort();
+        quicksort = new Quicksort(numTasks);
         data = quicksort.shuffledInts(n);
     }
     

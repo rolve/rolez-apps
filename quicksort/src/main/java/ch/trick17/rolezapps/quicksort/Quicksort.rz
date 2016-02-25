@@ -4,9 +4,17 @@ import rolez.util.Random
 import rolez.util.StopWatch
 
 class Quicksort {
-    val maxTasks: int = 4 // TODO: Use number of (real) CPUs
+    val tasks: int
     
-    def pure maxLevel: int { return this.log2(this.maxTasks); }
+    new {
+        this.tasks = 2; // TODO: Use number of (real) CPUs
+    }
+    
+    new(tasks: int) {
+        this.tasks = tasks;
+    }
+    
+    def pure maxLevel: int { return this.log2(this.tasks); }
     
     def pure log2(i: int): int {
         // TODO: Move this to Math once non-mapped methods are supported for mapped singletons
