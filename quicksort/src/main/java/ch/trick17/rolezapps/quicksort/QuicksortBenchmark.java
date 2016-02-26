@@ -24,7 +24,7 @@ import rolez.lang.TaskSystem;
 @State(Scope.Thread)
 public class QuicksortBenchmark {
     
-    @Param({"100", "1000", "10000", "100000"})
+    @Param({"10000", "100000", "1000000"})
     int n;
     
     @Param({"1", "2", "4", "8"})
@@ -51,7 +51,7 @@ public class QuicksortBenchmark {
     
     public static void main(String[] args) throws RunnerException {
         Options options = new OptionsBuilder().include(QuicksortBenchmark.class.getSimpleName())
-                .warmupIterations(10).build();
+                .warmupIterations(5).build();
         new Runner(options).run();
     }
 }
