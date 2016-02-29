@@ -2,6 +2,7 @@ package ch.trick17.rolezapps.quicksort
 
 import rolez.util.Random
 import rolez.util.StopWatch
+import rolez.util.Scanner
 
 class Quicksort {
     val tasks: int
@@ -69,14 +70,17 @@ class Quicksort {
             }
         }
         
-        if(begin < right) {
-            if(level < this.maxLevel)
-                this start doSort(s.slice(begin, right + 1, 1), begin, right + 1, level + 1);
-            else
-                this.doSort(s, begin, right + 1, level + 1);
+        val sortLeft  = begin < right;
+        val sortRight = left  < end - 1;
+        if(level < this.maxLevel) {
+            // Create slices
+            if(sortLeft)  this start doSort(s.slice(begin, right + 1, 1), begin, right + 1, level + 1);
+            if(sortRight) this.doSort(s.slice(left, end, 1), left, end, level + 1);
         }
-        if(left < end)
-            this.doSort(s, left, end, level + 1);
+        else {
+            if(sortLeft)  this.doSort(s, begin, right + 1, level + 1);
+            if(sortRight) this.doSort(s, left, end, level + 1);
+        }
     }
     
     def pure pivot(s: readonly Slice[int], begin: int, end: int): int {
