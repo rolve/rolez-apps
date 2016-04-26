@@ -10,6 +10,10 @@
     <artifactId>rolez-benchmark-parent</artifactId>
     <packaging>pom</packaging>
 
+    <properties>
+        <jmh.version>1.12</jmh.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>

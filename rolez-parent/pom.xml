@@ -12,7 +12,6 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <rolezOutputDir>${project.build.directory}/generated-sources/rolez</rolezOutputDir>
-        <jmh.version>1.11.3</jmh.version>
     </properties>
 
     <dependencies>
