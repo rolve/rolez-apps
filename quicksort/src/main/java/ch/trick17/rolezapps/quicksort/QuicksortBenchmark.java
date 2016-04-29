@@ -18,6 +18,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import rolez.lang.GuardedArray;
+import rolez.lang.MathExtra;
 import rolez.lang.TaskSystem;
 
 @BenchmarkMode(SingleShotTime)
@@ -25,18 +26,24 @@ import rolez.lang.TaskSystem;
 @State(Thread)
 public class QuicksortBenchmark {
     
-    @Param({"10000", "100000", "1000000"})
+    @Param({"2000000"})
     int n;
     
-    @Param({"1", "2", "4", "8"})
-    int numTasks;
+    @Param({"", "LocalOpt", "Java", "JavaPerfectPivot", "JavaPerfectPivotBranchOpt",
+            "JavaSorted", "JavaDesorted"})
+    String implementation;
+    
+    @Param({"1", "2", "4", "16", "64", "256"})
+    int tasks;
     
     Quicksort quicksort;
     GuardedArray<int[]> data;
     
-    @Setup(Level.Invocation)
-    public void setup() {
-        quicksort = new Quicksort(numTasks);
+    @Setup(Level.Iteration)
+    public void setup() throws ReflectiveOperationException {
+        Class<?> quicksortClass = Class.forName(Quicksort.class.getName() + implementation);
+        quicksort = (Quicksort) quicksortClass.getConstructor(int.class)
+                .newInstance(MathExtra.INSTANCE.log2(tasks));
         data = quicksort.shuffledInts(n);
     }
     

@@ -4,23 +4,17 @@ import rolez.util.Random
 import rolez.util.StopWatch
 import rolez.util.Scanner
 
+/* To inspect JITed code, run with
+ * -XX:+UnlockDiagnosticVMOptions -XX:+LogCompilation -XX:+TraceClassLoading -XX:+PrintAssembly */
 class Quicksort {
-    val tasks: int
+    val maxLevel: int
     
     new {
-        this.tasks = 2; // TODO: Use number of (real) CPUs
+        this.maxLevel = 3; // 8 tasks
     }
     
-    new(tasks: int) {
-        this.tasks = tasks;
-    }
-    
-    def pure maxLevel: int { return this.log2(this.tasks); }
-    
-    def pure log2(i: int): int {
-        // TODO: Move this to Math once non-mapped methods are supported for mapped singletons
-        if(i < 1) return -1;
-        else return 31 - the Int.numberOfLeadingZeros(i);
+    new(maxLevel: int) {
+        this.maxLevel = maxLevel;
     }
     
     task pure main(args: readonly Array[pure String]): {
@@ -80,6 +74,8 @@ class Quicksort {
         
         val sortLeft  = begin < right;
         val sortRight = left  < end - 1;
+        
+        // TODO: Switch to optimized version when maxLevel is reached
         if(level < this.maxLevel) {
             // Create slices
             if(sortLeft)  this start doSort(s.slice(begin, right + 1, 1), begin, right + 1, level + 1);

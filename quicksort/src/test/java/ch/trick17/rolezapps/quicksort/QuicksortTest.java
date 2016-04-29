@@ -11,7 +11,7 @@ public class QuicksortTest {
     @Test
     public void testSort() {
         // Only tests the single-threaded sort implementation
-        Quicksort quicksort = new Quicksort(1);
+        Quicksort quicksort = new Quicksort(0);
         
         int n = 1000;
         GuardedArray<int[]> ints = quicksort.shuffledInts(n);
