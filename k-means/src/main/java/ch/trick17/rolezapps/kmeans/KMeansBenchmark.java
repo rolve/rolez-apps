@@ -1,5 +1,6 @@
 package ch.trick17.rolezapps.kmeans;
 
+import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
 
@@ -30,6 +31,9 @@ public class KMeansBenchmark {
     @Param({"1000"})
     int n;
     
+    @Param({"", "LocalOpt"})
+    String implementation;
+    
     int clusters;
     
     @Param({"1", "2", "4", "8", "16", "32", "64", "128", "256"})
@@ -41,7 +45,7 @@ public class KMeansBenchmark {
     @Setup(Level.Iteration)
     public void setup() {
         clusters = n / 100;
-        kMeans = new KMeans(dim, clusters, tasks);
+        kMeans = instantiateBenchmark(KMeans.class, implementation, dim, clusters, tasks);
         data = kMeans.createDataSet(n);
     }
     
