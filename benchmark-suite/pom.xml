@@ -7,10 +7,10 @@
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../rolez-benchmark-parent/pom.xml</relativePath>
     </parent>
-    <artifactId>rolez-benchmarks</artifactId>
+    <artifactId>benchmark-suite</artifactId>
     
     <properties>
-        <benchmarkClass>ch.trick17.rolezapps.RolezBenchmarks</benchmarkClass>
+        <benchmarkClass>ch.trick17.rolezapps.BenchmarkSuite</benchmarkClass>
     </properties>
 
     <dependencies>
