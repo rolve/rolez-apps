@@ -10,7 +10,7 @@
         <module>rolez-parent</module>
         <module>rolez-benchmark-parent</module>
         <module>quicksort</module>
-        <module>rolez-benchmarks</module>
         <module>k-means</module>
+        <module>benchmark-suite</module>
     </modules>
 </project>
