@@ -8,4 +8,8 @@
         <relativePath>../rolez-benchmark-parent/pom.xml</relativePath>
     </parent>
     <artifactId>k-means</artifactId>
+    
+    <properties>
+        <benchmarkClass>ch.trick17.rolezapps.kmeans.KMeansBenchmark</benchmarkClass>
+    </properties>
 </project>
