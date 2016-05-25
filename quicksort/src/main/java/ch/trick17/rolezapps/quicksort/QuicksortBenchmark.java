@@ -50,7 +50,7 @@ public class QuicksortBenchmark {
     @Benchmark
     public void quicksort() {
         TaskSystem.getDefault().run(new Callable<Void>() {
-            public Void call() throws Exception {
+            public Void call() {
                 quicksort.sort(data);
                 return null;
             }
