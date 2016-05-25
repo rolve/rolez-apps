@@ -1,15 +1,17 @@
+package ch.trick17.rolezapps.kmeans
+
 import rolez.util.Random
 
 class KMeans {
     
     val dim: int
     val clusters: int
-    val parallelism: int
+    val numTasks: int
     
-    new(dim: int, clusters: int, parallelism: int) {
+    new(dim: int, clusters: int, numTasks: int) {
         this.dim = dim;
         this.clusters = clusters;
-        this.parallelism = parallelism;
+        this.numTasks = numTasks;
     }
     
     def pure createDataSet(n: int): readwrite Array[readonly Array[double]] {
@@ -34,9 +36,9 @@ class KMeans {
         while(changed) {
             /* Assignment step */
             // TODO: Why are type declarations required?
-            val dataParts: readonly Array[readwrite Slice[readonly Array[double]]] = dataSet.partition(the ContiguousPartitioner, this.parallelism);
-            val assignParts: readonly Array[readwrite Slice[int]] = assignments.partition(the ContiguousPartitioner, this.parallelism);
-            val tasks = new Array[pure Task[boolean]](this.parallelism);
+            val dataParts: readonly Array[readwrite Slice[readonly Array[double]]] = dataSet.partition(the ContiguousPartitioner, this.numTasks);
+            val assignParts: readonly Array[readwrite Slice[int]] = assignments.partition(the ContiguousPartitioner, this.numTasks);
+            val tasks = new Array[pure Task[boolean]](this.numTasks);
             
             for(var i = 0; i < tasks.length; i+= 1)
                 tasks.set(i, this start assign(dataParts.get(i), centroids, assignParts.get(i)));
@@ -76,7 +78,31 @@ class KMeans {
             centroids: readonly Array[readonly Array[double]],
             assignments: readwrite Slice[int]): boolean {
         var changed = false;
+        for(var i = dataSet.range.begin; i < dataSet.range.end; i += dataSet.range.step) {
+            var min = the Double.POSITIVE_INFINITY;
+            var minIndex = -1;
+            for(var c = 0; c < centroids.length; c += 1) {
+                val distance2 = this.distance2(dataSet.get(i), centroids.get(c));
+                if(distance2 < min) {
+                    min = distance2;
+                    minIndex = c;
+                }
+            }
+            if(minIndex != assignments.get(i)) {
+                changed = true;
+                assignments.set(i, minIndex);
+            }
+        }
         return changed;
+    }
+    
+    def pure distance2(v1: readonly Array[double], v2: readonly Array[double]): double {
+        var sum = 0.0;
+        for(var d = 0; d < this.dim; d += 1) {
+            val diff = v1.get(d) - v2.get(d);
+            sum += diff * diff;
+        }
+        return sum;
     }
     
     def pure newRandomVector(random: readwrite Random): readonly Array[double] {
