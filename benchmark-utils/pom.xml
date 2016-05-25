@@ -2,16 +2,6 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>ch.trick17.rolez-apps</groupId>
-    <artifactId>rolez-apps</artifactId>
+    <artifactId>benchmark-utils</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    
-    <modules>
-        <module>rolez-parent</module>
-        <module>rolez-benchmark-parent</module>
-        <module>benchmark-utils</module>
-        <module>quicksort</module>
-        <module>k-means</module>
-        <module>benchmark-suite</module>
-    </modules>
 </project>

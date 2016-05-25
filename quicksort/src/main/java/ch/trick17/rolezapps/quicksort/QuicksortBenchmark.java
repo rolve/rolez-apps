@@ -1,5 +1,6 @@
 package ch.trick17.rolezapps.quicksort;
 
+import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
 
@@ -40,10 +41,9 @@ public class QuicksortBenchmark {
     GuardedArray<int[]> data;
     
     @Setup(Level.Iteration)
-    public void setup() throws ReflectiveOperationException {
-        Class<?> quicksortClass = Class.forName(Quicksort.class.getName() + implementation);
-        quicksort = (Quicksort) quicksortClass.getConstructor(int.class)
-                .newInstance(MathExtra.INSTANCE.log2(tasks));
+    public void setup() {
+        int maxLevel = MathExtra.INSTANCE.log2(tasks);
+        quicksort = instantiateBenchmark(Quicksort.class, implementation, maxLevel);
         data = quicksort.shuffledInts(n);
     }
     
