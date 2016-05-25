@@ -11,5 +11,6 @@
         <module>rolez-benchmark-parent</module>
         <module>quicksort</module>
         <module>rolez-benchmarks</module>
+        <module>k-means</module>
     </modules>
 </project>

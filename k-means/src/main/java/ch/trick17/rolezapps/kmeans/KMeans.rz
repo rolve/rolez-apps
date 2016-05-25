@@ -1,0 +1,88 @@
+import rolez.util.Random
+
+class KMeans {
+    
+    val dim: int
+    val clusters: int
+    val parallelism: int
+    
+    new(dim: int, clusters: int, parallelism: int) {
+        this.dim = dim;
+        this.clusters = clusters;
+        this.parallelism = parallelism;
+    }
+    
+    def pure createDataSet(n: int): readwrite Array[readonly Array[double]] {
+        val random = new Random;
+        val dataSet = new Array[readonly Array[double]](n);
+        for(var i = 0; i < n; i += 1)
+            dataSet.set(i, this.newRandomVector(random));
+        return dataSet;
+    }
+    
+    task pure kMeans(dataSet: readwrite Array[readonly Array[double]]): readwrite Array[readonly Array[double]] {
+        /* Initialization */
+        val random = new Random;
+        val centroids = new Array[readonly Array[double]](this.clusters);
+        for(var i = 0; i < this.clusters; i += 1)
+            centroids.set(i, this.newRandomVector(random));
+        
+        val assignments = new Array[int](dataSet.length);
+        
+        /* Computation */
+        var changed = true;
+        while(changed) {
+            /* Assignment step */
+            // TODO: Why are type declarations required?
+            val dataParts: readonly Array[readwrite Slice[readonly Array[double]]] = dataSet.partition(the ContiguousPartitioner, this.parallelism);
+            val assignParts: readonly Array[readwrite Slice[int]] = assignments.partition(the ContiguousPartitioner, this.parallelism);
+            val tasks = new Array[pure Task[boolean]](this.parallelism);
+            
+            for(var i = 0; i < tasks.length; i+= 1)
+                tasks.set(i, this start assign(dataParts.get(i), centroids, assignParts.get(i)));
+            
+            changed = false;
+            for(var i = 0; i < tasks.length; i += 1)
+                changed |= tasks.get(i).get;
+            
+            /* Update step */
+            val newCentroids = new Array[readwrite Array[double]](this.clusters);
+            for(var i = 0; i < newCentroids.length; i += 1)
+                newCentroids.set(i, new Array[double](this.dim));
+            val counts = new Array[int](this.clusters);
+            
+            for(var i = 0; i < dataSet.length; i += 1) {
+                val vector = dataSet.get(i);
+                val centroidIndex = assignments.get(i);
+                val centroid = newCentroids.get(centroidIndex);
+                for(var d = 0; d < this.dim; d += 1)
+                    centroid.set(d, centroid.get(d) + vector.get(d));
+                counts.set(centroidIndex, counts.get(centroidIndex) + 1);
+            }
+            
+            for(var i = 0; i < centroids.length; i += 1) {
+                val centroid = newCentroids.get(i);
+                val count = counts.get(i);
+                for(var d = 0; d < this.dim; d += 1)
+                    centroid.set(d, centroid.get(d) / count);
+                centroids.set(i, centroid);
+            }
+        }
+        
+        return centroids;
+    }
+    
+    task pure assign(dataSet: readonly Slice[readonly Array[double]],
+            centroids: readonly Array[readonly Array[double]],
+            assignments: readwrite Slice[int]): boolean {
+        var changed = false;
+        return changed;
+    }
+    
+    def pure newRandomVector(random: readwrite Random): readonly Array[double] {
+        val vec = new Array[double](this.dim);
+        for(var d = 0; d < this.dim; d += 1)
+            vec.set(d, random.nextDouble);
+        return vec;
+    }
+}
