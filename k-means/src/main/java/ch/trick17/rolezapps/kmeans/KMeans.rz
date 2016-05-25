@@ -1,12 +1,20 @@
 package ch.trick17.rolezapps.kmeans
 
 import rolez.util.Random
+import rolez.util.Scanner
+import rolez.util.StopWatch
 
 class KMeans {
     
     val dim: int
     val clusters: int
     val numTasks: int
+    
+    new {
+        this.dim = 10;
+        this.clusters = 10;
+        this.numTasks = 8;
+    }
     
     new(dim: int, clusters: int, numTasks: int) {
         this.dim = dim;
@@ -110,5 +118,23 @@ class KMeans {
         for(var d = 0; d < this.dim; d += 1)
             vec.set(d, random.nextDouble);
         return vec;
+    }
+    
+    task pure main(args: readonly Array[pure String]): {
+        val n = the Int.parseInt(args.get(0));
+        val iterations = 10;
+        val watch = new StopWatch;
+        
+        val dataSets = new Array[readwrite Array[readonly Array[double]]](iterations);
+        for(var i = 0; i < iterations; i += 1)
+            dataSets.set(i, this.createDataSet(n));
+        
+        the System.out.println("Press Enter to start");
+        new Scanner(the System.in).nextLine;
+        for(var i = 0; i < iterations; i += 1) {
+            watch.go;
+            this.kMeans(dataSets.get(i));
+            the System.out.println(watch.get);
+        }
     }
 }

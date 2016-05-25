@@ -31,7 +31,7 @@ public class KMeansBenchmark {
     @Param({"1000"})
     int n;
     
-    @Param({"", "LocalOpt"})
+    @Param({"", "LocalOpt", "GlobalOpt"})
     String implementation;
     
     int clusters;

@@ -1,5 +1,7 @@
 package ch.trick17.rolezapps.kmeans;
 
+import static rolez.lang.GuardedArray.wrap;
+
 import java.util.Random;
 import java.util.concurrent.Callable;
 
@@ -9,6 +11,11 @@ import rolez.lang.GuardedSlice;
 import rolez.lang.Task;
 import rolez.lang.TaskSystem;
 
+/**
+ * A manually optimized version of {@link KMeans}. Guarding ops were moved out of loops and removed
+ * if a method-local analysis could deduce that guarding is not necessary, under the assumption that
+ * the analysis knows which methods can start tasks.
+ */
 public class KMeansLocalOpt extends KMeans {
     
     public KMeansLocalOpt(final int dim, final int clusters, final int numTasks) {
@@ -128,5 +135,11 @@ public class KMeansLocalOpt extends KMeans {
         for(int d = 0; d < this.dim; d += 1)
             vec.data[d] = random.nextDouble();
         return vec;
+    }
+    
+    public static void main(final String[] args) {
+        int numTasks = 1;
+        GuardedArray<String[]> wrapped = wrap(args);
+        TaskSystem.getDefault().run(new KMeansLocalOpt(10, 10, numTasks).$mainTask(wrapped));
     }
 }
