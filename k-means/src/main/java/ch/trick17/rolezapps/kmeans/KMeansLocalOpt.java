@@ -22,45 +22,51 @@ public class KMeansLocalOpt extends KMeans {
         GuardedArray<GuardedArray<double[]>[]> centroids = new GuardedArray<GuardedArray<double[]>[]>(
                 new GuardedArray[this.clusters]);
         for(int i = 0; i < this.clusters; i += 1)
-            guardReadWrite(centroids).data[i] = this.newRandomVector(random);
+            centroids.data[i] = this.newRandomVector(random);
+            
         GuardedArray<int[]> assignments = new GuardedArray<int[]>(new int[dataSet.data.length]);
+        
         boolean changed = true;
         while(changed) {
             GuardedArray<GuardedSlice<GuardedArray<double[]>[]>[]> dataParts = dataSet
                     .partition(ContiguousPartitioner.INSTANCE, this.numTasks);
             GuardedArray<GuardedSlice<int[]>[]> assignParts = assignments
                     .partition(ContiguousPartitioner.INSTANCE, this.numTasks);
+                    
             GuardedArray<Task<Boolean>[]> tasks = new GuardedArray<Task<Boolean>[]>(
                     new Task[this.numTasks]);
             for(int i = 0; i < tasks.data.length; i += 1)
-                guardReadWrite(tasks).data[i] = TaskSystem.getDefault().start(this
-                        .$assignTask(guardReadOnly(dataParts).data[i], centroids, guardReadOnly(
-                                assignParts).data[i]));
+                tasks.data[i] = TaskSystem.getDefault().start(this.$assignTask(dataParts.data[i],
+                        centroids, assignParts.data[i]));
+                        
             changed = false;
-            for(int i = 0; i < tasks.data.length; i += 1)
-                changed |= guardReadOnly(tasks).data[i].get();
+            for(Task<Boolean> element : tasks.data)
+                changed |= element.get();
+                
             GuardedArray<GuardedArray<double[]>[]> newCentroids = new GuardedArray<GuardedArray<double[]>[]>(
                     new GuardedArray[this.clusters]);
             for(int i = 0; i < newCentroids.data.length; i += 1)
-                guardReadWrite(newCentroids).data[i] = new GuardedArray<double[]>(
-                        new double[this.dim]);
+                newCentroids.data[i] = new GuardedArray<double[]>(new double[this.dim]);
+                
             GuardedArray<int[]> counts = new GuardedArray<int[]>(new int[this.clusters]);
+            guardReadOnly(dataSet);
+            guardReadOnly(assignments);
             for(int i = 0; i < dataSet.data.length; i += 1) {
-                GuardedArray<double[]> vector = guardReadOnly(dataSet).data[i];
-                int centroidIndex = guardReadOnly(assignments).data[i];
-                GuardedArray<double[]> centroid = guardReadOnly(newCentroids).data[centroidIndex];
+                GuardedArray<double[]> vector = dataSet.data[i];
+                int centroidIndex = assignments.data[i];
+                GuardedArray<double[]> centroid = newCentroids.data[centroidIndex];
                 for(int d = 0; d < this.dim; d += 1)
-                    guardReadWrite(centroid).data[d] = guardReadOnly(centroid).data[d]
-                            + guardReadOnly(vector).data[d];
-                guardReadWrite(counts).data[centroidIndex] = guardReadOnly(
-                        counts).data[centroidIndex] + 1;
+                    centroid.data[d] = centroid.data[d] + vector.data[d];
+                counts.data[centroidIndex]++;
             }
+            
+            guardReadWrite(centroids);
             for(int i = 0; i < centroids.data.length; i += 1) {
-                GuardedArray<double[]> centroid = guardReadOnly(newCentroids).data[i];
-                int count = guardReadOnly(counts).data[i];
+                GuardedArray<double[]> centroid = newCentroids.data[i];
+                int count = counts.data[i];
                 for(int d = 0; d < this.dim; d += 1)
-                    guardReadWrite(centroid).data[d] = guardReadOnly(centroid).data[d] / count;
-                guardReadWrite(centroids).data[i] = centroid;
+                    centroid.data[d] /= count;
+                centroids.data[i] = centroid;
             }
         }
         return centroids;
@@ -82,17 +88,16 @@ public class KMeansLocalOpt extends KMeans {
                         double min = Double.POSITIVE_INFINITY;
                         int minIndex = -1;
                         for(int c = 0; c < centroids.data.length; c += 1) {
-                            double distance2 = distance2(guardReadOnly(dataSet)
-                                    .<GuardedArray<double[]>> get(i), guardReadOnly(
-                                            centroids).data[c]);
+                            double distance2 = distance2(dataSet.<GuardedArray<double[]>> get(i),
+                                    centroids.data[c]);
                             if(distance2 < min) {
                                 min = distance2;
                                 minIndex = c;
                             }
                         }
-                        if(minIndex != guardReadOnly(assignments).getInt(i)) {
+                        if(minIndex != assignments.getInt(i)) {
                             changed = true;
-                            guardReadWrite(assignments).setInt(i, minIndex);
+                            assignments.setInt(i, minIndex);
                         }
                     }
                     return changed;
@@ -108,8 +113,10 @@ public class KMeansLocalOpt extends KMeans {
     @Override
     public double distance2(GuardedArray<double[]> v1, final GuardedArray<double[]> v2) {
         double sum = 0.0;
+        guardReadOnly(v1);
+        guardReadOnly(v2);
         for(int d = 0; d < this.dim; d += 1) {
-            final double diff = guardReadOnly(v1).data[d] - guardReadOnly(v2).data[d];
+            final double diff = v1.data[d] - v2.data[d];
             sum += diff * diff;
         }
         return sum;
@@ -119,7 +126,7 @@ public class KMeansLocalOpt extends KMeans {
     public GuardedArray<double[]> newRandomVector(Random random) {
         GuardedArray<double[]> vec = new GuardedArray<double[]>(new double[this.dim]);
         for(int d = 0; d < this.dim; d += 1)
-            guardReadWrite(vec).data[d] = random.nextDouble();
+            vec.data[d] = random.nextDouble();
         return vec;
     }
 }
