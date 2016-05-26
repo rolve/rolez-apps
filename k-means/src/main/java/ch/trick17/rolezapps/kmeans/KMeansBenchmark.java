@@ -28,10 +28,10 @@ public class KMeansBenchmark {
     
     int dim = 10;
     
-    @Param({"1000"})
+    @Param({"10000"})
     int n;
     
-    @Param({"", "LocalOpt", "GlobalOpt"})
+    @Param({"", "LocalOpt", "GlobalOpt", "Java"})
     String implementation;
     
     int clusters;
@@ -50,11 +50,10 @@ public class KMeansBenchmark {
     }
     
     @Benchmark
-    public void kMeans() {
-        TaskSystem.getDefault().run(new Callable<Void>() {
-            public Void call() {
-                kMeans.kMeans(data);
-                return null;
+    public Object kMeans() {
+        return TaskSystem.getDefault().run(new Callable<Object>() {
+            public Object call() {
+                return kMeans.kMeans(data);
             }
         });
     }

@@ -19,7 +19,7 @@ public class KMeansGlobalOpt extends KMeansLocalOpt {
     @Override
     public double distance2(GuardedArray<double[]> v1, final GuardedArray<double[]> v2) {
         double sum = 0.0;
-        for(int d = 0; d < this.dim; d += 1) {
+        for(int d = 0; d < dim; d += 1) {
             final double diff = v1.data[d] - v2.data[d];
             sum += diff * diff;
         }
