@@ -1,5 +1,7 @@
 package ch.trick17.rolezapps.quicksort;
 
+import static rolez.lang.GuardedArray.wrap;
+
 import rolez.lang.GuardedArray;
 
 /**
@@ -21,13 +23,13 @@ public class QuicksortJavaDesorted extends QuicksortJavaPerfectPivot {
     }
     
     @Override
-    public GuardedArray<int[]> shuffledInts(final int n) {
+    public GuardedArray<int[]> shuffledInts(int n) {
         int[] array = new int[n];
         for(int i = 0; i < n; i += 1)
             array[i] = i;
             
         desort(array, 0, n);
-        return GuardedArray.wrap(array);
+        return wrap(array);
     }
     
     private void desort(int[] s, int begin, int end) {

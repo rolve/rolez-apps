@@ -29,12 +29,12 @@ public class QuicksortJavaPerfectPivotBranchOpt extends QuicksortJava {
         quicksort.sort(ints);
     }
     
-    public QuicksortJavaPerfectPivotBranchOpt(final int maxLevel) {
+    public QuicksortJavaPerfectPivotBranchOpt(int maxLevel) {
         super(maxLevel);
     }
     
     @Override
-    public void doSort(final int[] s, final int begin, final int end, final int level) {
+    public void doSort(int[] s, int begin, int end, int level) {
         int pivot = this.pivot(s, begin, end);
         int left = begin;
         int right = end - 1;
@@ -64,17 +64,17 @@ public class QuicksortJavaPerfectPivotBranchOpt extends QuicksortJava {
         Thread child = null;
         if(level < maxLevel) {
             if(sortLeft) {
-                child = new Thread(this.$doSortTask(s, begin, right + 1, level + 1));
+                child = new Thread($doSortTask(s, begin, right + 1, level + 1));
                 child.start();
             }
             if(sortRight)
-                this.doSort(s, left, end, level + 1);
+                doSort(s, left, end, level + 1);
         }
         else {
             if(sortLeft)
-                this.doSort(s, begin, right + 1, level + 1);
+                doSort(s, begin, right + 1, level + 1);
             if(sortRight)
-                this.doSort(s, left, end, level + 1);
+                doSort(s, left, end, level + 1);
         }
         
         while(child != null)
@@ -85,7 +85,7 @@ public class QuicksortJavaPerfectPivotBranchOpt extends QuicksortJava {
     }
     
     @Override
-    public int pivot(final int[] s, final int begin, final int end) {
+    public int pivot(int[] s, int begin, int end) {
         return begin + (end - begin) / 2;
     }
 }

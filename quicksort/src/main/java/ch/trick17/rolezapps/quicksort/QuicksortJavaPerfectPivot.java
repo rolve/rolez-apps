@@ -30,12 +30,12 @@ public class QuicksortJavaPerfectPivot extends QuicksortJava {
         quicksort.sort(ints);
     }
     
-    public QuicksortJavaPerfectPivot(final int maxLevel) {
+    public QuicksortJavaPerfectPivot(int maxLevel) {
         super(maxLevel);
     }
     
     @Override
-    public int pivot(final int[] s, final int begin, final int end) {
+    public int pivot(int[] s, int begin, int end) {
         return (begin + end) / 2;
     }
 }
