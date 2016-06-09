@@ -16,6 +16,8 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import com.carrotsearch.hppc.IntArrayList;
+
 import rolez.lang.GuardedArray;
 
 @BenchmarkMode(SingleShotTime)
@@ -29,6 +31,7 @@ public class ArrayBenchmark {
     Integer[] integerArray = new Integer[n];
     ArrayList<Integer> integerList = new ArrayList<>(n);
     GuardedArray<int[]> guardedIntArray = new GuardedArray<>(new int[n]);
+    IntArrayList intList = new IntArrayList(n);
     
     @Setup
     public void setup() {
@@ -39,6 +42,7 @@ public class ArrayBenchmark {
             integerArray[i] = a;
             integerList.add(a);
             guardedIntArray.setInt(i, a);
+            intList.set(i, a);
         }
     }
     
@@ -74,9 +78,17 @@ public class ArrayBenchmark {
         return sum;
     }
     
+    @Benchmark
+    public long intList() {
+        long sum = 0;
+        for(int i = 0; i < n; i++)
+            sum += intList.get(i);
+        return sum;
+    }
+    
     public static void main(String[] args) throws RunnerException {
         Options options = new OptionsBuilder().include(ArrayBenchmark.class.getSimpleName())
-                .warmupIterations(20).measurementIterations(30).build();
+                .warmupIterations(30).measurementIterations(30).build();
         new Runner(options).run();
     }
     

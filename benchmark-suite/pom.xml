@@ -8,7 +8,7 @@
         <relativePath>../rolez-benchmark-parent/pom.xml</relativePath>
     </parent>
     <artifactId>benchmark-suite</artifactId>
-    
+
     <properties>
         <benchmarkClass>ch.trick17.rolezapps.BenchmarkSuite</benchmarkClass>
     </properties>
@@ -23,6 +23,11 @@
             <groupId>ch.trick17.rolez-apps</groupId>
             <artifactId>k-means</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.carrotsearch</groupId>
+            <artifactId>hppc</artifactId>
+            <version>0.7.1</version>
         </dependency>
     </dependencies>
 </project>
