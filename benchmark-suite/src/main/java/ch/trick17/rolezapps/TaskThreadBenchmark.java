@@ -74,6 +74,9 @@ public class TaskThreadBenchmark {
         return volatileField;
     }
     
+    @Benchmark
+    public void empty() {}
+    
     public static void main(String[] args) throws RunnerException {
         String name = TaskThreadBenchmark.class.getSimpleName();
         new Runner(new OptionsBuilder().include(name).build()).run();

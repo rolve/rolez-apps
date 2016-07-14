@@ -20,6 +20,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import rolez.lang.GuardedArray;
 import rolez.lang.MathExtra;
+import rolez.lang.Task;
 import rolez.lang.TaskSystem;
 
 @BenchmarkMode(SingleShotTime)
@@ -49,12 +50,12 @@ public class QuicksortBenchmark {
     
     @Benchmark
     public void quicksort() {
-        TaskSystem.getDefault().run(new Callable<Void>() {
+        TaskSystem.getDefault().run(new Task<>(new Callable<Void>() {
             public Void call() {
                 quicksort.sort(data);
                 return null;
             }
-        });
+        }));
     }
     
     public static void main(String[] args) throws RunnerException {

@@ -3,6 +3,7 @@ package ch.trick17.rolezapps.quicksort;
 import java.util.concurrent.Callable;
 
 import rolez.lang.GuardedSlice;
+import rolez.lang.Task;
 import rolez.lang.TaskSystem;
 
 public class QuicksortLocalOpt extends Quicksort {
@@ -36,24 +37,24 @@ public class QuicksortLocalOpt extends Quicksort {
             if(sortLeft)
                 TaskSystem.getDefault().start($doSortTask(s.slice(begin, right + 1, 1), begin, right
                         + 1, level + 1));
-                        
+            
             if(sortRight)
                 this.doSort(s.slice(left, end, 1), left, end, level + 1);
         }
         else {
             if(sortLeft)
                 this.doSort(s, begin, right + 1, level + 1);
-                
+            
             if(sortRight)
                 this.doSort(s, left, end, level + 1);
         }
     }
     
     @Override
-    public Callable<Void> $doSortTask(final GuardedSlice<int[]> s, final int begin, final int end,
+    public Task<Void> $doSortTask(final GuardedSlice<int[]> s, final int begin, final int end,
             final int level) {
         s.pass();
-        return new Callable<Void>() {
+        return new Task<>(new Callable<Void>() {
             public Void call() {
                 s.registerNewOwner();
                 try {
@@ -80,14 +81,14 @@ public class QuicksortLocalOpt extends Quicksort {
                         if(sortLeft)
                             TaskSystem.getDefault().start($doSortTask(s.slice(begin, right + 1, 1),
                                     begin, right + 1, level + 1));
-                                    
+                        
                         if(sortRight)
                             doSort(s.slice(left, end, 1), left, end, level + 1);
                     }
                     else {
                         if(sortLeft)
                             doSort(s, begin, right + 1, level + 1);
-                            
+                        
                         if(sortRight)
                             doSort(s, left, end, level + 1);
                     }
@@ -96,7 +97,7 @@ public class QuicksortLocalOpt extends Quicksort {
                 }
                 return null;
             }
-        };
+        });
     }
     
     @Override

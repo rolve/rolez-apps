@@ -19,6 +19,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import rolez.lang.GuardedArray;
+import rolez.lang.Task;
 import rolez.lang.TaskSystem;
 
 @BenchmarkMode(SingleShotTime)
@@ -31,12 +32,12 @@ public class KMeansBenchmark {
     @Param({"10000"})
     int n;
     
-    @Param({"", "LocalOpt", "GlobalOpt", "Java"})
+    @Param({"LocalOpt", "GlobalOpt", "Java"})
     String implementation;
     
     int clusters;
     
-    @Param({"1", "2", "4", "8", "16", "32", "64", "128", "256"})
+    @Param({"1", "2", "4", "8", "16", "32"})
     int tasks;
     
     KMeans kMeans;
@@ -51,11 +52,11 @@ public class KMeansBenchmark {
     
     @Benchmark
     public Object kMeans() {
-        return TaskSystem.getDefault().run(new Callable<Object>() {
+        return TaskSystem.getDefault().run(new Task<>(new Callable<Object>() {
             public Object call() {
                 return kMeans.kMeans(data);
             }
-        });
+        }));
     }
     
     public static void main(String[] args) throws RunnerException {

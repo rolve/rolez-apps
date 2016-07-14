@@ -30,7 +30,7 @@ class KMeans {
         return dataSet;
     }
     
-    task pure kMeans(dataSet: readwrite Array[readonly Array[double]]): readwrite Array[readonly Array[double]] {
+    def pure kMeans(dataSet: readwrite Array[readonly Array[double]]): readwrite Array[readonly Array[double]] {
         /* Initialization */
         val random = new Random;
         val centroids = new Array[readonly Array[double]](this.clusters);

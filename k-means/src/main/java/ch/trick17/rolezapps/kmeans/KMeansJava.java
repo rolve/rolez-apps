@@ -27,28 +27,27 @@ public class KMeansJava extends KMeans {
         double[][] centroids = new double[clusters][];
         for(int i = 0; i < clusters; i += 1)
             centroids[i] = newRandomVectorJava(random);
-            
+        
         int[] assignments = new int[n];
         SliceRange[] ranges = ContiguousPartitioner.INSTANCE.partition(dataSet.range,
                 numTasks).data;
-                
+        
         boolean changed = true;
         while(changed) {
             List<Task<Boolean>> tasks = new ArrayList<Task<Boolean>>(numTasks);
             for(int i = 0; i < numTasks; i += 1) {
-                Callable<Boolean> task = $assignTask(dataSet.data, centroids, assignments,
-                        ranges[i]);
+                Task<Boolean> task = $assignTask(dataSet.data, centroids, assignments, ranges[i]);
                 tasks.add(TaskSystem.getDefault().start(task));
             }
             
             changed = false;
             for(Task<Boolean> element : tasks)
                 changed |= element.get();
-                
+            
             double[][] newCentroids = new double[clusters][];
             for(int i = 0; i < clusters; i += 1)
                 newCentroids[i] = new double[dim];
-                
+            
             int[] counts = new int[clusters];
             for(int i = 0; i < n; i += 1) {
                 double[] vector = dataSet.data[i].data;
@@ -74,9 +73,9 @@ public class KMeansJava extends KMeans {
         return wrap(wrappedCentroids);
     }
     
-    public Callable<Boolean> $assignTask(final GuardedArray<double[]>[] dataSet,
+    public Task<Boolean> $assignTask(final GuardedArray<double[]>[] dataSet,
             final double[][] centroids, final int[] assignments, final SliceRange range) {
-        return new Callable<Boolean>() {
+        return new Task<>(new Callable<Boolean>() {
             public Boolean call() {
                 boolean changed = false;
                 for(int i = range.begin; i < range.end; i += range.step) {
@@ -96,7 +95,7 @@ public class KMeansJava extends KMeans {
                 }
                 return changed;
             }
-        };
+        });
     }
     
     public double distance2(double[] data, final double[] centroids) {

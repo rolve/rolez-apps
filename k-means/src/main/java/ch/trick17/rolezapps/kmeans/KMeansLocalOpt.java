@@ -30,7 +30,7 @@ public class KMeansLocalOpt extends KMeans {
                 new GuardedArray[clusters]);
         for(int i = 0; i < clusters; i += 1)
             centroids.data[i] = newRandomVector(random);
-            
+        
         GuardedArray<int[]> assignments = new GuardedArray<int[]>(new int[dataSet.data.length]);
         
         boolean changed = true;
@@ -39,22 +39,22 @@ public class KMeansLocalOpt extends KMeans {
                     .partition(ContiguousPartitioner.INSTANCE, numTasks);
             GuardedArray<GuardedSlice<int[]>[]> assignParts = assignments
                     .partition(ContiguousPartitioner.INSTANCE, numTasks);
-                    
+            
             GuardedArray<Task<Boolean>[]> tasks = new GuardedArray<Task<Boolean>[]>(
                     new Task[numTasks]);
             for(int i = 0; i < tasks.data.length; i += 1)
                 tasks.data[i] = TaskSystem.getDefault().start($assignTask(dataParts.data[i],
                         centroids, assignParts.data[i]));
-                        
+            
             changed = false;
             for(Task<Boolean> element : tasks.data)
                 changed |= element.get();
-                
+            
             GuardedArray<GuardedArray<double[]>[]> newCentroids = new GuardedArray<GuardedArray<double[]>[]>(
                     new GuardedArray[clusters]);
             for(int i = 0; i < newCentroids.data.length; i += 1)
                 newCentroids.data[i] = new GuardedArray<double[]>(new double[dim]);
-                
+            
             GuardedArray<int[]> counts = new GuardedArray<int[]>(new int[clusters]);
             guardReadOnly(dataSet);
             guardReadOnly(assignments);
@@ -80,13 +80,10 @@ public class KMeansLocalOpt extends KMeans {
     }
     
     @Override
-    public Callable<Boolean> $assignTask(final GuardedSlice<GuardedArray<double[]>[]> dataSet,
+    public Task<Boolean> $assignTask(final GuardedSlice<GuardedArray<double[]>[]> dataSet,
             final GuardedArray<GuardedArray<double[]>[]> centroids,
             final GuardedSlice<int[]> assignments) {
-        dataSet.share();
-        centroids.share();
-        assignments.pass();
-        return new Callable<Boolean>() {
+        Task<Boolean> task = new Task<>(new Callable<Boolean>() {
             public Boolean call() {
                 assignments.registerNewOwner();
                 try {
@@ -114,7 +111,11 @@ public class KMeansLocalOpt extends KMeans {
                     assignments.releasePassed();
                 }
             }
-        };
+        });
+        dataSet.share(task);
+        centroids.share(task);
+        assignments.pass();
+        return task;
     }
     
     @Override
