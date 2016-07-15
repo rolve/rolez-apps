@@ -85,7 +85,7 @@ public class KMeansLocalOpt extends KMeans {
             final GuardedSlice<int[]> assignments) {
         Task<Boolean> task = new Task<>(new Callable<Boolean>() {
             public Boolean call() {
-                assignments.registerNewOwner();
+                assignments.completePass();
                 try {
                     boolean changed = false;
                     for(int i = dataSet.range.begin; i < dataSet.range.end; i += dataSet.range.step) {
@@ -114,7 +114,7 @@ public class KMeansLocalOpt extends KMeans {
         });
         dataSet.share(task);
         centroids.share(task);
-        assignments.pass();
+        assignments.pass(task);
         return task;
     }
     
