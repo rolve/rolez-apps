@@ -32,12 +32,12 @@ public class KMeansBenchmark {
     @Param({"10000"})
     int n;
     
-    @Param({"LocalOpt", "GlobalOpt", "Java"})
+    @Param({"", "LocalOpt", "GlobalOpt", "Java"})
     String implementation;
     
     int clusters;
     
-    @Param({"1", "2", "4", "8", "16", "32"})
+    @Param({"1", "2", "4", "8", "16", "32", "64", "128", "256"})
     int tasks;
     
     KMeans kMeans;
