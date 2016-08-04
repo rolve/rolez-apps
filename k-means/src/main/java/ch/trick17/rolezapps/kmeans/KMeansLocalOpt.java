@@ -24,7 +24,7 @@ public class KMeansLocalOpt extends KMeans {
     
     @Override
     public GuardedArray<GuardedArray<double[]>[]> kMeans(
-            GuardedArray<GuardedArray<double[]>[]> dataSet) {
+            GuardedArray<GuardedArray<double[]>[]> dataSet, int maxIterations) {
         Random random = new Random();
         GuardedArray<GuardedArray<double[]>[]> centroids = new GuardedArray<GuardedArray<double[]>[]>(
                 new GuardedArray[clusters]);
@@ -33,8 +33,9 @@ public class KMeansLocalOpt extends KMeans {
         
         GuardedArray<int[]> assignments = new GuardedArray<int[]>(new int[dataSet.data.length]);
         
+        int iterations = 0;
         boolean changed = true;
-        while(changed) {
+        while(changed && iterations < maxIterations) {
             GuardedArray<GuardedSlice<GuardedArray<double[]>[]>[]> dataParts = dataSet
                     .partition(ContiguousPartitioner.INSTANCE, numTasks);
             GuardedArray<GuardedSlice<int[]>[]> assignParts = assignments
@@ -75,6 +76,7 @@ public class KMeansLocalOpt extends KMeans {
                     centroid.data[d] /= count;
                 centroids.data[i] = centroid;
             }
+            iterations++;
         }
         return centroids;
     }

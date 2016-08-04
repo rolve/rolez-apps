@@ -32,12 +32,15 @@ public class KMeansBenchmark {
     @Param({"10000"})
     int n;
     
-    @Param({"", "LocalOpt", "GlobalOpt", "Java"})
+    @Param({"50"})
+    int maxIters;
+    
+    @Param({"LocalOpt", "GlobalOpt", "Java"})
     String implementation;
     
     int clusters;
     
-    @Param({"1", "2", "4", "8", "16", "32", "64", "128", "256"})
+    @Param({"1", "2", "4", "8"})
     int tasks;
     
     KMeans kMeans;
@@ -54,7 +57,7 @@ public class KMeansBenchmark {
     public Object kMeans() {
         return TaskSystem.getDefault().run(new Task<>(new Callable<Object>() {
             public Object call() {
-                return kMeans.kMeans(data);
+                return kMeans.kMeans(data, maxIters);
             }
         }));
     }

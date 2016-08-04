@@ -21,7 +21,7 @@ public class KMeansJava extends KMeans {
     
     @Override
     public GuardedArray<GuardedArray<double[]>[]> kMeans(
-            GuardedArray<GuardedArray<double[]>[]> dataSet) {
+            GuardedArray<GuardedArray<double[]>[]> dataSet, int maxIterations) {
         int n = dataSet.data.length;
         Random random = new Random();
         double[][] centroids = new double[clusters][];
@@ -32,8 +32,9 @@ public class KMeansJava extends KMeans {
         SliceRange[] ranges = ContiguousPartitioner.INSTANCE.partition(dataSet.range,
                 numTasks).data;
         
+        int iterations = 0;
         boolean changed = true;
-        while(changed) {
+        while(changed && iterations < maxIterations) {
             List<Task<Boolean>> tasks = new ArrayList<Task<Boolean>>(numTasks);
             for(int i = 0; i < numTasks; i += 1) {
                 Task<Boolean> task = $assignTask(dataSet.data, centroids, assignments, ranges[i]);
@@ -65,6 +66,7 @@ public class KMeansJava extends KMeans {
                     centroid[d] /= count;
                 centroids[i] = centroid;
             }
+            iterations++;
         }
         
         GuardedArray<double[]>[] wrappedCentroids = new GuardedArray[clusters];
