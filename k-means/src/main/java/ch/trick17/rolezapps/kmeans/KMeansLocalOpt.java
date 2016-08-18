@@ -87,7 +87,6 @@ public class KMeansLocalOpt extends KMeans {
         Task<Boolean> task = new Task<Boolean>() {
             @Override
             protected Boolean runRolez() {
-                assignments.completePass();
                 try {
                     boolean changed = false;
                     for(int i = dataSet.range.begin; i < dataSet.range.end; i += dataSet.range.step) {
@@ -108,15 +107,11 @@ public class KMeansLocalOpt extends KMeans {
                     }
                     return changed;
                 } finally {
-                    dataSet.releaseShared();
-                    centroids.releaseShared();
-                    assignments.releasePassed();
+                    taskFinishTransitions();
                 }
             }
         };
-        dataSet.share(task);
-        centroids.share(task);
-        assignments.pass(task);
+        task.taskStartTransitions(new Object[]{assignments}, new Object[]{dataSet, centroids});
         return task;
     }
     

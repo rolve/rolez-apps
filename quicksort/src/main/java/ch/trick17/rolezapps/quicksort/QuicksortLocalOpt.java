@@ -54,7 +54,6 @@ public class QuicksortLocalOpt extends Quicksort {
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void runRolez() {
-                s.completePass();
                 try {
                     int pivot = pivot(s, begin, end);
                     int left = begin;
@@ -91,12 +90,12 @@ public class QuicksortLocalOpt extends Quicksort {
                             doSort(s, left, end, level + 1);
                     }
                 } finally {
-                    s.releasePassed();
+                    taskFinishTransitions();
                 }
                 return null;
             }
         };
-        s.pass(task);
+        task.taskStartTransitions(new Object[]{s}, new Object[]{});
         return task;
     }
     
