@@ -4,9 +4,6 @@ import static org.openjdk.jmh.annotations.Level.Trial;
 import static org.openjdk.jmh.annotations.Mode.Throughput;
 import static org.openjdk.jmh.annotations.Scope.Benchmark;
 
-import java.lang.reflect.Field;
-import java.util.Deque;
-
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -31,22 +28,15 @@ public class TaskThreadBenchmark {
     final ThreadLocal<Object> threadLocal = new ThreadLocal<>();
     
     @Setup(Trial)
-    public void pushTask() throws NoSuchFieldException, IllegalAccessException {
-        getStack().push(new Task<Object>(null));
+    public void setup() {
+        Task.registerNewTask();
         threadLocal.set(new Object());
     }
     
     @TearDown(Trial)
-    public void popTask() throws NoSuchFieldException, IllegalAccessException {
-        getStack().pop();
+    public void tearDown() {
+        Task.unregisterCurrentTask();
         threadLocal.set(null);
-    }
-    
-    @SuppressWarnings("unchecked")
-    Deque<Task<?>> getStack() throws NoSuchFieldException, IllegalAccessException {
-        Field stackField = Task.class.getDeclaredField("localStack");
-        stackField.setAccessible(true);
-        return ((ThreadLocal<Deque<Task<?>>>) stackField.get(null)).get();
     }
     
     @Benchmark
