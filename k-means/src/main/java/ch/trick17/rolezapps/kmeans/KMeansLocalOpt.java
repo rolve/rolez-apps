@@ -3,7 +3,6 @@ package ch.trick17.rolezapps.kmeans;
 import static rolez.lang.GuardedArray.wrap;
 
 import java.util.Random;
-import java.util.concurrent.Callable;
 
 import rolez.lang.ContiguousPartitioner;
 import rolez.lang.GuardedArray;
@@ -85,8 +84,9 @@ public class KMeansLocalOpt extends KMeans {
     public Task<Boolean> $assignTask(final GuardedSlice<GuardedArray<double[]>[]> dataSet,
             final GuardedArray<GuardedArray<double[]>[]> centroids,
             final GuardedSlice<int[]> assignments) {
-        Task<Boolean> task = new Task<>(new Callable<Boolean>() {
-            public Boolean call() {
+        Task<Boolean> task = new Task<Boolean>() {
+            @Override
+            protected Boolean runRolez() {
                 assignments.completePass();
                 try {
                     boolean changed = false;
@@ -113,7 +113,7 @@ public class KMeansLocalOpt extends KMeans {
                     assignments.releasePassed();
                 }
             }
-        });
+        };
         dataSet.share(task);
         centroids.share(task);
         assignments.pass(task);

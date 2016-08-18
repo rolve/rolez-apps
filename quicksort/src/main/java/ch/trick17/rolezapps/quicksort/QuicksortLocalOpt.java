@@ -1,7 +1,5 @@
 package ch.trick17.rolezapps.quicksort;
 
-import java.util.concurrent.Callable;
-
 import rolez.lang.GuardedSlice;
 import rolez.lang.Task;
 import rolez.lang.TaskSystem;
@@ -53,8 +51,9 @@ public class QuicksortLocalOpt extends Quicksort {
     @Override
     public Task<Void> $doSortTask(final GuardedSlice<int[]> s, final int begin, final int end,
             final int level) {
-        Task<Void> task = new Task<>(new Callable<Void>() {
-            public Void call() {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void runRolez() {
                 s.completePass();
                 try {
                     int pivot = pivot(s, begin, end);
@@ -96,7 +95,7 @@ public class QuicksortLocalOpt extends Quicksort {
                 }
                 return null;
             }
-        });
+        };
         s.pass(task);
         return task;
     }

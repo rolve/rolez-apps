@@ -5,7 +5,6 @@ import static rolez.lang.GuardedArray.wrap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Callable;
 
 import rolez.lang.ContiguousPartitioner;
 import rolez.lang.GuardedArray;
@@ -77,8 +76,9 @@ public class KMeansJava extends KMeans {
     
     public Task<Boolean> $assignTask(final GuardedArray<double[]>[] dataSet,
             final double[][] centroids, final int[] assignments, final SliceRange range) {
-        return new Task<>(new Callable<Boolean>() {
-            public Boolean call() {
+        return new Task<Boolean>() {
+            @Override
+            protected Boolean runRolez() {
                 boolean changed = false;
                 for(int i = range.begin; i < range.end; i += range.step) {
                     double min = Double.POSITIVE_INFINITY;
@@ -97,7 +97,7 @@ public class KMeansJava extends KMeans {
                 }
                 return changed;
             }
-        });
+        };
     }
     
     public double distance2(double[] data, final double[] centroids) {
