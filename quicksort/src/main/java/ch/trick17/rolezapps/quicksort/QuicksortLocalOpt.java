@@ -51,7 +51,7 @@ public class QuicksortLocalOpt extends Quicksort {
     @Override
     public Task<Void> $doSortTask(final GuardedSlice<int[]> s, final int begin, final int end,
             final int level) {
-        Task<Void> task = new Task<Void>() {
+        return new Task<Void>(new Object[]{s}, new Object[]{}) {
             @Override
             protected Void runRolez() {
                 int pivot = pivot(s, begin, end);
@@ -91,8 +91,6 @@ public class QuicksortLocalOpt extends Quicksort {
                 return null;
             }
         };
-        task.taskStartTransitions(new Object[]{s}, new Object[]{});
-        return task;
     }
     
     @Override

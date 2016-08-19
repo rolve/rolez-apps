@@ -84,7 +84,7 @@ public class KMeansLocalOpt extends KMeans {
     public Task<Boolean> $assignTask(final GuardedSlice<GuardedArray<double[]>[]> dataSet,
             final GuardedArray<GuardedArray<double[]>[]> centroids,
             final GuardedSlice<int[]> assignments) {
-        Task<Boolean> task = new Task<Boolean>() {
+        return new Task<Boolean>(new Object[]{assignments}, new Object[]{dataSet, centroids}) {
             @Override
             protected Boolean runRolez() {
                 boolean changed = false;
@@ -107,8 +107,6 @@ public class KMeansLocalOpt extends KMeans {
                 return changed;
             }
         };
-        task.taskStartTransitions(new Object[]{assignments}, new Object[]{dataSet, centroids});
-        return task;
     }
     
     @Override
