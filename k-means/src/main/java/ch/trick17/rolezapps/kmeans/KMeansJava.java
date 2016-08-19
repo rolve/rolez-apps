@@ -5,11 +5,13 @@ import static rolez.lang.GuardedArray.wrap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 import rolez.lang.ContiguousPartitioner;
 import rolez.lang.GuardedArray;
 import rolez.lang.SliceRange;
-import rolez.lang.Task;
 import rolez.lang.TaskSystem;
 
 public class KMeansJava extends KMeans {
@@ -34,15 +36,21 @@ public class KMeansJava extends KMeans {
         int iterations = 0;
         boolean changed = true;
         while(changed && iterations < maxIterations) {
-            List<Task<Boolean>> tasks = new ArrayList<Task<Boolean>>(numTasks);
+            List<FutureTask<Boolean>> tasks = new ArrayList<FutureTask<Boolean>>(numTasks);
             for(int i = 0; i < numTasks; i += 1) {
-                Task<Boolean> task = $assignTask(dataSet.data, centroids, assignments, ranges[i]);
-                tasks.add(TaskSystem.getDefault().start(task));
+                FutureTask<Boolean> task = $assignTask(dataSet.data, centroids, assignments,
+                        ranges[i]);
+                tasks.add(task);
+                new Thread(task).start();
             }
             
             changed = false;
-            for(Task<Boolean> element : tasks)
-                changed |= element.get();
+            for(FutureTask<Boolean> element : tasks)
+                try {
+                    changed |= element.get();
+                } catch(InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
             
             double[][] newCentroids = new double[clusters][];
             for(int i = 0; i < clusters; i += 1)
@@ -74,11 +82,10 @@ public class KMeansJava extends KMeans {
         return wrap(wrappedCentroids);
     }
     
-    public Task<Boolean> $assignTask(final GuardedArray<double[]>[] dataSet,
+    public FutureTask<Boolean> $assignTask(final GuardedArray<double[]>[] dataSet,
             final double[][] centroids, final int[] assignments, final SliceRange range) {
-        return new Task<Boolean>() {
-            @Override
-            protected Boolean runRolez() {
+        return new FutureTask<>(new Callable<Boolean>() {
+            public Boolean call() {
                 boolean changed = false;
                 for(int i = range.begin; i < range.end; i += range.step) {
                     double min = Double.POSITIVE_INFINITY;
@@ -97,7 +104,7 @@ public class KMeansJava extends KMeans {
                 }
                 return changed;
             }
-        };
+        });
     }
     
     public double distance2(double[] data, final double[] centroids) {
