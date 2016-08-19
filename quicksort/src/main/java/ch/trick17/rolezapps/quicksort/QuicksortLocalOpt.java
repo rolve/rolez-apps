@@ -54,43 +54,39 @@ public class QuicksortLocalOpt extends Quicksort {
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void runRolez() {
-                try {
-                    int pivot = pivot(s, begin, end);
-                    int left = begin;
-                    int right = end - 1;
-                    guardReadWrite(s);
-                    while(left <= right) {
-                        while(s.getInt(left) < pivot)
-                            left += 1;
-                        while(s.getInt(right) > pivot)
-                            right -= 1;
-                        if(left <= right) {
-                            int temp = s.getInt(left);
-                            s.setInt(left, s.getInt(right));
-                            s.setInt(right, temp);
-                            left += 1;
-                            right -= 1;
-                        }
+                int pivot = pivot(s, begin, end);
+                int left = begin;
+                int right = end - 1;
+                guardReadWrite(s);
+                while(left <= right) {
+                    while(s.getInt(left) < pivot)
+                        left += 1;
+                    while(s.getInt(right) > pivot)
+                        right -= 1;
+                    if(left <= right) {
+                        int temp = s.getInt(left);
+                        s.setInt(left, s.getInt(right));
+                        s.setInt(right, temp);
+                        left += 1;
+                        right -= 1;
                     }
-                    boolean sortLeft = begin < right;
-                    boolean sortRight = left < (end - 1);
-                    if(level < maxLevel) {
-                        if(sortLeft)
-                            TaskSystem.getDefault().start($doSortTask(s.slice(begin, right + 1, 1),
-                                    begin, right + 1, level + 1));
-                        
-                        if(sortRight)
-                            doSort(s.slice(left, end, 1), left, end, level + 1);
-                    }
-                    else {
-                        if(sortLeft)
-                            doSort(s, begin, right + 1, level + 1);
-                        
-                        if(sortRight)
-                            doSort(s, left, end, level + 1);
-                    }
-                } finally {
-                    taskFinishTransitions();
+                }
+                boolean sortLeft = begin < right;
+                boolean sortRight = left < (end - 1);
+                if(level < maxLevel) {
+                    if(sortLeft)
+                        TaskSystem.getDefault().start($doSortTask(s.slice(begin, right + 1, 1),
+                                begin, right + 1, level + 1));
+                    
+                    if(sortRight)
+                        doSort(s.slice(left, end, 1), left, end, level + 1);
+                }
+                else {
+                    if(sortLeft)
+                        doSort(s, begin, right + 1, level + 1);
+                    
+                    if(sortRight)
+                        doSort(s, left, end, level + 1);
                 }
                 return null;
             }

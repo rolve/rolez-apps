@@ -87,28 +87,24 @@ public class KMeansLocalOpt extends KMeans {
         Task<Boolean> task = new Task<Boolean>() {
             @Override
             protected Boolean runRolez() {
-                try {
-                    boolean changed = false;
-                    for(int i = dataSet.range.begin; i < dataSet.range.end; i += dataSet.range.step) {
-                        double min = Double.POSITIVE_INFINITY;
-                        int minIndex = -1;
-                        for(int c = 0; c < centroids.data.length; c += 1) {
-                            double distance2 = distance2(dataSet.<GuardedArray<double[]>> get(i),
-                                    centroids.data[c]);
-                            if(distance2 < min) {
-                                min = distance2;
-                                minIndex = c;
-                            }
-                        }
-                        if(minIndex != assignments.getInt(i)) {
-                            changed = true;
-                            assignments.setInt(i, minIndex);
+                boolean changed = false;
+                for(int i = dataSet.range.begin; i < dataSet.range.end; i += dataSet.range.step) {
+                    double min = Double.POSITIVE_INFINITY;
+                    int minIndex = -1;
+                    for(int c = 0; c < centroids.data.length; c += 1) {
+                        double distance2 = distance2(dataSet.<GuardedArray<double[]>> get(i),
+                                centroids.data[c]);
+                        if(distance2 < min) {
+                            min = distance2;
+                            minIndex = c;
                         }
                     }
-                    return changed;
-                } finally {
-                    taskFinishTransitions();
+                    if(minIndex != assignments.getInt(i)) {
+                        changed = true;
+                        assignments.setInt(i, minIndex);
+                    }
                 }
+                return changed;
             }
         };
         task.taskStartTransitions(new Object[]{assignments}, new Object[]{dataSet, centroids});
