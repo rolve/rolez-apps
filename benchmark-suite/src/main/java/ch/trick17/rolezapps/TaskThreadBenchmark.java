@@ -29,13 +29,13 @@ public class TaskThreadBenchmark {
     
     @Setup(Trial)
     public void setup() {
-        Task.registerNewTask();
+        Task.registerNewRootTask();
         threadLocal.set(new Object());
     }
     
     @TearDown(Trial)
     public void tearDown() {
-        Task.unregisterCurrentTask();
+        Task.unregisterRootTask();
         threadLocal.set(null);
     }
     

@@ -41,7 +41,7 @@ public class QuicksortBenchmark {
     
     @Setup(Level.Iteration)
     public void setup() {
-        Task.registerNewTask();
+        Task.registerNewRootTask();
         int maxLevel = MathExtra.INSTANCE.log2(tasks);
         quicksort = instantiateBenchmark(Quicksort.class, implementation, maxLevel);
         data = quicksort.shuffledInts(n);
@@ -54,7 +54,7 @@ public class QuicksortBenchmark {
     
     @TearDown(Level.Iteration)
     public void tearDown() {
-        Task.unregisterCurrentTask();
+        Task.unregisterRootTask();
     }
     
     public static void main(String[] args) throws RunnerException {

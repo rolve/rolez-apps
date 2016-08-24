@@ -34,7 +34,7 @@ public class KMeansBenchmark {
     int maxIters;
     
     @Param({"LocalOpt", "GlobalOpt", "Java"})
-    String implementation;
+    String impl;
     
     int clusters;
     
@@ -46,9 +46,9 @@ public class KMeansBenchmark {
     
     @Setup(Level.Iteration)
     public void setup() {
-        Task.registerNewTask();
+        Task.registerNewRootTask();
         clusters = n / 100;
-        kMeans = instantiateBenchmark(KMeans.class, implementation, dim, clusters, tasks);
+        kMeans = instantiateBenchmark(KMeans.class, impl, dim, clusters, tasks);
         data = kMeans.createDataSet(n);
     }
     
@@ -59,7 +59,7 @@ public class KMeansBenchmark {
     
     @TearDown(Level.Iteration)
     public void tearDown() {
-        Task.unregisterCurrentTask();
+        Task.unregisterRootTask();
     }
     
     public static void main(String[] args) throws RunnerException {
