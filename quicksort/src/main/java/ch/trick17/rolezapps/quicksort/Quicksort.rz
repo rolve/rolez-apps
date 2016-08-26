@@ -19,7 +19,7 @@ class Quicksort {
     
     task pure main(args: readonly Array[pure String]): {
         val n = the Int.parseInt(args.get(0));
-        val iterations = 10;
+        val iterations = 20;
         val watch = new StopWatch;
         
         val arrays = new Array[readwrite Array[int]](iterations);

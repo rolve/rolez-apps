@@ -30,7 +30,7 @@ public class QuicksortBenchmark {
     int n;
     
     @Param({"LocalOpt", "Java"})
-    String implementation;
+    String impl;
     
     @Param({"1", "2", "4", "16", "64", "256"})
     int tasks;
@@ -42,7 +42,7 @@ public class QuicksortBenchmark {
     public void setup() {
         Task.registerNewRootTask();
         int maxLevel = MathExtra.INSTANCE.log2(tasks);
-        quicksort = instantiateBenchmark(Quicksort.class, implementation, maxLevel);
+        quicksort = instantiateBenchmark(Quicksort.class, impl, maxLevel);
         data = quicksort.shuffledInts(n);
     }
     
