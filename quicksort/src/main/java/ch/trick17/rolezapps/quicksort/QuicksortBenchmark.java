@@ -29,8 +29,7 @@ public class QuicksortBenchmark {
     @Param({"2000000"})
     int n;
     
-    @Param({"", "LocalOpt", "Java", "JavaPerfectPivot", "JavaPerfectPivotBranchOpt",
-            "JavaSorted", "JavaDesorted"})
+    @Param({"LocalOpt", "Java"})
     String implementation;
     
     @Param({"1", "2", "4", "16", "64", "256"})
