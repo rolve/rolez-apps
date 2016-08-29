@@ -21,8 +21,7 @@ public class KMeansJava extends KMeans {
     }
     
     @Override
-    public GuardedArray<GuardedArray<double[]>[]> kMeans(
-            GuardedArray<GuardedArray<double[]>[]> dataSet, int maxIterations) {
+    public GuardedArray<double[][]> kMeans(GuardedArray<double[][]> dataSet, int maxIterations) {
         int n = dataSet.data.length;
         Random random = new Random();
         double[][] centroids = new double[clusters][];
@@ -58,7 +57,7 @@ public class KMeansJava extends KMeans {
             
             int[] counts = new int[clusters];
             for(int i = 0; i < n; i += 1) {
-                double[] vector = dataSet.data[i].data;
+                double[] vector = dataSet.data[i];
                 int centroidIndex = assignments[i];
                 double[] centroid = newCentroids[centroidIndex];
                 for(int d = 0; d < dim; d += 1)
@@ -82,7 +81,7 @@ public class KMeansJava extends KMeans {
         return wrap(wrappedCentroids);
     }
     
-    public FutureTask<Boolean> $assignTask(final GuardedArray<double[]>[] dataSet,
+    public FutureTask<Boolean> $assignTask(final double[][] dataSet,
             final double[][] centroids, final int[] assignments, final SliceRange range) {
         return new FutureTask<>(new Callable<Boolean>() {
             public Boolean call() {
@@ -91,7 +90,7 @@ public class KMeansJava extends KMeans {
                     double min = Double.POSITIVE_INFINITY;
                     int minIndex = -1;
                     for(int c = 0; c < clusters; c += 1) {
-                        double distance2 = distance2(dataSet[i].data, centroids[c]);
+                        double distance2 = distance2(dataSet[i], centroids[c]);
                         if(distance2 < min) {
                             min = distance2;
                             minIndex = c;
@@ -107,6 +106,7 @@ public class KMeansJava extends KMeans {
         });
     }
     
+    @Override
     public double distance2(double[] data, final double[] centroids) {
         double sum = 0.0;
         for(int d = 0; d < dim; d += 1) {

@@ -33,7 +33,7 @@ public class KMeansBenchmark {
     @Param({"50"})
     int maxIters;
     
-    @Param({"LocalOpt", "GlobalOpt", "Java"})
+    @Param({"", "LocalOpt", "Java"})
     String impl;
     
     int clusters;
@@ -42,7 +42,7 @@ public class KMeansBenchmark {
     int tasks;
     
     KMeans kMeans;
-    GuardedArray<GuardedArray<double[]>[]> data;
+    GuardedArray<double[][]> data;
     
     @Setup(Level.Iteration)
     public void setup() {

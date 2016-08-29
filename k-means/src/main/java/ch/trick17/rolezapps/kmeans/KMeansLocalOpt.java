@@ -7,6 +7,7 @@ import java.util.Random;
 import rolez.lang.ContiguousPartitioner;
 import rolez.lang.GuardedArray;
 import rolez.lang.GuardedSlice;
+import rolez.lang.GuardedVectorBuilder;
 import rolez.lang.Task;
 import rolez.lang.TaskSystem;
 
@@ -22,11 +23,9 @@ public class KMeansLocalOpt extends KMeans {
     }
     
     @Override
-    public GuardedArray<GuardedArray<double[]>[]> kMeans(
-            GuardedArray<GuardedArray<double[]>[]> dataSet, int maxIterations) {
+    public GuardedArray<double[][]> kMeans(GuardedArray<double[][]> dataSet, int maxIterations) {
         Random random = new Random();
-        GuardedArray<GuardedArray<double[]>[]> centroids = new GuardedArray<GuardedArray<double[]>[]>(
-                new GuardedArray[clusters]);
+        GuardedArray<double[][]> centroids = new GuardedArray<double[][]>(new double[clusters][]);
         for(int i = 0; i < clusters; i += 1)
             centroids.data[i] = newRandomVector(random);
         
@@ -35,7 +34,7 @@ public class KMeansLocalOpt extends KMeans {
         int iterations = 0;
         boolean changed = true;
         while(changed && iterations < maxIterations) {
-            GuardedArray<GuardedSlice<GuardedArray<double[]>[]>[]> dataParts = dataSet
+            GuardedArray<GuardedSlice<double[][]>[]> dataParts = dataSet
                     .partition(ContiguousPartitioner.INSTANCE, numTasks);
             GuardedArray<GuardedSlice<int[]>[]> assignParts = assignments
                     .partition(ContiguousPartitioner.INSTANCE, numTasks);
@@ -50,30 +49,30 @@ public class KMeansLocalOpt extends KMeans {
             for(Task<Boolean> element : tasks.data)
                 changed |= element.get();
             
-            GuardedArray<GuardedArray<double[]>[]> newCentroids = new GuardedArray<GuardedArray<double[]>[]>(
-                    new GuardedArray[clusters]);
+            GuardedArray<GuardedVectorBuilder<double[]>[]> newCentroids = new GuardedArray<GuardedVectorBuilder<double[]>[]>(
+                    new GuardedVectorBuilder[clusters]);
             for(int i = 0; i < newCentroids.data.length; i += 1)
-                newCentroids.data[i] = new GuardedArray<double[]>(new double[dim]);
+                newCentroids.data[i] = new GuardedVectorBuilder<double[]>(new double[dim]);
             
             GuardedArray<int[]> counts = new GuardedArray<int[]>(new int[clusters]);
             guardReadOnly(dataSet);
             guardReadOnly(assignments);
             for(int i = 0; i < dataSet.data.length; i += 1) {
-                GuardedArray<double[]> vector = dataSet.data[i];
+                double[] vector = dataSet.data[i];
                 int centroidIndex = assignments.data[i];
-                GuardedArray<double[]> centroid = newCentroids.data[centroidIndex];
+                GuardedVectorBuilder<double[]> centroid = newCentroids.data[centroidIndex];
                 for(int d = 0; d < dim; d += 1)
-                    centroid.data[d] = centroid.data[d] + vector.data[d];
+                    centroid.data[d] = centroid.data[d] + vector[d];
                 counts.data[centroidIndex]++;
             }
             
             guardReadWrite(centroids);
             for(int i = 0; i < centroids.data.length; i += 1) {
-                GuardedArray<double[]> centroid = newCentroids.data[i];
+                GuardedVectorBuilder<double[]> centroid = newCentroids.data[i];
                 int count = counts.data[i];
                 for(int d = 0; d < dim; d += 1)
                     centroid.data[d] /= count;
-                centroids.data[i] = centroid;
+                centroids.data[i] = centroid.build();
             }
             iterations++;
         }
@@ -81,8 +80,8 @@ public class KMeansLocalOpt extends KMeans {
     }
     
     @Override
-    public Task<Boolean> $assignTask(final GuardedSlice<GuardedArray<double[]>[]> dataSet,
-            final GuardedArray<GuardedArray<double[]>[]> centroids,
+    public Task<Boolean> $assignTask(final GuardedSlice<double[][]> dataSet,
+            final GuardedArray<double[][]> centroids,
             final GuardedSlice<int[]> assignments) {
         return new Task<Boolean>(new Object[]{assignments}, new Object[]{dataSet, centroids}) {
             @Override
@@ -92,8 +91,7 @@ public class KMeansLocalOpt extends KMeans {
                     double min = Double.POSITIVE_INFINITY;
                     int minIndex = -1;
                     for(int c = 0; c < centroids.data.length; c += 1) {
-                        double distance2 = distance2(dataSet.<GuardedArray<double[]>> get(i),
-                                centroids.data[c]);
+                        double distance2 = distance2(dataSet.<double[]> get(i), centroids.data[c]);
                         if(distance2 < min) {
                             min = distance2;
                             minIndex = c;
@@ -110,23 +108,11 @@ public class KMeansLocalOpt extends KMeans {
     }
     
     @Override
-    public double distance2(GuardedArray<double[]> v1, final GuardedArray<double[]> v2) {
-        double sum = 0.0;
-        guardReadOnly(v1);
-        guardReadOnly(v2);
-        for(int d = 0; d < dim; d += 1) {
-            final double diff = v1.data[d] - v2.data[d];
-            sum += diff * diff;
-        }
-        return sum;
-    }
-    
-    @Override
-    public GuardedArray<double[]> newRandomVector(Random random) {
-        GuardedArray<double[]> vec = new GuardedArray<double[]>(new double[dim]);
+    public double[] newRandomVector(Random random) {
+        final GuardedVectorBuilder<double[]> vec = new GuardedVectorBuilder<>(new double[this.dim]);
         for(int d = 0; d < dim; d += 1)
-            vec.data[d] = random.nextDouble();
-        return vec;
+            vec.setDouble(d, random.nextDouble());
+        return vec.build();
     }
     
     public static void main(final String[] args) {

@@ -22,19 +22,19 @@ class KMeans {
         this.numTasks = numTasks;
     }
     
-    def pure createDataSet(n: int): readwrite Array[readonly Array[double]] {
+    def pure createDataSet(n: int): readwrite Array[readonly Vector[double]] {
         val random = new Random;
-        val dataSet = new Array[readonly Array[double]](n);
+        val dataSet = new Array[readonly Vector[double]](n);
         for(var i = 0; i < n; i += 1)
             dataSet.set(i, this.newRandomVector(random));
         return dataSet;
     }
     
-    def pure kMeans(dataSet: readwrite Array[readonly Array[double]], maxIterations: int):
-            readwrite Array[readonly Array[double]] {
+    def pure kMeans(dataSet: readwrite Array[readonly Vector[double]], maxIterations: int):
+            readwrite Array[readonly Vector[double]] {
         /* Initialization */
         val random = new Random;
-        val centroids = new Array[readonly Array[double]](this.clusters);
+        val centroids = new Array[readonly Vector[double]](this.clusters);
         for(var i = 0; i < this.clusters; i += 1)
             centroids.set(i, this.newRandomVector(random));
         
@@ -46,7 +46,7 @@ class KMeans {
         while(changed && iterations < maxIterations) {
             /* Assignment step */
             // TODO: Why are type declarations required?
-            val dataParts: readonly Array[readwrite Slice[readonly Array[double]]] = dataSet.partition(the ContiguousPartitioner, this.numTasks);
+            val dataParts: readonly Array[readwrite Slice[readonly Vector[double]]] = dataSet.partition(the ContiguousPartitioner, this.numTasks);
             val assignParts: readonly Array[readwrite Slice[int]] = assignments.partition(the ContiguousPartitioner, this.numTasks);
             val tasks = new Array[pure Task[boolean]](this.numTasks);
             
@@ -58,9 +58,9 @@ class KMeans {
                 changed |= tasks.get(i).get;
             
             /* Update step */
-            val newCentroids = new Array[readwrite Array[double]](this.clusters);
+            val newCentroids = new Array[readwrite VectorBuilder[double]](this.clusters);
             for(var i = 0; i < newCentroids.length; i += 1)
-                newCentroids.set(i, new Array[double](this.dim));
+                newCentroids.set(i, new VectorBuilder[double](this.dim));
             val counts = new Array[int](this.clusters);
             
             for(var i = 0; i < dataSet.length; i += 1) {
@@ -77,15 +77,15 @@ class KMeans {
                 val count = counts.get(i);
                 for(var d = 0; d < this.dim; d += 1)
                     centroid.set(d, centroid.get(d) / count);
-                centroids.set(i, centroid);
+                centroids.set(i, centroid.build);
             }
             iterations += 1;
         }
         return centroids;
     }
     
-    task pure assign(dataSet: readonly Slice[readonly Array[double]],
-            centroids: readonly Array[readonly Array[double]],
+    task pure assign(dataSet: readonly Slice[readonly Vector[double]],
+            centroids: readonly Array[readonly Vector[double]],
             assignments: readwrite Slice[int]): boolean {
         var changed = false;
         for(var i = dataSet.range.begin; i < dataSet.range.end; i += dataSet.range.step) {
@@ -106,7 +106,7 @@ class KMeans {
         return changed;
     }
     
-    def pure distance2(v1: readonly Array[double], v2: readonly Array[double]): double {
+    def pure distance2(v1: readonly Vector[double], v2: readonly Vector[double]): double {
         var sum = 0.0;
         for(var d = 0; d < this.dim; d += 1) {
             val diff = v1.get(d) - v2.get(d);
@@ -115,11 +115,11 @@ class KMeans {
         return sum;
     }
     
-    def pure newRandomVector(random: readwrite Random): readonly Array[double] {
-        val vec = new Array[double](this.dim);
+    def pure newRandomVector(random: readwrite Random): readonly Vector[double] {
+        val vec = new VectorBuilder[double](this.dim);
         for(var d = 0; d < this.dim; d += 1)
             vec.set(d, random.nextDouble);
-        return vec;
+        return vec.build;
     }
     
     task pure main(args: readonly Array[pure String]): {
@@ -128,7 +128,7 @@ class KMeans {
         val repetitions = 100;
         val watch = new StopWatch;
         
-        val dataSets = new Array[readwrite Array[readonly Array[double]]](repetitions);
+        val dataSets = new Array[readwrite Array[readonly Vector[double]]](repetitions);
         for(var i = 0; i < repetitions; i += 1)
             dataSets.set(i, this.createDataSet(n));
         
