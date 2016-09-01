@@ -30,7 +30,7 @@ class KMeans {
         return dataSet;
     }
     
-    def pure kMeans(dataSet: readwrite Array[pure Vector[double]], maxIterations: int):
+    def pure kMeans(dataSet: readonly Array[pure Vector[double]], maxIterations: int):
             readwrite Array[pure Vector[double]] {
         /* Initialization */
         val random = new Random;
@@ -46,7 +46,7 @@ class KMeans {
         while(changed && iterations < maxIterations) {
             /* Assignment step */
             // TODO: Why are type declarations required?
-            val dataParts: readonly Array[readwrite Slice[pure Vector[double]]] = dataSet.partition(the ContiguousPartitioner, this.numTasks);
+            val dataParts: readonly Array[readonly Slice[pure Vector[double]]] = dataSet.partition(the ContiguousPartitioner, this.numTasks);
             val assignParts: readonly Array[readwrite Slice[int]] = assignments.partition(the ContiguousPartitioner, this.numTasks);
             val tasks = new Array[pure Task[boolean]](this.numTasks);
             
