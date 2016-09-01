@@ -47,7 +47,7 @@ class KMeans {
             /* Assignment step */
             // TODO: Why are type declarations required?
             val dataParts: readonly Array[readonly Slice[pure Vector[double]]] = dataSet.partition(the ContiguousPartitioner, this.numTasks);
-            val assignParts: readonly Array[readwrite Slice[int]] = assignments.partition(the ContiguousPartitioner, this.numTasks);
+            val assignParts: readwrite Array[readwrite Slice[int]] = assignments.partition(the ContiguousPartitioner, this.numTasks);
             val tasks = new Array[pure Task[boolean]](this.numTasks);
             
             for(var i = 0; i < tasks.length; i+= 1)
