@@ -12,6 +12,7 @@
         <module>benchmark-utils</module>
         <module>quicksort</module>
         <module>k-means</module>
+        <module>raytracer</module>
         <module>benchmark-suite</module>
     </modules>
 </project>

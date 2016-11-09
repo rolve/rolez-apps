@@ -1,0 +1,153 @@
+package ch.trick17.rolezapps.raytracer
+
+class Raytracer {
+    
+    var numTasks: int
+    var maxRecursions: int
+    var scene: readonly Scene
+    
+    new {
+        this.numTasks = 8;
+        this.maxRecursions = 6;
+    }
+    
+    def readonly render(image: readwrite Array[readwrite Array[int]]): {
+        val parts = image.partition(the StripedPartitioner, this.numTasks);
+        for(var i = 1; i < parts.length; i += 1)
+            this start renderPart(parts.get(i));
+        this.renderPart(parts.get(0));
+    }
+    
+    task readonly renderPart(imagePart: readwrite Slice[readwrite Array[int]]): {
+        val view = this.scene.view;
+        val width = imagePart.get(imagePart.range.begin).length;
+        val height = imagePart.arrayLength;
+        
+        val frustrumHeight = view.distance * the Math.tan(view.angle);
+
+        val viewDir = view.at.minus(view.from).normalize;
+        val viewDown = view.up.minus(viewDir.scale(view.up.dot(viewDir))).normalize.scale(-frustrumHeight);
+        val viewLeft = view.up.cross(viewDir).normalize.scale(view.aspect * frustrumHeight);
+        
+        for(var y = imagePart.range.begin; y < imagePart.range.end; y += imagePart.range.step) {
+            val yLen = 2.0 * y / height - 1;
+            for(var x = 0; x < width; x += 1) {
+                val xLen = 2.0 * x / width - 1;
+                val dir = viewDir.plus(viewLeft.scale(xLen)).plus(viewDown.scale(yLen));
+                val ray = new Ray(view.from, dir.normalize);
+                
+                val color = this.trace(ray, 1.0, 0);
+                
+                imagePart.get(y).set(x, color.toRgbInt);
+            }
+        }
+    }
+    
+    def readonly trace(ray: pure Ray, intensity: double, recursion: int): pure Color {
+        if(recursion == this.maxRecursions)
+            return the Colors.black;
+        
+        val intersection = this.scene.intersect(ray);
+        if(intersection != null)
+            return this.shade(intersection, ray, intensity, recursion);
+        else
+            return this.scene.background;
+    }
+    
+    def readonly shade(intersection: readonly Intersection, ray: pure Ray,
+            intensity: double, recursion: int): pure Color {
+        val mat = intersection.primitive.mat;
+        
+        val point = ray.point(intersection.t);
+        var normal = intersection.primitive.normal(point);
+        if(ray.direction.dot(normal) > 0)
+            normal = normal.negate;
+        
+        val reflectDir = ray.direction.reflect(normal).normalize;
+        val color = new ColorBuilder;
+        
+        // Lighting
+        for(var i = 0; i < this.scene.lights.length; i += 1) {
+            val light = this.scene.lights.get(i);
+            val lightVec = light.position.minus(point);
+            if(normal.dot(lightVec) >= 0) {
+                val shadowRay = new Ray(point, lightVec);
+                val intersect = this.scene.intersect(shadowRay);
+                if(intersect == null || intersect.t > lightVec.length)
+                    this.light(mat, light, shadowRay.direction, normal, reflectDir, color);
+            }
+        }
+        
+        // Reflection
+        if(mat.ks * intensity > 0.001)
+            color.add(this.trace(new Ray(point, reflectDir), intensity * mat.ks, recursion + 1), mat.ks);
+        
+        // Refraction
+        if(mat.kt * intensity > 0.001) {
+            var eta: double;
+            if(intersection.enter)
+                eta = 1 / mat.ior;
+            else
+                eta = mat.ior;
+            val refractRay = new Ray(point, ray.direction.refract(normal, eta));
+            color.add(this.trace(refractRay, intensity * mat.kt, recursion + 1), mat.kt);
+        }
+        
+        return color.build;
+    }
+    
+    def pure light(material: readonly Material, light: readonly Light, lightDir: pure Vector3D,
+            normal: pure Vector3D, reflectDir: pure Vector3D, color: readwrite ColorBuilder): {
+        val shade = normal.dot(lightDir) * light.brightness * material.kd;
+        color.add(material.color, shade);
+        if(material.shine > 0.000001)
+            color.add(the Math.pow(reflectDir.dot(lightDir), material.shine));
+    }
+    
+    task readwrite main(args: readonly Array[readonly String]): {
+        this.scene = this.createScene;
+        
+        val width = 800;
+        val height = (width / this.scene.view.aspect) as int;
+        
+        val image = new Array[readwrite Array[int]](height);
+        for(var i = 0; i < height; i += 1)
+            image.set(i, new Array[int](width));
+        
+        this.render(image);
+        
+        the ImageWriter.write(image, "png", "test.png");
+    }
+    
+    def pure createScene: readwrite Scene {
+        val scene = new Scene;
+        
+        scene.view = new View;
+        scene.view.from = new Vector3D(0.0, 0.0, 0.0);
+        scene.view.at   = new Vector3D(1.0, 0.0, 0.0);
+        scene.view.up   = new Vector3D(0.0, 0.0, 1.0);
+        scene.view.distance = 1.0;
+        scene.view.angle    = the Math.PI / 6;
+        scene.view.aspect   = 16.0/9.0;
+        
+        val mat = new Material;
+        mat.color = new Color(0.9, 0.1, 0.1);
+        mat.kd    = 0.9;
+        mat.shine = 15.0;
+        mat.ks    = 0.5;
+        mat.kt    = 0.1;
+        mat.ior   = 1.333; // like water
+        
+        scene.objects = new Array[readwrite Primitive](2);
+        scene.objects.set(0, new Sphere(new Vector3D(16.0, -5.0, -2.0), 3.0, mat));
+        scene.objects.set(1, new Sphere(new Vector3D(25.0, 7.0, 5.0), 10.0, mat));
+        
+        scene.lights = new Array[readwrite Light](2);
+        scene.lights.set(0, new Light(new Vector3D(2.0, 10.0, 10.0), 1.0));
+        scene.lights.set(1, new Light(new Vector3D(10.0, -10.0, -5.0), 0.2));
+        
+        scene.background = new Color(0.05, 0.1, 0.3);
+        
+        return scene;
+    }
+}

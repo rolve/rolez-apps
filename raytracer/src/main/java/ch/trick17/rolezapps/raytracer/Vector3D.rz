@@ -1,0 +1,68 @@
+package ch.trick17.rolezapps.raytracer
+
+pure class Vector3D {
+    
+    val x: double
+    val y: double
+    val z: double
+    
+    new(x: double, y: double, z: double) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+    
+    def pure length: double {
+        return the Math.sqrt(this.dot(this));
+    }
+    
+    def pure negate: pure Vector3D {
+        return new Vector3D(-this.x, -this.y, -this.z);
+    }
+    
+    def pure plus(other: pure Vector3D): pure Vector3D {
+        return new Vector3D(this.x + other.x, this.y + other.y, this.z + other.z);
+    }
+    
+    def pure minus(other: pure Vector3D): pure Vector3D {
+        return new Vector3D(this.x - other.x, this.y - other.y, this.z - other.z);
+    }
+    
+    def pure scale(t: double): pure Vector3D {
+        return new Vector3D(this.x * t, this.y * t, this.z * t);
+    }
+    
+    def pure dot(other: pure Vector3D): double {
+        return this.x * other.x + this.y * other.y + this.z * other.z;
+    }
+    
+    def pure cross(other: pure Vector3D): pure Vector3D {
+        return new Vector3D(
+            this.y * other.z - this.z * other.y,
+            this.z * other.x - this.x * other.z,
+            this.x * other.y - this.y * other.x
+        );
+    }
+    
+    def pure reflect(normal: pure Vector3D): pure Vector3D {
+        return this.scale(1 / the Math.abs(this.dot(normal))).plus(normal.scale(2.0));
+    }
+    
+    def pure refract(normal: pure Vector3D, eta: double): pure Vector3D {
+        val c1 = -this.dot(normal);
+        val cs2 = 1 - eta * eta * (1 - c1 * c1);
+        return this.scale(eta).plus(normal.scale(eta * c1 - the Math.sqrt(cs2)));
+    }
+    
+    def pure normalize: pure Vector3D {
+        val length = this.length;
+        if(length > 0)
+            return new Vector3D(this.x / length, this.y / length, this.z / length);
+        else
+            return this;
+    }
+    
+    override readonly toString: readonly String {
+        return "(" + this.x + ", " + this.y + ", " + this.z + ")";
+    }
+}

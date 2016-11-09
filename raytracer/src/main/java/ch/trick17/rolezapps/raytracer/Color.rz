@@ -1,0 +1,77 @@
+package ch.trick17.rolezapps.raytracer
+
+pure class Color {
+    val r: double
+    val g: double
+    val b: double
+    
+    new(r: double, g: double, b: double) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+    
+    def pure red: int {
+        return this.toByte(this.r);
+    }
+    
+    def pure green: int {
+        return this.toByte(this.g);
+    }
+    
+    def pure blue: int {
+        return this.toByte(this.b);
+    }
+    
+    def pure toByte(value: double): int {
+        val byte = (value * 255) as int;
+        if(byte > 255)
+            return 255;
+        else if(byte < 0)
+            return 0;
+        else
+            return byte;
+    }
+    
+    def pure toRgbInt: int {
+        return this.red*256*256 + this.green*256 + this.blue; // We need shifting ops...
+    }
+}
+
+class ColorBuilder {
+    var r: double
+    var g: double
+    var b: double
+    
+    def readonly build: pure Color {
+        return new Color(this.r, this.g, this.b);
+    }
+    
+    def readwrite add(color: pure Color, multiplier: double): {
+        this.r += multiplier * color.r;
+        this.g += multiplier * color.g;
+        this.b += multiplier * color.b;
+    }
+    
+    def readwrite add(color: pure Color): {
+        this.r += color.r;
+        this.g += color.g;
+        this.b += color.b;
+    }
+    
+    def readwrite add(value: double): {
+        this.r += value;
+        this.g += value;
+        this.b += value;
+    }
+    
+    def readwrite multiply(value: double): {
+        this.r = this.r * value;
+        this.g = this.g * value;
+        this.b = this.b * value;
+    }
+}
+
+object Colors {
+    val black: pure Color = new Color(0.0, 0.0, 0.0) // TODO: Check performance of this, with and without -XX:+TrustFinalNonStaticFields
+}

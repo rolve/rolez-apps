@@ -1,0 +1,50 @@
+package ch.trick17.rolezapps.raytracer
+
+class Scene {
+    var lights: readwrite Array[readwrite Light]
+    var objects: readwrite Array[readwrite Primitive]
+    var background: pure Color
+    var view: readwrite View
+    
+    def readonly intersect(ray: pure Ray): readonly Intersection {
+        var closest: readonly Intersection = null;
+        for(var i = 0; i < this.objects.length; i += 1) {
+            val intersection = this.objects.get(i).intersect(ray);
+            if(intersection != null && (closest == null || intersection.t < closest.t))
+                closest = intersection;
+        }
+        return closest;
+    }
+}
+
+class Light {
+    var position: pure Vector3D
+    var brightness: double
+    
+    new(position: pure Vector3D, brightness: double) {
+        this.position = position;
+        this.brightness = brightness;
+    }
+}
+
+class Intersection {
+    val t: double
+    val enter: boolean
+    val primitive: readonly Primitive
+    
+    new(t: double, enter: boolean, primitive: readonly Primitive) {
+        this.t = t;
+        this.enter = enter;
+        this.primitive = primitive;
+    }
+}
+
+class View {
+    var from: pure Vector3D
+    var at:   pure Vector3D
+    var up:   pure Vector3D
+    
+    var distance: double
+    var angle:    double
+    var aspect:   double
+}
