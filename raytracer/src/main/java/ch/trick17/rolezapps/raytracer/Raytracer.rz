@@ -4,11 +4,13 @@ class Raytracer {
     
     var numTasks: int
     var maxRecursions: int
+    var oversample: int
     var scene: readonly Scene
     
     new {
         this.numTasks = 8;
         this.maxRecursions = 10;
+        this.oversample = 3;
     }
     
     def readonly render(image: readwrite Array[readwrite Array[int]]): {
@@ -26,21 +28,34 @@ class Raytracer {
         val frustrumHeight = view.distance * the Math.tan(view.angle);
 
         val viewDir = view.at.minus(view.from).normalize;
-        val viewDown = view.up.minus(viewDir.scale(view.up.dot(viewDir))).normalize.scale(-frustrumHeight);
         val viewLeft = view.up.cross(viewDir).normalize.scale(view.aspect * frustrumHeight);
+        val viewDown = view.up.minus(viewDir.scale(view.up.dot(viewDir))).normalize.scale(-frustrumHeight);
         
         for(var y = imagePart.range.begin; y < imagePart.range.end; y += imagePart.range.step) {
-            val yLen = 2.0 * y / height - 1;
             for(var x = 0; x < width; x += 1) {
-                val xLen = 2.0 * x / width - 1;
-                val dir = viewDir.plus(viewLeft.scale(xLen)).plus(viewDown.scale(yLen));
-                val ray = new Ray(view.from, dir.normalize);
-                
-                val color = this.trace(ray, 1.0, 0);
-                
+                val color = this.renderPixel(x, y, width, height, viewDir, viewLeft, viewDown);
                 imagePart.get(y).set(x, color.toRgbInt);
             }
         }
+    }
+    
+    def readonly renderPixel(x: int, y: int, width: int, height: int,
+            viewDir: pure Vector3D, viewLeft: pure Vector3D, viewDown: pure Vector3D): pure Color {
+        val samples = this.oversample;
+        val color = new ColorBuilder;
+        for(var ySample = 0; ySample < samples; ySample += 1) {
+            for(var xSample = 0; xSample < samples; xSample += 1) {
+                val xLen = 2.0 * (x + xSample as double / samples) / width - 1;
+                val yLen = 2.0 * (y + ySample as double / samples) / height - 1;
+                val dir = viewDir.plus(viewLeft.scale(xLen)).plus(viewDown.scale(yLen));
+                val ray = new Ray(this.scene.view.from, dir.normalize);
+                
+                color.add(this.trace(ray, 1.0, 0));
+                
+            }
+        }
+        color.multiply(1.0 / (samples * samples));
+        return color.build;
     }
     
     def readonly trace(ray: pure Ray, intensity: double, recursion: int): pure Color {
@@ -165,7 +180,7 @@ class Raytracer {
         scene.objects.set(0, new Sphere(new Vector3D( 16.0, -5.0, -2.0),  3.0, mat1));
         scene.objects.set(1, new Sphere(new Vector3D( 35.0, 15.0, -1.0), 20.0, mat1));
         scene.objects.set(2, new  Plane(new Vector3D(  0.0,  0.0,  1.0),  3.0, mat2));
-        scene.objects.set(3, new Sphere(new Vector3D( 10.0, -7.0,  4.0),  3.0, mat3));
+        scene.objects.set(3, new Sphere(new Vector3D( 10.0, -7.0,  5.0),  3.0, mat3));
         scene.objects.set(4, new Sphere(new Vector3D(-90.0,-60.0, 30.0), 90.0, mat4));
         
         scene.lights = new Array[readwrite Light](2);
