@@ -8,7 +8,7 @@ class Raytracer {
     
     new {
         this.numTasks = 8;
-        this.maxRecursions = 6;
+        this.maxRecursions = 10;
     }
     
     def readonly render(image: readwrite Array[readwrite Array[int]]): {
@@ -126,29 +126,51 @@ class Raytracer {
         val scene = new Scene;
         
         scene.view = new View;
-        scene.view.from = new Vector3D(0.0, 0.0, 0.0);
-        scene.view.at   = new Vector3D(1.0, 0.0, 0.0);
-        scene.view.up   = new Vector3D(0.0, 0.0, 1.0);
+        scene.view.from = new Vector3D( 0.0, 0.0, 7.0);
+        scene.view.at   = new Vector3D(25.0, 0.0, 0.0);
+        scene.view.up   = new Vector3D( 0.0, 0.0, 1.0);
         scene.view.distance = 1.0;
-        scene.view.angle    = the Math.PI / 6;
-        scene.view.aspect   = 16.0/9.0;
+        scene.view.angle    = the Math.toRadians(40.0);
+        scene.view.aspect   = 3.0/2.0;
         
-        val mat = new Material;
-        mat.color = new Color(0.9, 0.1, 0.1);
-        mat.kd    = 0.9;
-        mat.shine = 15.0;
-        mat.ks    = 0.5;
-        mat.kt    = 0.1;
-        mat.ior   = 1.333; // like water
+        val mat1 = new Material;
+        mat1.color = new Color(0.9, 0.1, 0.1);
+        mat1.kd    = 0.9;
+        mat1.shine = 15.0;
+        mat1.ks    = 0.5;
+        mat1.kt    = 0.0;
+        mat1.ior   = 1.0;
+
+        val mat2 = new Material;
+        mat2.color = new Color(0.9, 0.9, 1.0);
+        mat2.kd    = 0.7;
+        mat2.shine = 15.0;
+        mat2.ks    = 0.3;
         
-        scene.objects = new Array[readwrite Primitive](3);
-        scene.objects.set(0, new Sphere(new Vector3D(16.0, -5.0, -2.0),  3.0, mat));
-        scene.objects.set(1, new Sphere(new Vector3D(25.0,  7.0,  5.0), 10.0, mat));
-        scene.objects.set(2, new  Plane(new Vector3D(0.0,   0.0,  1.0),  3.0, mat));
+        val mat3 = new Material;
+        mat3.color = the Colors.black;
+        mat3.kd    = 0.0;
+        mat3.shine = 15.0;
+        mat3.ks    = 0.2;
+        mat3.kt    = 1.0;
+        mat3.ior   = 1.1;
+        
+        val mat4 = new Material;
+        mat4.color = the Colors.black;
+        mat4.kd    = 0.0;
+        mat4.shine = 10.0;
+        mat4.ks    = 0.2;
+        
+        scene.objects = new Array[readwrite Primitive](5);
+        scene.objects.set(0, new Sphere(new Vector3D( 16.0, -5.0, -2.0),  3.0, mat1));
+        scene.objects.set(1, new Sphere(new Vector3D( 35.0, 15.0, -1.0), 20.0, mat1));
+        scene.objects.set(2, new  Plane(new Vector3D(  0.0,  0.0,  1.0),  3.0, mat2));
+        scene.objects.set(3, new Sphere(new Vector3D( 10.0, -7.0,  4.0),  3.0, mat3));
+        scene.objects.set(4, new Sphere(new Vector3D(-90.0,-60.0, 30.0), 90.0, mat4));
         
         scene.lights = new Array[readwrite Light](2);
-        scene.lights.set(0, new Light(new Vector3D( 2.0,  10.0, 10.0), 1.0));
-        scene.lights.set(1, new Light(new Vector3D(10.0, -10.0,  5.0), 0.2));
+        scene.lights.set(0, new Light(new Vector3D( 2.0,  18.0, 10.0), 1.0));
+        scene.lights.set(1, new Light(new Vector3D(20.0, -50.0,  8.0), 0.3));
         
         scene.background = new Color(0.05, 0.1, 0.3);
         
