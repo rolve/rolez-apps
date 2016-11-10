@@ -100,8 +100,11 @@ class Raytracer {
             normal: pure Vector3D, reflectDir: pure Vector3D, color: readwrite ColorBuilder): {
         val shade = normal.dot(lightDir) * light.brightness * material.kd;
         color.add(material.color, shade);
-        if(material.shine > 0.000001)
-            color.add(the Math.pow(reflectDir.dot(lightDir), material.shine));
+        if(material.shine > 0.000001) {
+            val spec = reflectDir.dot(lightDir);
+            if(spec > 0.000001)
+                color.add(the Math.pow(spec, material.shine));
+        }
     }
     
     task readwrite main(args: readonly Array[readonly String]): {
