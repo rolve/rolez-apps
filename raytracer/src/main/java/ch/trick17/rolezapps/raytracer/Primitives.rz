@@ -57,3 +57,31 @@ class Sphere extends Primitive {
             return new Intersection(t, diff.dot(diff) > r2 + 0.000001, this);
     }
 }
+
+class Plane extends Primitive {
+    var normal: pure Vector3D
+    var distance: double
+    
+    new(normal: pure Vector3D, distance: double, mat: readwrite Material) {
+        super(mat);
+        this.normal = normal;
+        this.distance = distance;
+    }
+    
+    override readonly normal(point: pure Vector3D): pure Vector3D {
+        return this.normal.normalize;
+    }
+    
+    override readonly intersect(ray: pure Ray): readonly Intersection {
+        val n = this.normal.normalize;
+        val divisor = ray.direction.dot(n);
+        if(divisor < 0.000001 && divisor > -0.000001)
+            return null;
+        
+        val t = (-this.distance - ray.origin.dot(n)) / divisor;
+        if(t < 0.000001)
+            return null;
+        else
+            return new Intersection(t, divisor < 0, this);
+    }
+}

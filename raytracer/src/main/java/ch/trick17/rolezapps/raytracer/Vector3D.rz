@@ -56,7 +56,7 @@ pure class Vector3D {
     
     def pure normalize: pure Vector3D {
         val length = this.length;
-        if(length > 0)
+        if(length > 0 && length != 1.0)
             return new Vector3D(this.x / length, this.y / length, this.z / length);
         else
             return this;
