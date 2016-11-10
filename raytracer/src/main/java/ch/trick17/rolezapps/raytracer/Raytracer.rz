@@ -103,7 +103,7 @@ class Raytracer {
         if(material.shine > 0.000001) {
             val spec = reflectDir.dot(lightDir);
             if(spec > 0.000001)
-                color.add(the Math.pow(spec, material.shine));
+                color.add(the Math.pow(spec, material.shine / light.brightness));
         }
     }
     
