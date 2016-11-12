@@ -2,16 +2,11 @@ package ch.trick17.rolezapps.raytracer
 
 class Raytracer {
     
-    var numTasks: int
-    var maxRecursions: int
-    var oversample: int
-    var scene: readonly Scene
+    var numTasks: int = 8
+    var maxRecursions: int = 10
+    var oversample: int = 3
     
-    new {
-        this.numTasks = 8;
-        this.maxRecursions = 10;
-        this.oversample = 3;
-    }
+    var scene: readonly Scene
     
     def readonly render(image: readwrite Array[readwrite Array[int]]): {
         val parts = image.partition(the StripedPartitioner, this.numTasks);
@@ -51,7 +46,6 @@ class Raytracer {
                 val ray = new Ray(this.scene.view.from, dir.normalize);
                 
                 color.add(this.trace(ray, 1.0, 0));
-                
             }
         }
         color.multiply(1.0 / (samples * samples));
@@ -120,75 +114,5 @@ class Raytracer {
             if(spec > 0.000001)
                 color.add(the Math.pow(spec, material.shine / light.brightness));
         }
-    }
-    
-    task readwrite main(args: readonly Array[readonly String]): {
-        this.scene = this.createScene;
-        
-        val width = 800;
-        val height = (width / this.scene.view.aspect) as int;
-        
-        val image = new Array[readwrite Array[int]](height);
-        for(var i = 0; i < height; i += 1)
-            image.set(i, new Array[int](width));
-        
-        this.render(image);
-        
-        the ImageWriter.write(image, "png", "test.png");
-    }
-    
-    def pure createScene: readwrite Scene {
-        val scene = new Scene;
-        
-        scene.view = new View;
-        scene.view.from = new Vector3D( 0.0, 0.0, 7.0);
-        scene.view.at   = new Vector3D(25.0, 0.0, 0.0);
-        scene.view.up   = new Vector3D( 0.0, 0.0, 1.0);
-        scene.view.distance = 1.0;
-        scene.view.angle    = the Math.toRadians(40.0);
-        scene.view.aspect   = 3.0/2.0;
-        
-        val mat1 = new Material;
-        mat1.color = new Color(0.9, 0.1, 0.1);
-        mat1.kd    = 0.9;
-        mat1.shine = 15.0;
-        mat1.ks    = 0.5;
-        mat1.kt    = 0.0;
-        mat1.ior   = 1.0;
-
-        val mat2 = new Material;
-        mat2.color = new Color(0.9, 0.9, 1.0);
-        mat2.kd    = 0.7;
-        mat2.shine = 15.0;
-        mat2.ks    = 0.3;
-        
-        val mat3 = new Material;
-        mat3.color = the Colors.black;
-        mat3.kd    = 0.0;
-        mat3.shine = 15.0;
-        mat3.ks    = 0.2;
-        mat3.kt    = 1.0;
-        mat3.ior   = 1.1;
-        
-        val mat4 = new Material;
-        mat4.color = the Colors.black;
-        mat4.kd    = 0.0;
-        mat4.shine = 10.0;
-        mat4.ks    = 0.2;
-        
-        scene.objects = new Array[readwrite Primitive](5);
-        scene.objects.set(0, new Sphere(new Vector3D( 16.0, -5.0, -2.0),  3.0, mat1));
-        scene.objects.set(1, new Sphere(new Vector3D( 35.0, 15.0, -1.0), 20.0, mat1));
-        scene.objects.set(2, new  Plane(new Vector3D(  0.0,  0.0,  1.0),  3.0, mat2));
-        scene.objects.set(3, new Sphere(new Vector3D( 10.0, -7.0,  5.0),  3.0, mat3));
-        scene.objects.set(4, new Sphere(new Vector3D(-90.0,-60.0, 30.0), 90.0, mat4));
-        
-        scene.lights = new Array[readwrite Light](2);
-        scene.lights.set(0, new Light(new Vector3D( 2.0,  18.0, 10.0), 1.0));
-        scene.lights.set(1, new Light(new Vector3D(20.0, -50.0,  8.0), 0.3));
-        
-        scene.background = new Color(0.05, 0.1, 0.3);
-        
-        return scene;
     }
 }

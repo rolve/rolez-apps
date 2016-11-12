@@ -10,7 +10,11 @@ import javax.imageio.ImageIO;
 
 public class ImageWriterJava {
     
-    public static void write(int[][] imageData, String formatName, String file) {
+    public static void write(int[][] imageData, String formatName, String file) throws IOException {
+        ImageIO.write(toBufferedImage(imageData), formatName, new File(file));
+    }
+    
+    static BufferedImage toBufferedImage(int[][] imageData) {
         int width = imageData[0].length;
         int height = imageData.length;
         BufferedImage image = new BufferedImage(width, height, TYPE_INT_RGB);
@@ -18,11 +22,6 @@ public class ImageWriterJava {
         for(int y = 0; y < height; y++)
             for(int x = 0; x < width; x++)
                 image.setRGB(x, y, imageData[y][x]);
-        
-        try {
-            ImageIO.write(image, formatName, new File(file));
-        } catch(IOException e) {
-            throw new RuntimeException(e);
-        }
+        return image;
     }
 }

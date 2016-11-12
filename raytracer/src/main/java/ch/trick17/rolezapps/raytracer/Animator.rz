@@ -1,0 +1,105 @@
+package ch.trick17.rolezapps.raytracer
+
+class Animator {
+    
+    var scene: readwrite Scene
+    var time: int = 0
+    
+    task readwrite main(args: readonly Array[readonly String]): {
+        this.createScene;
+
+        val tracer = new Raytracer;
+        tracer.scene = this.scene;
+        tracer.oversample = 1;
+        
+        val writer = new VideoWriter("test.mp4");
+        
+        val width = 800;
+        val height = (width / tracer.scene.view.aspect) as int;
+        val image = new Array[readwrite Array[int]](height);
+        for(var i = 0; i < height; i += 1)
+            image.set(i, new Array[int](width));
+        
+        while(this.time < 525) {
+            tracer.render(image);
+            writer.writeFrame(image);
+            
+            this.time += 1;
+            this.updateScene;
+        }
+        writer.close;
+    }
+    
+    def readwrite createScene: {
+        var scene = new Scene;
+        
+        scene.view = new View;
+        scene.view.from = new Vector3D(-20.0, 2.0, 7.0);
+        scene.view.at   = new Vector3D( 25.0, 0.0, 0.0);
+        scene.view.up   = new Vector3D(  0.0, 0.0, 1.0);
+        scene.view.distance = 1.0;
+        scene.view.angle    = the Math.toRadians(30.0);
+        scene.view.aspect   = 3.0/2.0;
+        
+        val mat1 = new Material;
+        mat1.color = new Color(0.9, 0.1, 0.1);
+        mat1.kd    = 0.9;
+        mat1.shine = 15.0;
+        mat1.ks    = 0.5;
+        mat1.kt    = 0.0;
+        mat1.ior   = 1.0;
+
+        val mat2 = new Material;
+        mat2.color = new Color(0.9, 0.9, 1.0);
+        mat2.kd    = 0.7;
+        mat2.shine = 15.0;
+        mat2.ks    = 0.3;
+        
+        val mat3 = new Material;
+        mat3.color = the Colors.black;
+        mat3.kd    = 0.0;
+        mat3.shine = 15.0;
+        mat3.ks    = 0.2;
+        mat3.kt    = 1.0;
+        mat3.ior   = 1.05;
+        
+        val mat4 = new Material;
+        mat4.color = the Colors.black;
+        mat4.kd    = 0.0;
+        mat4.shine = 10.0;
+        mat4.ks    = 0.2;
+        
+        scene.objects = new Array[readwrite Primitive](5);
+        scene.objects.set(0, new Sphere(new Vector3D( 16.0, -5.0, -2.0),  3.0, mat1));
+        scene.objects.set(1, new Sphere(new Vector3D( 35.0, 15.0, -1.0), 20.0, mat1));
+        scene.objects.set(2, new  Plane(new Vector3D(  0.0,  0.0,  1.0),  3.0, mat2));
+        scene.objects.set(3, new Sphere(new Vector3D( 10.0, -7.0,  5.0),  3.0, mat3));
+        scene.objects.set(4, new Sphere(new Vector3D(-90.0,-60.0, 30.0), 90.0, mat4));
+        
+        scene.lights = new Array[readwrite Light](2);
+        scene.lights.set(0, new Light(new Vector3D( 2.0,  18.0, 10.0), 1.0));
+        scene.lights.set(1, new Light(new Vector3D(20.0, -50.0,  8.0), 0.3));
+        
+        scene.background = new Color(0.05, 0.1, 0.3);
+        
+        this.scene = scene;
+    }
+    
+    def readwrite updateScene: {
+        val scene = this.scene;
+        
+        scene.view.from = scene.view.from.plus(new Vector3D(0.12, -0.05, 0.0));
+        scene.view.angle += the Math.toRadians(0.05);
+        
+        if(this.time >= 400) {
+            for(var i = 0; i < scene.lights.length; i += 1) {
+                val light = scene.lights.get(i);
+                light.brightness = the Math.max(light.brightness - 0.01, 0.0);
+            }
+        }
+        if(this.time >= 500) {
+            val bg = scene.background;
+            scene.background = new Color(bg.r - 0.002, bg.g - 0.004, bg.b - 0.012);
+        }
+    }
+}
