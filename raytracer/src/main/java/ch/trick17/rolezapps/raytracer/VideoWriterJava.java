@@ -1,29 +1,116 @@
 package ch.trick17.rolezapps.raytracer;
 
+import static ch.trick17.rolezapps.raytracer.ImageWriterJava.toBufferedImage;
+import static org.jcodec.scale.AWTUtil.fromBufferedImage;
+
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
-import org.jcodec.api.awt.SequenceEncoder;
+import org.jcodec.codecs.h264.H264Encoder;
+import org.jcodec.codecs.h264.H264Utils;
+import org.jcodec.common.NIOUtils;
+import org.jcodec.common.SeekableByteChannel;
+import org.jcodec.common.model.ColorSpace;
+import org.jcodec.common.model.Picture;
+import org.jcodec.containers.mp4.Brand;
+import org.jcodec.containers.mp4.MP4Packet;
+import org.jcodec.containers.mp4.TrackType;
+import org.jcodec.containers.mp4.muxer.FramesMP4MuxerTrack;
+import org.jcodec.containers.mp4.muxer.MP4Muxer;
+import org.jcodec.scale.ColorUtil;
+import org.jcodec.scale.Transform;
 
+/**
+ * This class is derived from the {@link org.jcodec.api.SequenceEncoder} class from JCodec
+ * (www.jcodec.org), which is licensed under the FreeBSD license.
+ * 
+ * @author The JCodec project
+ * @author Michael Faes
+ */
 public class VideoWriterJava {
+
+    private final int width;
+    private final int height;
+    private final int framerate;
     
-    private final SequenceEncoder encoder;
-    private boolean closed;
+    private final SeekableByteChannel channel;
+    private final Transform transform;
+    private final H264Encoder encoder;
+    private final ArrayList<ByteBuffer> spsList;
+    private final ArrayList<ByteBuffer> ppsList;
+    private final FramesMP4MuxerTrack track;
+    private final ByteBuffer buffer;
+    private final MP4Muxer muxer;
     
-    public VideoWriterJava(String file) throws IOException {
-        encoder = new SequenceEncoder(new File(file));
+    private int frameNo;
+    
+    public VideoWriterJava(String file, int width, int height, int framerate) throws IOException {
+        this.width = width;
+        this.height = height;
+        this.framerate = framerate;
+        
+        channel = NIOUtils.writableFileChannel(new File(file));
+        
+        // Muxer that will store the encoded frames
+        muxer = new MP4Muxer(channel, Brand.MP4);
+        
+        // Add video track to muxer
+        track = muxer.addTrack(TrackType.VIDEO, framerate);
+        
+        // Allocate a buffer big enough to hold output frames
+        buffer = ByteBuffer.allocate(width * height * 6);
+        
+        // Create an instance of encoder
+        encoder = new H264Encoder();
+        
+        // Transform to convert between RGB and YUV
+        transform = ColorUtil.getTransform(ColorSpace.RGB, encoder.getSupportedColorSpaces()[0]);
+        
+        // Encoder extra data ( SPS, PPS ) to be stored in a special place of MP4
+        spsList = new ArrayList<ByteBuffer>();
+        ppsList = new ArrayList<ByteBuffer>();
     }
     
     public void writeFrame(int[][] imageData) throws IOException {
-        if(closed)
+        if(!channel.isOpen())
             throw new IllegalStateException("already closed");
-        encoder.encodeImage(ImageWriterJava.toBufferedImage(imageData));
+        if(imageData.length != height || imageData[0].length != width)
+            throw new IllegalArgumentException("invalid dimensions");
+        
+        Picture pic = fromBufferedImage(toBufferedImage(imageData));
+        Picture transformed = Picture.create(width, height, encoder
+                .getSupportedColorSpaces()[0]);
+        
+        // Perform conversion
+        transform.transform(pic, transformed);
+        
+        // Encode image into H.264 frame, the result is stored in buffer
+        buffer.clear();
+        ByteBuffer res = encoder.encodeFrame(transformed, buffer);
+        
+        // Based on the frame above form correct MP4 packet
+        spsList.clear();
+        ppsList.clear();
+        H264Utils.wipePS(res, spsList, ppsList);
+        H264Utils.encodeMOVPacket(res);
+        
+        // Add packet to video track
+        track.addFrame(new MP4Packet(res, frameNo, framerate, 1, frameNo, true, null, frameNo, 0));
+        
+        frameNo++;
     }
     
     public void close() throws IOException {
-        if(closed)
+        if(!channel.isOpen())
             throw new IllegalStateException("already closed");
-        encoder.finish();
-        closed = true;
+        
+        // Push saved SPS/PPS to a special storage in MP4
+        track.addSampleEntry(H264Utils.createMOVSampleEntry(spsList, ppsList, 4));
+        
+        // Write MP4 header and finalize recording
+        muxer.writeHeader();
+        NIOUtils.closeQuietly(channel);
     }
 }

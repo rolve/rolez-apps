@@ -3,7 +3,13 @@ package ch.trick17.rolezapps.raytracer
 class Animator {
     
     var scene: readwrite Scene
-    var time: int = 0
+    var framerate: int = 25
+    var length: double = 21.0
+    
+    var frame: int = 0
+    
+    def readonly time: double { return this.frame as double / this.framerate; }
+    def readonly frames: int  { return the Math.ceil(this.length * this.framerate) as int; }
     
     task readwrite main(args: readonly Array[readonly String]): {
         this.createScene;
@@ -12,20 +18,20 @@ class Animator {
         tracer.scene = this.scene;
         tracer.oversample = 1;
         
-        val writer = new VideoWriter("test.mp4");
-        
         val width = 800;
         val height = (width / tracer.scene.view.aspect) as int;
         val image = new Array[readwrite Array[int]](height);
         for(var i = 0; i < height; i += 1)
             image.set(i, new Array[int](width));
         
-        while(this.time < 525) {
+        val writer = new VideoWriter("test.mp4", width, height, this.framerate);
+        while(this.frame < this.frames) {
             tracer.render(image);
             writer.writeFrame(image);
             
-            this.time += 1;
+            this.frame += 1;
             this.updateScene;
+            the System.out.println("Frame " + this.frame + "/" + this.frames);
         }
         writer.close;
     }
@@ -39,7 +45,7 @@ class Animator {
         scene.view.up   = new Vector3D(  0.0, 0.0, 1.0);
         scene.view.distance = 1.0;
         scene.view.angle    = the Math.toRadians(30.0);
-        scene.view.aspect   = 3.0/2.0;
+        scene.view.aspect   = 16.0/9.0;
         
         val mat1 = new Material;
         mat1.color = new Color(0.9, 0.1, 0.1);
@@ -87,19 +93,20 @@ class Animator {
     
     def readwrite updateScene: {
         val scene = this.scene;
+        val f = this.framerate as double;
         
-        scene.view.from = scene.view.from.plus(new Vector3D(0.12, -0.05, 0.0));
-        scene.view.angle += the Math.toRadians(0.05);
+        scene.view.from = scene.view.from.plus(new Vector3D(3/f, -1.25/f, 0.0));
+        scene.view.angle += the Math.toRadians(1.25/f);
         
-        if(this.time >= 400) {
+        if(this.time >= 16) {
             for(var i = 0; i < scene.lights.length; i += 1) {
                 val light = scene.lights.get(i);
-                light.brightness = the Math.max(light.brightness - 0.01, 0.0);
+                light.brightness = the Math.max(light.brightness - 0.25/f, 0.0);
             }
         }
-        if(this.time >= 500) {
+        if(this.time >= 19.5) {
             val bg = scene.background;
-            scene.background = new Color(bg.r - 0.002, bg.g - 0.004, bg.b - 0.012);
+            scene.background = new Color(bg.r - 0.05/f, bg.g - 0.1/f, bg.b - 0.3/f);
         }
     }
 }
