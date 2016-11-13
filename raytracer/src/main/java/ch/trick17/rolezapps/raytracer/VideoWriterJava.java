@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import org.jcodec.codecs.h264.H264Encoder;
 import org.jcodec.codecs.h264.H264Utils;
+import org.jcodec.codecs.h264.encode.RateControl;
 import org.jcodec.common.NIOUtils;
 import org.jcodec.common.SeekableByteChannel;
 import org.jcodec.common.model.ColorSpace;
@@ -46,7 +47,8 @@ public class VideoWriterJava {
     
     private int frameNo;
     
-    public VideoWriterJava(String file, int width, int height, int framerate) throws IOException {
+    public VideoWriterJava(String file, int width, int height, int framerate, int qp)
+            throws IOException {
         this.width = width;
         this.height = height;
         this.framerate = framerate;
@@ -63,7 +65,7 @@ public class VideoWriterJava {
         buffer = ByteBuffer.allocate(width * height * 6);
         
         // Create an instance of encoder
-        encoder = new H264Encoder();
+        encoder = new H264Encoder(new FixedQp(qp));
         
         // Transform to convert between RGB and YUV
         transform = ColorUtil.getTransform(ColorSpace.RGB, encoder.getSupportedColorSpaces()[0]);
@@ -112,5 +114,28 @@ public class VideoWriterJava {
         // Write MP4 header and finalize recording
         muxer.writeHeader();
         NIOUtils.closeQuietly(channel);
+    }
+    
+    private static class FixedQp implements RateControl {
+        
+        private final int qp;
+        
+        public FixedQp(int qp) {
+            this.qp = qp;
+        }
+        
+        public int getInitQp() {
+            return qp;
+        }
+        
+        public int getQpDelta() {
+            return 0;
+        }
+        
+        public boolean accept(int bits) {
+            return true;
+        }
+        
+        public void reset() {}
     }
 }

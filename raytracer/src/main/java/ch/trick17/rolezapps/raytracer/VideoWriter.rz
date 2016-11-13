@@ -2,7 +2,7 @@ package ch.trick17.rolezapps.raytracer
 
 class VideoWriter mapped to VideoWriterJava {
     
-    mapped new(file: pure String, width: int, height: int, framerate: int)
+    mapped new(file: pure String, width: int, height: int, framerate: int, qp: int)
     
     mapped def readwrite writeFrame(image: readonly Array[readwrite Array[int]]):
     mapped def readwrite close:

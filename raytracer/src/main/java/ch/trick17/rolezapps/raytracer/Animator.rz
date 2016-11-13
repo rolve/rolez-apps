@@ -24,7 +24,7 @@ class Animator {
         for(var i = 0; i < height; i += 1)
             image.set(i, new Array[int](width));
         
-        val writer = new VideoWriter("test.mp4", width, height, this.framerate);
+        val writer = new VideoWriter("test.mp4", width, height, this.framerate, 12);
         while(this.frame < this.frames) {
             tracer.render(image);
             writer.writeFrame(image);
