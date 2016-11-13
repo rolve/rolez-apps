@@ -1,0 +1,96 @@
+package ch.trick17.rolezapps.raytracer
+
+class Animation {
+    
+    val startTime: double
+    
+    new(startTime: double) {
+        this.startTime = startTime;
+    }
+    
+    /* To be implemented by subclasses */
+    def readwrite step(time: double, framerate: int): {}
+}
+
+class LinearMovement extends Animation {
+    
+    val obj: readwrite Moveable
+    val deltaPerS: pure Vector3D
+    
+    new(startTime: double, obj: readwrite Moveable, deltaPerS: pure Vector3D) {
+        super(startTime);
+        this.obj = obj;
+        this.deltaPerS = deltaPerS;
+    }
+    
+    override readwrite step(time: double, framerate: int): {
+        this.obj.move(this.deltaPerS.scale(1.0 / framerate));
+    }
+}
+
+class CircularMovement extends Animation {
+    
+    val obj: readwrite Moveable
+    val u1: pure Vector3D
+    val u2: pure Vector3D
+    val thetaPerS: double
+    
+    new(startTime: double, obj: readwrite Moveable, toCenter: pure Vector3D, up: pure Vector3D,
+            thetaPerS: double) {
+        super(startTime);
+        this.obj = obj;
+        this.u1 = toCenter.negate;
+        this.u2 = up.cross(this.u1).normalize.scale(this.u1.length);
+        this.thetaPerS = thetaPerS;
+    }
+    
+    override readwrite step(time: double, framerate: int): {
+        val oldTheta = (time - this.startTime - 1.0 / framerate) * this.thetaPerS;
+        val newTheta = (time - this.startTime) * this.thetaPerS;
+        val delta = this.u1.scale(the Math.cos(newTheta) - the Math.cos(oldTheta))
+                .plus(this.u2.scale(the Math.sin(newTheta) - the Math.sin(oldTheta)));
+        this.obj.move(delta);
+    }
+}
+
+class BrightnessChange extends Animation {
+    
+    val light: readwrite Light
+    val changePerS: double
+    
+    new(startTime: double, light: readwrite Light, changePerS: double) {
+        super(startTime);
+        this.light = light;
+        this.changePerS = changePerS;
+    }
+    
+    override readwrite step(time: double, f: int): {
+        this.light.brightness = the Math.max(0.0, this.light.brightness + this.changePerS / f);
+    }
+}
+
+class BackgroundChange extends Animation {
+    
+    val scene: readwrite Scene
+    val rChangePerS: double
+    val gChangePerS: double
+    val bChangePerS: double
+    
+    new(startTime: double, scene: readwrite Scene,
+            rChangePerS: double, gChangePerS: double, bChangePerS: double) {
+        super(startTime);
+        this.scene = scene;
+        this.rChangePerS = rChangePerS;
+        this.gChangePerS = gChangePerS;
+        this.bChangePerS = bChangePerS;
+    }
+    
+    override readwrite step(time: double, f: int): {
+        val bg = this.scene.background;
+        this.scene.background = new Color(
+            bg.r + this.rChangePerS/f,
+            bg.g + this.gChangePerS/f,
+            bg.b + this.bChangePerS/f
+        );
+    }
+}

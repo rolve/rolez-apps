@@ -17,16 +17,6 @@ class Scene {
     }
 }
 
-class Light {
-    var position: pure Vector3D
-    var brightness: double
-    
-    new(position: pure Vector3D, brightness: double) {
-        this.position = position;
-        this.brightness = brightness;
-    }
-}
-
 class Intersection {
     val t: double
     val enter: boolean
@@ -39,7 +29,25 @@ class Intersection {
     }
 }
 
-class View {
+class Moveable {
+    def readwrite move(delta: pure Vector3D): { /* to be implemented by subclasses */}
+}
+
+class Light extends Moveable {
+    var position: pure Vector3D
+    var brightness: double
+    
+    new(position: pure Vector3D, brightness: double) {
+        this.position = position;
+        this.brightness = brightness;
+    }
+    
+    override readwrite move(delta: pure Vector3D): {
+        this.position = this.position.plus(delta);
+    }
+}
+
+class View extends Moveable {
     var from: pure Vector3D
     var at:   pure Vector3D
     var up:   pure Vector3D
@@ -47,4 +55,8 @@ class View {
     var distance: double
     var angle:    double
     var aspect:   double
+    
+    override readwrite move(delta: pure Vector3D): {
+        this.from = this.from.plus(delta);
+    }
 }

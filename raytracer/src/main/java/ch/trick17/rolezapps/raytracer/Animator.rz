@@ -4,8 +4,9 @@ class Animator {
     
     var scene: readwrite Scene
     var framerate: int = 25
-    var length: double = 21.0
+    var length: double = 22.0
     
+    var animations: readwrite Array[readwrite Animation]
     var frame: int = 0
     
     def readonly time: double { return this.frame as double / this.framerate; }
@@ -30,7 +31,7 @@ class Animator {
             writer.writeFrame(image);
             
             this.frame += 1;
-            this.updateScene;
+            this.animate;
             the System.out.println("Frame " + this.frame + "/" + this.frames);
         }
         writer.close;
@@ -38,6 +39,7 @@ class Animator {
     
     def readwrite createScene: {
         var scene = new Scene;
+        val animations = new Array[readwrite Animation](5);
         
         scene.view = new View;
         scene.view.from = new Vector3D(-20.0, 2.0, 7.0);
@@ -46,6 +48,8 @@ class Animator {
         scene.view.distance = 1.0;
         scene.view.angle    = the Math.toRadians(30.0);
         scene.view.aspect   = 16.0/9.0;
+        animations.set(0, new LinearMovement(0.0, scene.view, new Vector3D(3.0, -1.25, 0.0)));
+        
         
         val mat1 = new Material;
         mat1.color = new Color(0.9, 0.1, 0.1);
@@ -76,37 +80,34 @@ class Animator {
         mat4.ks    = 0.2;
         
         scene.objects = new Array[readwrite Primitive](5);
-        scene.objects.set(0, new Sphere(new Vector3D( 16.0, -5.0, -2.0),  3.0, mat1));
-        scene.objects.set(1, new Sphere(new Vector3D( 35.0, 15.0, -1.0), 20.0, mat1));
+        val s0 = new Sphere(new Vector3D( 16.0, -5.0,  3.0),  3.0, mat1);
+        val s1 = new Sphere(new Vector3D( 35.0, 15.0, -1.0), 20.0, mat1);
+        scene.objects.set(0, s0);
+        scene.objects.set(1, s1);
+        animations.set(1, new CircularMovement(0.0, s0, s1.center.minus(s0.center), new Vector3D(0.0, 0.0, 1.0), the Math.PI / 2));
+        
         scene.objects.set(2, new  Plane(new Vector3D(  0.0,  0.0,  1.0),  3.0, mat2));
         scene.objects.set(3, new Sphere(new Vector3D( 10.0, -7.0,  5.0),  3.0, mat3));
         scene.objects.set(4, new Sphere(new Vector3D(-90.0,-60.0, 30.0), 90.0, mat4));
         
         scene.lights = new Array[readwrite Light](2);
-        scene.lights.set(0, new Light(new Vector3D( 2.0,  18.0, 10.0), 1.0));
-        scene.lights.set(1, new Light(new Vector3D(20.0, -50.0,  8.0), 0.3));
+        val l0 = new Light(new Vector3D( 2.0,  18.0, 10.0), 1.0);
+        val l1 = new Light(new Vector3D(20.0, -50.0,  8.0), 0.5);
+        scene.lights.set(0, l0);
+        scene.lights.set(1, l1);
+        animations.set(2, new BrightnessChange(18.0, l0, -0.5));
+        animations.set(3, new BrightnessChange(16.0, l1, -0.25));
         
         scene.background = new Color(0.05, 0.1, 0.3);
+        animations.set(4, new BackgroundChange(20.0, scene, -0.05, -0.1, -0.3));
         
         this.scene = scene;
+        this.animations = animations;
     }
     
-    def readwrite updateScene: {
-        val scene = this.scene;
-        val f = this.framerate as double;
-        
-        scene.view.from = scene.view.from.plus(new Vector3D(3/f, -1.25/f, 0.0));
-        scene.view.angle += the Math.toRadians(1.25/f);
-        
-        if(this.time >= 16) {
-            for(var i = 0; i < scene.lights.length; i += 1) {
-                val light = scene.lights.get(i);
-                light.brightness = the Math.max(light.brightness - 0.25/f, 0.0);
-            }
-        }
-        if(this.time >= 19.5) {
-            val bg = scene.background;
-            scene.background = new Color(bg.r - 0.05/f, bg.g - 0.1/f, bg.b - 0.3/f);
-        }
+    def readwrite animate: {
+        for(var i = 0; i < this.animations.length; i += 1)
+            if(this.time >= this.animations.get(i).startTime)
+                this.animations.get(i).step(this.time, this.framerate);
     }
 }

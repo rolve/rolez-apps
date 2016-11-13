@@ -1,6 +1,6 @@
 package ch.trick17.rolezapps.raytracer
 
-class Primitive {
+class Primitive extends Moveable {
     var mat: readwrite Material
     
     new(mat: readwrite Material) {
@@ -31,6 +31,10 @@ class Sphere extends Primitive {
         super(mat);
         this.center = center;
         this.radius = radius;
+    }
+    
+    override readwrite move(delta: pure Vector3D): {
+        this.center = this.center.plus(delta);
     }
     
     override readonly normal(point: pure Vector3D): pure Vector3D {
@@ -66,6 +70,10 @@ class Plane extends Primitive {
         super(mat);
         this.normal = normal;
         this.distance = distance;
+    }
+    
+    override readwrite move(delta: pure Vector3D): {
+        // TODO: not supported yet (too lazy)
     }
     
     override readonly normal(point: pure Vector3D): pure Vector3D {
