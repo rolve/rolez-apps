@@ -5,6 +5,7 @@ class Raytracer {
     var numTasks: int = 8
     var maxRecursions: int = 10
     var oversample: int = 3
+    var renderLights: boolean
     
     var scene: readonly Scene
     
@@ -46,6 +47,9 @@ class Raytracer {
                 val ray = new Ray(this.scene.view.from, dir.normalize);
                 
                 color.add(this.trace(ray, 1.0, 0));
+                if(this.renderLights)
+                    for(var i = 0; i < this.scene.lights.length; i += 1)
+                        this.renderLight(ray, this.scene.lights.get(i), color);
             }
         }
         color.multiply(1.0 / (samples * samples));
@@ -117,5 +121,16 @@ class Raytracer {
             if(spec > 0.000001)
                 color.add(the Math.pow(spec, mat.shine / intensity));
         }
+    }
+    
+    def readonly renderLight(ray: pure Ray, light: readonly Light, color: readwrite ColorBuilder): {
+        // Basically the same as specular highlights on a surface. It kind of would make
+        // sense to put this in the trace method and let it also handle specular highlights
+        // on surfaces, but only kind of...
+        val lightVec = light.position.minus(ray.origin);
+        val intensity = light.brightness / lightVec.length;
+        val spec = ray.direction.dot(lightVec.normalize);
+        if(spec > 0.000001)
+            color.add(the Math.pow(spec, 50 / intensity));
     }
 }

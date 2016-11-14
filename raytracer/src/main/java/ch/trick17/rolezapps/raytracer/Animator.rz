@@ -17,6 +17,7 @@ class Animator {
 
         val tracer = new Raytracer;
         tracer.scene = this.scene;
+        tracer.renderLights = true;
         tracer.oversample = 1;
         
         val width = 800;
