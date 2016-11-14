@@ -76,6 +76,7 @@ class Raytracer {
         val color = new ColorBuilder;
         
         // Lighting
+        color.add(mat.color, this.scene.ambientLight);
         for(var i = 0; i < this.scene.lights.length; i += 1) {
             val light = this.scene.lights.get(i);
             val lightVec = light.position.minus(point);
@@ -83,7 +84,7 @@ class Raytracer {
                 val shadowRay = new Ray(point, lightVec);
                 val intersect = this.scene.intersect(shadowRay);
                 if(intersect == null || intersect.t > lightVec.length)
-                    this.light(mat, light, shadowRay.direction, normal, reflectDir, color);
+                    this.light(mat, light, lightVec, normal, reflectDir, color);
             }
         }
         
@@ -105,14 +106,16 @@ class Raytracer {
         return color.build;
     }
     
-    def pure light(material: readonly Material, light: readonly Light, lightDir: pure Vector3D,
+    def readonly light(mat: readonly Material, light: readonly Light, lightVec: pure Vector3D,
             normal: pure Vector3D, reflectDir: pure Vector3D, color: readwrite ColorBuilder): {
-        val shade = normal.dot(lightDir) * light.brightness * material.kd;
-        color.add(material.color, shade);
-        if(material.shine > 0.000001) {
+        val lightDir = lightVec.normalize;
+        val intensity = light.brightness / lightVec.length;
+        val shade = intensity * mat.kd * normal.dot(lightDir);
+        color.add(mat.color, shade);
+        if(mat.shine > 0.000001) {
             val spec = reflectDir.dot(lightDir);
             if(spec > 0.000001)
-                color.add(the Math.pow(spec, material.shine / light.brightness));
+                color.add(the Math.pow(spec, mat.shine / intensity));
         }
     }
 }

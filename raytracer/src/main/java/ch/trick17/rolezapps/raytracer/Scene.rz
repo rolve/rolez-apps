@@ -1,10 +1,11 @@
 package ch.trick17.rolezapps.raytracer
 
 class Scene {
-    var lights: readwrite Array[readwrite Light]
-    var objects: readwrite Array[readwrite Primitive]
-    var background: pure Color
     var view: readwrite View
+    var objects: readwrite Array[readwrite Primitive]
+    var lights: readwrite Array[readwrite Light]
+    var ambientLight: double
+    var background: pure Color
     
     def readonly intersect(ray: pure Ray): readonly Intersection {
         var closest: readonly Intersection = null;

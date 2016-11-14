@@ -69,6 +69,22 @@ class BrightnessChange extends Animation {
     }
 }
 
+class AmbientLightChange extends Animation {
+    
+    val scene: readwrite Scene
+    val changePerS: double
+    
+    new(startTime: double, scene: readwrite Scene, changePerS: double) {
+        super(startTime);
+        this.scene = scene;
+        this.changePerS = changePerS;
+    }
+    
+    override readwrite step(time: double, framerate: int): {
+        this.scene.ambientLight += this.changePerS / framerate;
+    }
+}
+
 class BackgroundChange extends Animation {
     
     val scene: readwrite Scene
@@ -88,9 +104,9 @@ class BackgroundChange extends Animation {
     override readwrite step(time: double, f: int): {
         val bg = this.scene.background;
         this.scene.background = new Color(
-            bg.r + this.rChangePerS/f,
-            bg.g + this.gChangePerS/f,
-            bg.b + this.bChangePerS/f
+            bg.r + this.rChangePerS / f,
+            bg.g + this.gChangePerS / f,
+            bg.b + this.bChangePerS / f
         );
     }
 }
