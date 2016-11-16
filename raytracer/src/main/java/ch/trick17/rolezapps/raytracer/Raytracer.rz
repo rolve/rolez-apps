@@ -11,9 +11,9 @@ class Raytracer {
     
     def readonly render(image: readwrite Array[readwrite Array[int]]): {
         val parts = image.partition(the StripedPartitioner, this.numTasks);
-        for(var i = 1; i < parts.length; i += 1)
+        for(var i = 0; i < parts.length - 1; i += 1)
             this start renderPart(parts.get(i));
-        this.renderPart(parts.get(0));
+        this.renderPart(parts.get(parts.length - 1));
     }
     
     task readonly renderPart(imagePart: readwrite Slice[readwrite Array[int]]): {
@@ -128,9 +128,12 @@ class Raytracer {
         // sense to put this in the trace method and let it also handle specular highlights
         // on surfaces, but only kind of...
         val lightVec = light.position.minus(ray.origin);
-        val intensity = light.brightness / lightVec.length;
-        val spec = ray.direction.dot(lightVec.normalize);
-        if(spec > 0.000001)
-            color.add(the Math.pow(spec, 50 / intensity));
+        val intersect = this.scene.intersect(new Ray(ray.origin, lightVec));
+        if(intersect == null || intersect.t > lightVec.length) {
+            val intensity = light.brightness / lightVec.length;
+            val spec = ray.direction.dot(lightVec.normalize);
+            if(spec > 0.000001)
+                color.add(the Math.pow(spec, 50 / intensity));
+        }
     }
 }
