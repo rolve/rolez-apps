@@ -48,7 +48,7 @@ class Raytracer {
                 
                 color.add(this.trace(ray, 1.0, 0));
                 if(this.renderLights)
-                    for(var i = 0; i < this.scene.lights.length; i += 1)
+                    for(var i = 0; i < this.scene.lights.size; i += 1)
                         this.renderLight(ray, this.scene.lights.get(i), color);
             }
         }
@@ -81,7 +81,7 @@ class Raytracer {
         
         // Lighting
         color.add(mat.color, this.scene.ambientLight);
-        for(var i = 0; i < this.scene.lights.length; i += 1) {
+        for(var i = 0; i < this.scene.lights.size; i += 1) {
             val light = this.scene.lights.get(i);
             val lightVec = light.position.minus(point);
             if(normal.dot(lightVec) >= 0) {

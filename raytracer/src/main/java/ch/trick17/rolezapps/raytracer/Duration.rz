@@ -1,0 +1,23 @@
+package ch.trick17.rolezapps.raytracer
+
+pure class Duration {
+    val begin: double
+    val end: double
+    
+    new {
+        this.begin = 0.0;
+        this.end = the Double.POSITIVE_INFINITY;
+    }
+    
+    new (begin: double) {
+        this.begin = begin;
+        this.end = the Double.POSITIVE_INFINITY;
+    }
+    
+    new(begin: double, end: double) {
+        this.begin = begin;
+        this.end = end;
+    }
+}
+
+object WholeTime extends Duration

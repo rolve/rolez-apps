@@ -1,12 +1,17 @@
 package ch.trick17.rolezapps.raytracer
 
+import rolez.util.ArrayList
+import rolez.util.Random
+
 class Animator {
+    
+    val random: readwrite Random = new Random
     
     var scene: readwrite Scene
     var framerate: int = 25
     var length: double = 22.0
     
-    var animations: readwrite Array[readwrite Animation]
+    var animations: readwrite ArrayList[readwrite Animation]
     var frame: int = 0
     
     def readonly time: double { return this.frame as double / this.framerate; }
@@ -42,77 +47,172 @@ class Animator {
     
     def readwrite createScene: {
         var scene = new Scene;
-        val animations = new Array[readwrite Animation](6);
+        val animations = new ArrayList[readwrite Animation];
         
-        scene.view = new View;
-        scene.view.from = new Vector3D(-20.0, 2.0, 7.0);
-        scene.view.at   = new Vector3D( 25.0, 0.0, 0.0);
-        scene.view.up   = new Vector3D(  0.0, 0.0, 1.0);
-        scene.view.distance = 1.0;
-        scene.view.angle    = the Math.toRadians(30.0);
-        scene.view.aspect   = 16.0/9.0;
-        animations.set(0, new LinearMovement(0.0, scene.view, new Vector3D(3.0, -1.25, 0.0)));
+        /* Parameters */
+        val height  = 22.0;
+        val side    = 40.0;
+        val camDist = side/2 - 1;
+        val ballsPerSecond = 4;
         
+        val dimLength = 8.0;
+        val darkLength = 0.5;
         
-        val mat1 = new Material;
-        mat1.color = new Color(0.9, 0.1, 0.1);
-        mat1.kd    = 0.9;
-        mat1.shine = 15.0;
-        mat1.ks    = 0.5;
-        mat1.kt    = 0.0;
-        mat1.ior   = 1.0;
+        /* View */
+        val view = new View;
+        view.from = new Vector3D(-camDist, 0.0, height/2 - 1);
+        view.at   = new Vector3D(0.0, 0.0, 0.0);
+        view.up   = new Vector3D(0.0, 0.0, 1.0);
+        view.distance = 1.0;
+        view.angle    = the Math.toRadians(35.0);
+        view.aspect   = 16.0/9.0;
+        scene.view = view;
+        animations.add(new CircularMovement(the WholeTime, view,
+                new Vector3D(0.0, 0.0, height/2 - 1).minus(view.from), view.up, the Math.PI / 6));
+        animations.add(new LinearMovement(the WholeTime, view, new Vector3D(0.0, 0.0, -(height-2) / this.length)));
+        
+        /* Materials */
+        val red = new Material;
+        red.color = new Color(0.9, 0.1, 0.1);
+        red.kd    = 0.9;
+        red.shine = 15.0;
+        red.ks    = 0.5;
 
-        val mat2 = new Material;
-        mat2.color = new Color(0.9, 0.9, 1.0);
-        mat2.kd    = 0.7;
-        mat2.shine = 15.0;
-        mat2.ks    = 0.3;
+        val white = new Material;
+        white.color = new Color(0.9, 0.9, 1.0);
+        white.kd    = 1.2;
+        white.shine = 100.0;
+        white.ks    = 0.25;
         
-        val mat3 = new Material;
-        mat3.color = the Colors.black;
-        mat3.kd    = 0.0;
-        mat3.shine = 15.0;
-        mat3.ks    = 0.2;
-        mat3.kt    = 1.0;
-        mat3.ior   = 1.05;
+        val glass = new Material;
+        glass.color = the Colors.black;
+        glass.kd    = 0.0;
+        glass.shine = 15.0;
+        glass.ks    = 0.2;
+        glass.kt    = 1.0;
+        glass.ior   = 1.05;
         
-        val mat4 = new Material;
-        mat4.color = the Colors.black;
-        mat4.kd    = 0.0;
-        mat4.shine = 10.0;
-        mat4.ks    = 0.2;
+        val blue = new Material;
+        blue.color = new Color(0.0, 0.0, 0.5);
+        blue.kd    = 0.5;
+        blue.shine = 10.0;
+        blue.ks    = 0.2;
         
-        scene.objects = new Array[readwrite Primitive](5);
-        val s0 = new Sphere(new Vector3D( 16.0, -5.0,  3.0),  3.0, mat1);
-        val s1 = new Sphere(new Vector3D( 35.0, 15.0, -1.0), 20.0, mat1);
-        scene.objects.set(0, s0);
-        scene.objects.set(1, s1);
-        animations.set(1, new CircularMovement(0.0, s0, s1.center.minus(s0.center), new Vector3D(0.0, 0.0, 1.0), the Math.PI / 2));
+        val black = new Material;
+        black.color = the Colors.black;
+        black.kd    = 0.0;
+        black.shine = 10.0;
+        black.ks    = 0.2;
         
-        scene.objects.set(2, new  Plane(new Vector3D(  0.0,  0.0,  1.0),  3.0, mat2));
-        scene.objects.set(3, new Sphere(new Vector3D( 10.0, -7.0,  5.0),  3.0, mat3));
-        scene.objects.set(4, new Sphere(new Vector3D(-90.0,-60.0, 30.0), 90.0, mat4));
+        /* Objects & lights */
+        scene.objects = new ArrayList[readwrite Primitive];
         
-        scene.lights = new Array[readwrite Light](2);
-        val l0 = new Light(new Vector3D( 2.0,  18.0, 18.0), 25.0);
-        val l1 = new Light(new Vector3D(20.0, -50.0,  8.0), 10.0);
-        scene.lights.set(0, l0);
-        scene.lights.set(1, l1);
-        animations.set(2, new BrightnessChange(18.0, l0, -10.0));
-        animations.set(3, new BrightnessChange(16.0, l1,  -5.0));
+        val wall1 = new Plane(new Vector3D(-1.0,  0.0,  0.0),   side/2, white);
+        val wall2 = new Plane(new Vector3D( 1.0,  0.0,  0.0),   side/2, white);
+        val wall3 = new Plane(new Vector3D( 0.0, -1.0,  0.0),   side/2, white);
+        val wall4 = new Plane(new Vector3D( 0.0,  1.0,  0.0),   side/2, white);
+        val ceil  = new Plane(new Vector3D( 0.0,  0.0, -1.0), height/2, blue );
+        val floor = new Plane(new Vector3D( 0.0,  0.0,  1.0), height/2, black);
+        scene.objects.add(wall1);
+        scene.objects.add(wall2);
+        scene.objects.add(wall3);
+        scene.objects.add(wall4);
+        scene.objects.add(floor);
+        scene.objects.add(ceil );
         
-        scene.ambientLight = 0.15;
-        scene.background = new Color(0.05, 0.1, 0.3);
-        animations.set(4, new AmbientLightChange(20.0, scene, -0.15));
-        animations.set(5, new   BackgroundChange(20.0, scene, -0.05, -0.1, -0.3));
+        scene.lights = new ArrayList[readwrite Light];
+        val mainLight = new Light(new Vector3D(0.0, 0.0, 0.0), 5.0);
+        scene.lights.add(mainLight);
+        animations.add(new BrightnessChange(new Duration(this.length - dimLength - darkLength),
+            mainLight, -mainLight.brightness / (0.5*dimLength)));
+        
+        scene.ambientLight = 0.2;
+        animations.add(new AmbientLightChange(new Duration(this.length - 0.75*dimLength - darkLength),
+            scene, -scene.ambientLight / (0.5*dimLength)));
+        
+        val lilLightsDimDuration = new Duration(this.length - 0.5*dimLength - darkLength);
+        for(var t = 0.0; t < this.length; t += 1.0/ballsPerSecond) {
+            val radius = the Math.abs(1.5 + 0.75 * this.random.nextGaussian);
+            
+            val distance = radius + 0.1 + (camDist - 2*radius - 0.2) * this.random.nextDouble;
+            val angle = 2 * the Math.PI * this.random.nextDouble;
+            val x = distance * the Math.cos(angle);
+            val y = distance * the Math.sin(angle);
+            
+            val speed = the Math.abs(6 + 3 * this.random.nextGaussian * 3);
+            val duration = new Duration(t, t + (height + 2*radius) / speed);
+            
+            val ball = new Sphere(new Vector3D(x, y, -height/2-radius), radius, red);
+            val light = new Light(new Vector3D(x, y + 1.2 * radius, - height/2-radius), 0.2);
+            
+            animations.add(new  BallAnimation(duration, ball, speed, scene));
+            animations.add(new LightAnimation(duration, light, ball.center, speed, the Math.PI, scene));
+            animations.add(new BrightnessChange(lilLightsDimDuration, light,
+                -light.brightness / (0.5*dimLength)));
+        }
         
         this.scene = scene;
         this.animations = animations;
     }
     
     def readwrite animate: {
-        for(var i = 0; i < this.animations.length; i += 1)
-            if(this.time >= this.animations.get(i).startTime)
-                this.animations.get(i).step(this.time, this.framerate);
+        for(var i = 0; i < this.animations.size; i += 1) {
+            val animation = this.animations.get(i);
+            if(animation.begun(this.time) && !animation.finished(this.time))
+                animation.animationStep(this.time, this.framerate);
+        }
     }
+}
+
+class BallAnimation extends LinearMovement {
+    
+    val scene: readwrite Scene
+    
+    new(duration: pure Duration, sphere: readwrite Sphere, speed: double, scene: readwrite Scene) {
+        super(duration, sphere, new Vector3D(0.0, 0.0, 1.0).scale(speed));
+        this.scene = scene;
+    }
+    
+    override readwrite onBegin: {
+        this.scene.objects.add(this.obj as readwrite Sphere);
+    }
+
+    override readwrite onFinish: {
+        this.scene.objects.remove(this.obj);
+    }
+}
+
+class LightAnimation extends AnimationGroup {
+    
+    val scene: readwrite Scene
+    val light: readwrite Light
+    
+    new(duration: pure Duration, light: readwrite Light, center: pure Vector3D,
+            riseSpeed: double, circularSpeed: double, scene: readwrite Scene) {
+        super(the Helper.lightAnimations(duration, light, center, riseSpeed, circularSpeed));
+        this.scene = scene;
+        this.light = light;
+    }
+    
+    override readwrite onFirstBegin: {
+        this.scene.lights.add(this.light);
+    }
+    
+    override readwrite onLastFinish: {
+        this.scene.lights.remove(this.light);
+    }
+}
+
+object Helper {
+    def pure lightAnimations(duration: pure Duration, light: readwrite Light, center: pure Vector3D,
+            riseSpeed: double, circularSpeed: double): readwrite Array[readwrite Animation] {
+        val up = new Vector3D(0.0, 0.0, 1.0);
+        val linear = new LinearMovement(duration, light, up.scale(riseSpeed));
+        val circular = new CircularMovement(duration, light, center.minus(light.position), up, circularSpeed);
+        
+        val result = new Array[readwrite Animation](2);
+        result.set(0, linear);
+        result.set(1, circular);
+        return result;
+    }   
 }

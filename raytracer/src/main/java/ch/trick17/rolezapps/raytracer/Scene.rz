@@ -1,15 +1,17 @@
 package ch.trick17.rolezapps.raytracer
 
+import rolez.util.ArrayList
+
 class Scene {
     var view: readwrite View
-    var objects: readwrite Array[readwrite Primitive]
-    var lights: readwrite Array[readwrite Light]
+    var objects: readwrite ArrayList[readwrite Primitive]
+    var lights: readwrite ArrayList[readwrite Light]
     var ambientLight: double
     var background: pure Color
     
     def readonly intersect(ray: pure Ray): readonly Intersection {
         var closest: readonly Intersection = null;
-        for(var i = 0; i < this.objects.length; i += 1) {
+        for(var i = 0; i < this.objects.size; i += 1) {
             val intersection = this.objects.get(i).intersect(ray);
             if(intersection != null && (closest == null || intersection.t < closest.t))
                 closest = intersection;
