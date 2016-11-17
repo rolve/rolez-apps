@@ -1,62 +1,39 @@
-package ch.trick17.rolezapps.raytracer
+package ch.trick17.rolezapps.raytracer.anim
 
 import rolez.util.ArrayList
 import rolez.util.Random
+import ch.trick17.rolezapps.raytracer.*
+import ch.trick17.rolezapps.raytracer.util.VideoWriter
 
-class Animator {
+object AnimatorApp {
     
-    val random: readwrite Random = new Random
-    
-    var scene: readwrite Scene
-    var framerate: int = 25
-    var length: double = 22.0
-    
-    var animations: readwrite ArrayList[readwrite Animation]
-    var frame: int = 0
-    
-    def readonly time: double { return this.frame as double / this.framerate; }
-    def readonly frames: int  { return the Math.ceil(this.length * this.framerate) as int; }
-    
-    task readwrite main(args: readonly Array[readonly String]): {
-        this.createScene;
-
-        val tracer = new Raytracer;
-        tracer.scene = this.scene;
-        tracer.renderLights = true;
-        tracer.oversample = 1;
+    task pure main(args: readonly Array[pure String]): {
+        val raytracer = new Raytracer;
+        raytracer.numTasks = 8;
+        raytracer.oversample = 2;
+        raytracer.renderLights = true;
         
+        val scene = this.createScene(new Random);
         val width = 800;
-        val height = (width / tracer.scene.view.aspect) as int;
-        val image = new Array[readwrite Array[int]](height);
-        for(var i = 0; i < height; i += 1)
-            image.set(i, new Array[int](width));
+        val height = (width / scene.view.aspect) as int;
+        val writer = new VideoWriter("movie.mp4", width, height, 25, 12);
         
-        val writer = new VideoWriter("test.mp4", width, height, this.framerate, 12);
-        while(this.frame < this.frames) {
-            tracer.render(image);
-            writer.writeFrame(image);
-            if(this.frame == 0)
-                the ImageWriter.write(image, "png", "test.png");
-            
-            this.frame += 1;
-            this.animate;
-            the System.out.println("Frame " + this.frame + "/" + this.frames);
-        }
-        writer.close;
+        val animator = new Animator(raytracer, scene, writer);
+        animator.render;
     }
     
-    def readwrite createScene: {
-        var scene = new Scene;
-        val animations = new ArrayList[readwrite Animation];
-        
+    def pure createScene(random: readwrite Random): readwrite AnimatedScene {
         /* Parameters */
+        val length  = 30.0;
         val height  = 22.0;
         val side    = 40.0;
         val camDist = side/2 - 1;
-        val ballsPerSecond = 4;
+        val ballsPerS = 4;
         
-        val dimLength = 8.0;
-        val darkLength = 0.5;
+        val dimLength = 11.0;
+        val darkLength = 1.0;
+
+        var scene = new AnimatedScene(length);
         
         /* View */
         val view = new View;
@@ -67,9 +44,10 @@ class Animator {
         view.angle    = the Math.toRadians(35.0);
         view.aspect   = 16.0/9.0;
         scene.view = view;
-        animations.add(new CircularMovement(the WholeTime, view,
+        scene.animations.add(new CircularMovement(the WholeTime, view,
                 new Vector3D(0.0, 0.0, height/2 - 1).minus(view.from), view.up, the Math.PI / 6));
-        animations.add(new LinearMovement(the WholeTime, view, new Vector3D(0.0, 0.0, -(height-2) / this.length)));
+        scene.animations.add(new LinearMovement(the WholeTime, view,
+                new Vector3D(0.0, 0.0, -(height-2) / scene.length)));
         
         /* Materials */
         val red = new Material;
@@ -104,9 +82,7 @@ class Animator {
         black.shine = 10.0;
         black.ks    = 0.2;
         
-        /* Objects & lights */
-        scene.objects = new ArrayList[readwrite Primitive];
-        
+        /* Objects & lights */        
         val wall1 = new Plane(new Vector3D(-1.0,  0.0,  0.0),   side/2, white);
         val wall2 = new Plane(new Vector3D( 1.0,  0.0,  0.0),   side/2, white);
         val wall3 = new Plane(new Vector3D( 0.0, -1.0,  0.0),   side/2, white);
@@ -120,55 +96,45 @@ class Animator {
         scene.objects.add(floor);
         scene.objects.add(ceil );
         
-        scene.lights = new ArrayList[readwrite Light];
         val mainLight = new Light(new Vector3D(0.0, 0.0, 0.0), 5.0);
         scene.lights.add(mainLight);
-        animations.add(new BrightnessChange(new Duration(this.length - dimLength - darkLength),
+        scene.animations.add(new BrightnessChange(new Duration(scene.length - dimLength - darkLength),
             mainLight, -mainLight.brightness / (0.5*dimLength)));
         
         scene.ambientLight = 0.2;
-        animations.add(new AmbientLightChange(new Duration(this.length - 0.75*dimLength - darkLength),
+        scene.animations.add(new AmbientLightChange(new Duration(scene.length - 0.75*dimLength - darkLength),
             scene, -scene.ambientLight / (0.5*dimLength)));
         
-        val lilLightsDimDuration = new Duration(this.length - 0.5*dimLength - darkLength);
-        for(var t = 0.0; t < this.length; t += 1.0/ballsPerSecond) {
-            val radius = the Math.abs(1.5 + 0.75 * this.random.nextGaussian);
+        val lilLightsDimDuration = new Duration(scene.length - 0.5*dimLength - darkLength);
+        for(var t = 0.0; t < scene.length; t += 1.0/ballsPerS) {
+            val radius = the Math.abs(1.5 + 0.75 * random.nextGaussian);
             
-            val distance = radius + 0.1 + (camDist - 2*radius - 0.2) * this.random.nextDouble;
-            val angle = 2 * the Math.PI * this.random.nextDouble;
+            val distance = radius + 0.1 + (camDist - 2*radius - 0.2) * random.nextDouble;
+            val angle = 2 * the Math.PI * random.nextDouble;
             val x = distance * the Math.cos(angle);
             val y = distance * the Math.sin(angle);
             
-            val speed = the Math.abs(6 + 3 * this.random.nextGaussian * 3);
+            val speed = the Math.abs(6 + 3 * random.nextGaussian);
             val duration = new Duration(t, t + (height + 2*radius) / speed);
             
             val ball = new Sphere(new Vector3D(x, y, -height/2-radius), radius, red);
             val light = new Light(new Vector3D(x, y + 1.2 * radius, - height/2-radius), 0.2);
             
-            animations.add(new  BallAnimation(duration, ball, speed, scene));
-            animations.add(new LightAnimation(duration, light, ball.center, speed, the Math.PI, scene));
-            animations.add(new BrightnessChange(lilLightsDimDuration, light,
+            scene.animations.add(new BallAnimation(duration, ball, speed, scene));
+            scene.animations.add(new LightAnimation(duration, light, ball.center, speed, the Math.PI, scene));
+            scene.animations.add(new BrightnessChange(lilLightsDimDuration, light,
                 -light.brightness / (0.5*dimLength)));
         }
         
-        this.scene = scene;
-        this.animations = animations;
-    }
-    
-    def readwrite animate: {
-        for(var i = 0; i < this.animations.size; i += 1) {
-            val animation = this.animations.get(i);
-            if(animation.begun(this.time) && !animation.finished(this.time))
-                animation.animationStep(this.time, this.framerate);
-        }
+        return scene;
     }
 }
 
 class BallAnimation extends LinearMovement {
     
-    val scene: readwrite Scene
+    val scene: readwrite AnimatedScene
     
-    new(duration: pure Duration, sphere: readwrite Sphere, speed: double, scene: readwrite Scene) {
+    new(duration: pure Duration, sphere: readwrite Sphere, speed: double, scene: readwrite AnimatedScene) {
         super(duration, sphere, new Vector3D(0.0, 0.0, 1.0).scale(speed));
         this.scene = scene;
     }
@@ -184,11 +150,11 @@ class BallAnimation extends LinearMovement {
 
 class LightAnimation extends AnimationGroup {
     
-    val scene: readwrite Scene
+    val scene: readwrite AnimatedScene
     val light: readwrite Light
     
     new(duration: pure Duration, light: readwrite Light, center: pure Vector3D,
-            riseSpeed: double, circularSpeed: double, scene: readwrite Scene) {
+            riseSpeed: double, circularSpeed: double, scene: readwrite AnimatedScene) {
         super(the Helper.lightAnimations(duration, light, center, riseSpeed, circularSpeed));
         this.scene = scene;
         this.light = light;

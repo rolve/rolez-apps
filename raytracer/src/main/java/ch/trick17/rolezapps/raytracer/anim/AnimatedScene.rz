@@ -1,0 +1,14 @@
+package ch.trick17.rolezapps.raytracer.anim
+
+import rolez.util.ArrayList
+import ch.trick17.rolezapps.raytracer.Scene
+
+class AnimatedScene extends Scene {
+    
+    val length: double
+    val animations: readwrite ArrayList[readwrite Animation] = new ArrayList[readwrite Animation]
+    
+    new(length: double) {
+        this.length = length;
+    }
+}

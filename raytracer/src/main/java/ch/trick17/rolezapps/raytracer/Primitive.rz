@@ -1,5 +1,7 @@
 package ch.trick17.rolezapps.raytracer
 
+import ch.trick17.rolezapps.raytracer.anim.Moveable
+
 class Primitive extends Moveable {
     var mat: readwrite Material
     

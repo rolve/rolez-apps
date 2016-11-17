@@ -1,4 +1,4 @@
-package ch.trick17.rolezapps.raytracer
+package ch.trick17.rolezapps.raytracer.anim
 
 pure class Duration {
     val begin: double

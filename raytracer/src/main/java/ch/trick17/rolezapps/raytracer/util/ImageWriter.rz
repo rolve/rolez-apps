@@ -1,4 +1,4 @@
-package ch.trick17.rolezapps.raytracer
+package ch.trick17.rolezapps.raytracer.util
 
 import rolez.io.File
 

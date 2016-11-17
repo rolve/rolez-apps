@@ -1,11 +1,12 @@
 package ch.trick17.rolezapps.raytracer
 
 import rolez.util.ArrayList
+import ch.trick17.rolezapps.raytracer.anim.Moveable
 
 class Scene {
     var view: readwrite View
-    var objects: readwrite ArrayList[readwrite Primitive]
-    var lights: readwrite ArrayList[readwrite Light]
+    val objects: readwrite ArrayList[readwrite Primitive] = new ArrayList[readwrite Primitive]
+    val lights: readwrite ArrayList[readwrite Light] = new ArrayList[readwrite Light]
     var ambientLight: double
     var background: pure Color
     
@@ -20,20 +21,18 @@ class Scene {
     }
 }
 
-class Intersection {
-    val t: double
-    val enter: boolean
-    val primitive: readonly Primitive
+class View extends Moveable {
+    var from: pure Vector3D
+    var at:   pure Vector3D
+    var up:   pure Vector3D
     
-    new(t: double, enter: boolean, primitive: readonly Primitive) {
-        this.t = t;
-        this.enter = enter;
-        this.primitive = primitive;
+    var distance: double
+    var angle:    double
+    var aspect:   double
+    
+    override readwrite move(delta: pure Vector3D): {
+        this.from = this.from.plus(delta);
     }
-}
-
-class Moveable {
-    def readwrite move(delta: pure Vector3D): { /* to be implemented by subclasses */}
 }
 
 class Light extends Moveable {
@@ -50,16 +49,14 @@ class Light extends Moveable {
     }
 }
 
-class View extends Moveable {
-    var from: pure Vector3D
-    var at:   pure Vector3D
-    var up:   pure Vector3D
+class Intersection {
+    val t: double
+    val enter: boolean
+    val primitive: readonly Primitive
     
-    var distance: double
-    var angle:    double
-    var aspect:   double
-    
-    override readwrite move(delta: pure Vector3D): {
-        this.from = this.from.plus(delta);
+    new(t: double, enter: boolean, primitive: readonly Primitive) {
+        this.t = t;
+        this.enter = enter;
+        this.primitive = primitive;
     }
 }

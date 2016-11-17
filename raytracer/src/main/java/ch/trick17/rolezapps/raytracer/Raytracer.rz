@@ -2,9 +2,9 @@ package ch.trick17.rolezapps.raytracer
 
 class Raytracer {
     
-    var numTasks: int = 8
+    var numTasks: int = 1
     var maxRecursions: int = 10
-    var oversample: int = 3
+    var oversample: int = 1
     var renderLights: boolean
     
     var scene: readonly Scene

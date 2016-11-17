@@ -1,6 +1,10 @@
-package ch.trick17.rolezapps.raytracer
+package ch.trick17.rolezapps.raytracer.util
 
 class VideoWriter mapped to VideoWriterJava {
+    
+    mapped val width: int
+    mapped val height: int
+    mapped val framerate: int
     
     mapped new(file: pure String, width: int, height: int, framerate: int, qp: int)
     

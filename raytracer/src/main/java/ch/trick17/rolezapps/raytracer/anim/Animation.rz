@@ -1,0 +1,89 @@
+package ch.trick17.rolezapps.raytracer.anim
+
+class Animation {
+    /* To be implemented by subclasses */
+    def readwrite    begun(time: double): boolean { return false; }
+    def readwrite finished(time: double): boolean { return false; }
+    def readwrite animationStep(time: double, framerate: int): {}
+}
+
+class SimpleAnimation extends Animation {
+    
+    val duration: pure Duration
+    
+    var    begun: boolean = false
+    var finished: boolean = false
+    
+    new(duration: pure Duration) {
+        this.duration = duration;
+    }
+    
+    override readwrite begun(time: double): boolean {
+        if(!this.begun && time >= this.duration.begin) {
+            this.begun = true;
+            this.onBegin;
+        }
+        return this.begun;
+    }
+    
+    override readwrite finished(time: double): boolean {
+        if(!this.finished && time >= this.duration.end) {
+            this.finished = true;
+            this.onFinish;
+        }
+        return this.finished;
+    }
+    
+    /* May be overridden by subclasses */
+    def readwrite onBegin : {}
+    def readwrite onFinish: {}
+}
+
+class AnimationGroup extends Animation {
+    
+    val animations: readwrite Array[readwrite Animation]
+    var firstBegun  : boolean = false
+    var lastFinished: boolean = false
+    
+    new(animations: readwrite Array[readwrite Animation]) {
+        this.animations = animations;
+    }
+    
+    override readwrite begun(time: double): boolean {
+        var oneBegun = false;
+        for(var i = 0; i < this.animations.length; i += 1) {
+            if(this.animations.get(i).begun(time))
+                oneBegun = true;
+        }
+        if(!this.firstBegun && oneBegun) {
+            this.firstBegun = true;
+            this.onFirstBegin;
+        }
+        return oneBegun;
+    }
+    
+    override readwrite finished(time: double): boolean {
+        var allFinished = true;
+        for(var i = 0; i < this.animations.length; i += 1) {
+            if(!this.animations.get(i).finished(time))
+                allFinished = false;
+        }
+        if(!this.lastFinished && allFinished) {
+            this.lastFinished = true;
+            this.onLastFinish;
+        }
+        return allFinished;
+    }
+    
+    override readwrite animationStep(time: double, framerate: int): {
+        for(var i = 0; i < this.animations.length; i += 1) {
+            val animation = this.animations.get(i);
+            if(animation.begun(time) && !animation.finished(time))
+                animation.animationStep(time, framerate);
+        }
+    }
+    
+    /* May be overridden by subclasses */
+    def readwrite onFirstBegin: {}
+    def readwrite onLastFinish: {}
+}

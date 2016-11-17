@@ -1,6 +1,6 @@
-package ch.trick17.rolezapps.raytracer;
+package ch.trick17.rolezapps.raytracer.util;
 
-import static ch.trick17.rolezapps.raytracer.ImageWriterJava.toBufferedImage;
+import static ch.trick17.rolezapps.raytracer.util.ImageWriterJava.toBufferedImage;
 import static org.jcodec.scale.AWTUtil.fromBufferedImage;
 
 import java.io.File;
@@ -32,9 +32,9 @@ import org.jcodec.scale.Transform;
  */
 public class VideoWriterJava {
 
-    private final int width;
-    private final int height;
-    private final int framerate;
+    public final int width;
+    public final int height;
+    public final int framerate;
     
     private final SeekableByteChannel channel;
     private final Transform transform;

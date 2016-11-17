@@ -1,4 +1,4 @@
-package ch.trick17.rolezapps.raytracer;
+package ch.trick17.rolezapps.raytracer.util;
 
 import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 
@@ -14,7 +14,7 @@ public class ImageWriterJava {
         ImageIO.write(toBufferedImage(imageData), formatName, new File(file));
     }
     
-    static BufferedImage toBufferedImage(int[][] imageData) {
+    public static BufferedImage toBufferedImage(int[][] imageData) {
         int width = imageData[0].length;
         int height = imageData.length;
         BufferedImage image = new BufferedImage(width, height, TYPE_INT_RGB);
