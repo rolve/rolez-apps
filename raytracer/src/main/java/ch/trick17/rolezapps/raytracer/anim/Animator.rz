@@ -7,9 +7,7 @@ import ch.trick17.rolezapps.raytracer.util.VideoWriter
 import ch.trick17.rolezapps.raytracer.util.ImageWriter
 
 class Animator {
-    
-    val random: readwrite Random = new Random
-    
+        
     val raytracer: readwrite Raytracer
     val scene: readwrite AnimatedScene
     val writer: readwrite VideoWriter
@@ -41,17 +39,9 @@ class Animator {
             this.writer.writeFrame(image);
             
             this.frame += 1;
-            this.animate;
+            this.scene.animate(this.time, this.writer.framerate);
             the System.out.println("Frame " + this.frame + "/" + this.frames);
         }
         this.writer.close;
-    }
-    
-    def readwrite animate: {
-        for(var i = 0; i < this.scene.animations.size; i += 1) {
-            val animation = this.scene.animations.get(i);
-            if(animation.begun(this.time) && !animation.finished(this.time))
-                animation.animationStep(this.time, this.writer.framerate);
-        }
     }
 }

@@ -11,7 +11,6 @@ object AnimatorApp {
         val raytracer = new Raytracer;
         raytracer.numTasks = 8;
         raytracer.oversample = 2;
-        raytracer.renderLights = true;
         
         val scene = this.createScene(new Random);
         val width = 800;

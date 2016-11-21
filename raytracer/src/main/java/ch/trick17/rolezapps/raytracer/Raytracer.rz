@@ -5,7 +5,7 @@ class Raytracer {
     var numTasks: int = 1
     var maxRecursions: int = 10
     var oversample: int = 1
-    var renderLights: boolean
+    var renderLights: boolean = true
     
     var scene: readonly Scene
     
