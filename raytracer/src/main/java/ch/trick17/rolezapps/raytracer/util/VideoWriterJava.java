@@ -23,6 +23,8 @@ import org.jcodec.containers.mp4.muxer.MP4Muxer;
 import org.jcodec.scale.ColorUtil;
 import org.jcodec.scale.Transform;
 
+import rolez.lang.Guarded;
+
 /**
  * This class is derived from the {@link org.jcodec.api.SequenceEncoder} class from JCodec
  * (www.jcodec.org), which is licensed under the FreeBSD license.
@@ -30,7 +32,7 @@ import org.jcodec.scale.Transform;
  * @author The JCodec project
  * @author Michael Faes
  */
-public class VideoWriterJava {
+public class VideoWriterJava extends Guarded {
 
     public final int width;
     public final int height;
