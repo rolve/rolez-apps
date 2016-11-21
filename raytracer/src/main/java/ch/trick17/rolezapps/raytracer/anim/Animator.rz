@@ -12,19 +12,20 @@ class Animator {
     val scene: readwrite AnimatedScene
     val writer: readwrite VideoWriter
     
+    var printProgress: boolean = false
+    
+    val frames: int
     var frame: int
     
     new(raytracer: readwrite Raytracer, scene: readwrite AnimatedScene, writer: readwrite VideoWriter) {
         this.raytracer = raytracer;
         this.scene = scene;
         this.writer = writer;
+        
+        this.frames = the Math.ceil(scene.length * writer.framerate) as int;
     }
     
     def readonly time: double { return this.frame as double / this.writer.framerate; }
-    
-    def readonly frames: int  {
-        return the Math.ceil(this.scene.length * this.writer.framerate) as int;
-    }
     
     def readwrite render: {
         this.frame = 0;
@@ -40,7 +41,8 @@ class Animator {
             
             this.frame += 1;
             this.scene.animate(this.time, this.writer.framerate);
-            the System.out.println("Frame " + this.frame + "/" + this.frames);
+            if(this.printProgress)
+                the System.out.println("Frame " + this.frame + "/" + this.frames);
         }
         this.writer.close;
     }

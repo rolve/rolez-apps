@@ -1,9 +1,10 @@
-package ch.trick17.rolezapps.raytracer;
+package ch.trick17.rolezapps.raytracer.anim;
 
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
 
+import java.io.IOException;
 import java.util.Random;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -19,55 +20,46 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import ch.trick17.rolezapps.raytracer.anim.AnimatedScene;
-import ch.trick17.rolezapps.raytracer.anim.AnimatorApp;
-import rolez.lang.Guarded;
-import rolez.lang.GuardedArray;
+import ch.trick17.rolezapps.raytracer.Raytracer;
+import ch.trick17.rolezapps.raytracer.util.VideoWriterJava;
 import rolez.lang.Task;
 
 @BenchmarkMode(SingleShotTime)
 @Fork(1)
 @State(Thread)
-public class RaytracerBenchmark {
+public class AnimatorBenchmark {
     
-    @Param({"180", "360"})
+    private static final String MOVIE_FILE = "movie.mp4";
+
+    @Param({"90"})
     int height;
     
     @Param({""})
     String impl;
     
-    @Param({"1", "2", "4", "8", "32", "128"})
+    @Param({"1", "8"})
     int tasks;
     
-    Raytracer raytracer;
-    GuardedArray<GuardedArray<int[]>[]> image;
+    Animator animator;
     
     @Setup(Level.Iteration)
-    public void setup() {
+    public void setup() throws IOException {
         Task.registerNewRootTask();
-        AnimatedScene scene = createBenchmarkScene();
-        
+        AnimatedScene scene = AnimatorApp.INSTANCE.createScene(new Random(42), 3.0);
         int width = (int) (height * scene.view.aspect);
-        image = GuardedArray.wrap(new int[height][width]);
         
-        raytracer = instantiateBenchmark(Raytracer.class, impl);
+        Raytracer raytracer = instantiateBenchmark(Raytracer.class, impl);
         raytracer.numTasks = tasks;
-        raytracer.maxRecursions = 5;
-        raytracer.scene = scene;
-    }
-
-    private static AnimatedScene createBenchmarkScene() {
-        AnimatedScene scene = AnimatorApp.INSTANCE.createScene(new Random(42), 30.0);
-        int framerate = 25;
-        for(int f = 1; f <= 8 * framerate; f++)
-            scene.animate(f / (double) framerate, framerate);
-        return scene;
+        raytracer.maxRecursions = 3;
+        
+        VideoWriterJava writer = new VideoWriterJava(MOVIE_FILE, width, height, 25, 12);
+        
+        animator = instantiateBenchmark(Animator.class, impl, raytracer, scene, writer);
     }
     
     @Benchmark
-    public void raytracer() {
-        raytracer.render(image);
-        Guarded.guardReadOnly(image); // This joins the render threads
+    public void animator() {
+        animator.render();
     }
     
     @TearDown(Level.Iteration)
@@ -76,8 +68,8 @@ public class RaytracerBenchmark {
     }
 
     public static void main(String[] args) throws RunnerException {
-        Options options = new OptionsBuilder().include(RaytracerBenchmark.class.getSimpleName())
-                .warmupIterations(20).measurementIterations(30).build();
+        Options options = new OptionsBuilder().include(AnimatorBenchmark.class.getSimpleName())
+                .warmupIterations(3).measurementIterations(30).build();
         new Runner(options).run();
     }
 }

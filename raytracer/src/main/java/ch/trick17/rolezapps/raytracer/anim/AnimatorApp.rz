@@ -2,6 +2,7 @@ package ch.trick17.rolezapps.raytracer.anim
 
 import rolez.util.ArrayList
 import rolez.util.Random
+import rolez.util.StopWatch
 import ch.trick17.rolezapps.raytracer.*
 import ch.trick17.rolezapps.raytracer.util.VideoWriter
 
@@ -12,18 +13,18 @@ object AnimatorApp {
         raytracer.numTasks = 8;
         raytracer.oversample = 2;
         
-        val scene = this.createScene(new Random);
+        val scene = this.createScene(new Random, 30.0);
         val width = 800;
         val height = (width / scene.view.aspect) as int;
         val writer = new VideoWriter("movie.mp4", width, height, 25, 12);
         
         val animator = new Animator(raytracer, scene, writer);
+        animator.printProgress = true;
         animator.render;
     }
     
-    def pure createScene(random: readwrite Random): readwrite AnimatedScene {
+    def pure createScene(random: readwrite Random, length: double): readwrite AnimatedScene {
         /* Parameters */
-        val length  = 30.0;
         val height  = 22.0;
         val side    = 40.0;
         val camDist = side/2 - 1;
