@@ -19,10 +19,6 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import ch.trick17.rolezapps.raytracer.anim.AnimatedScene;
-import ch.trick17.rolezapps.raytracer.anim.AnimatorApp;
-import rolez.lang.Guarded;
-import rolez.lang.GuardedArray;
 import rolez.lang.Task;
 
 @BenchmarkMode(SingleShotTime)
@@ -33,41 +29,24 @@ public class RaytracerBenchmark {
     @Param({"180", "360"})
     int height;
     
-    @Param({""})
-    String impl;
-    
     @Param({"1", "2", "4", "8", "32", "128"})
     int tasks;
     
-    Raytracer raytracer;
-    GuardedArray<GuardedArray<int[]>[]> image;
+    @Param({"Rolez", "Java"})
+    String impl;
+    
+    RaytracerBenchmarkSetup setup;
     
     @Setup(Level.Iteration)
     public void setup() {
         Task.registerNewRootTask();
-        AnimatedScene scene = createBenchmarkScene();
-        
-        int width = (int) (height * scene.view.aspect);
-        image = GuardedArray.wrap(new int[height][width]);
-        
-        raytracer = instantiateBenchmark(Raytracer.class, impl);
-        raytracer.numTasks = tasks;
-        raytracer.maxRecursions = 5;
-        raytracer.scene = scene;
-    }
-
-    private static AnimatedScene createBenchmarkScene() {
-        AnimatedScene scene = AnimatorApp.INSTANCE.createScene(new Random(42), 30.0);
-        int framerate = 25;
-        for(int f = 1; f <= 8 * framerate; f++)
-            scene.animate(f / (double) framerate, framerate);
-        return scene;
+        Random random = new Random(42);
+        setup = instantiateBenchmark(RaytracerBenchmarkSetup.class, impl, height, tasks, random);
     }
     
     @Benchmark
-    public void raytracer() {
-        raytracer.render(image);
-        Guarded.guardReadOnly(image); // This joins the render threads
+    public int raytracer() {
+        return setup.runRaytracer();
     }
     
     @TearDown(Level.Iteration)

@@ -1,0 +1,40 @@
+package ch.trick17.rolezapps.raytracer
+
+import ch.trick17.rolezapps.raytracer.anim.AnimatorApp
+import rolez.util.Random
+
+class RaytracerBenchmarkSetup {
+    def readwrite runRaytracer: int { return 0; }
+}
+
+class RaytracerBenchmarkSetupRolez extends RaytracerBenchmarkSetup {
+    
+    val raytracer: readwrite Raytracer = new Raytracer
+    val image: readwrite Array[readwrite Array[int]]
+    
+    new(height: int, numTasks: int, random: readwrite Random) {
+        val scene = this.createBenchmarkScene(random);
+        val width = (height * scene.view.aspect) as int;
+        
+        this.image = new Array[readwrite Array[int]](height);
+        for(var i = 0; i < height; i += 1)
+            this.image.set(i, new Array[int](width));
+        
+        this.raytracer.numTasks = numTasks;
+        this.raytracer.maxRecursions = 5;
+        this.raytracer.scene = scene;
+    }
+    
+    def pure createBenchmarkScene(random: readwrite Random): readwrite Scene {
+        val scene = the AnimatorApp.createScene(random, 30.0);
+        val framerate = 25;
+        for(var f = 1; f <= 8 * framerate; f += 1)
+            scene.animate(f as double / framerate, framerate);
+        return scene;
+    }
+    
+    override readwrite runRaytracer: int {
+        this.raytracer.render(this.image);
+        return this.image.get(0).get(0);
+    }
+}
