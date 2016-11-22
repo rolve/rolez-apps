@@ -1,0 +1,33 @@
+package ch.trick17.rolezapps.raytracer
+
+import ch.trick17.rolezapps.raytracer.anim.AnimatorApp
+import ch.trick17.rolezapps.raytracer.util.ImageWriter
+import rolez.util.Random
+import rolez.util.Scanner
+
+object RaytracerApp {
+    
+    task pure main(args: readonly Array[pure String]): {
+        val scene = the AnimatorApp.createScene(new Random, 30.0);
+        for(var i = 0; i < 8; i += 1)
+            scene.animationStep(1.0);
+        
+        val raytracer = new Raytracer;
+        raytracer.numTasks = 8;
+        raytracer.maxRecursions = 5;
+        raytracer.oversample = 2;
+        raytracer.scene = scene;
+        
+        val height = 360;
+        val width = (scene.view.aspect * 360) as int;
+        val image = new Array[readwrite Array[int]](height);
+        for(var i = 0; i < height; i += 1)
+            image.set(i, new Array[int](width));
+        
+        the System.out.println("Press Enter to start");
+        new Scanner(the System.in).nextLine;
+        raytracer.render(image);
+        
+        the ImageWriter.write(image, "png", "image.png");
+    }
+}
