@@ -69,7 +69,7 @@ public class AnimatorBenchmark {
 
     public static void main(String[] args) throws RunnerException {
         Options options = new OptionsBuilder().include(AnimatorBenchmark.class.getSimpleName())
-                .warmupIterations(3).measurementIterations(30).build();
+                .warmupIterations(5).measurementIterations(30).build();
         new Runner(options).run();
     }
 }

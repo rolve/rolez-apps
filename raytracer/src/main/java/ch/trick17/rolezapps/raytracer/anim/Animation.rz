@@ -4,7 +4,7 @@ class Animation {
     /* To be implemented by subclasses */
     def readwrite    begun(time: double): boolean { return false; }
     def readwrite finished(time: double): boolean { return false; }
-    def readwrite animationStep(time: double, framerate: int): {}
+    def readwrite animationStep(time: double, timeStep: double): {}
 }
 
 class SimpleAnimation extends Animation {
@@ -75,11 +75,11 @@ class AnimationGroup extends Animation {
         return allFinished;
     }
     
-    override readwrite animationStep(time: double, framerate: int): {
+    override readwrite animationStep(time: double, timeStep: double): {
         for(var i = 0; i < this.animations.length; i += 1) {
             val animation = this.animations.get(i);
             if(animation.begun(time) && !animation.finished(time))
-                animation.animationStep(time, framerate);
+                animation.animationStep(time, timeStep);
         }
     }
     

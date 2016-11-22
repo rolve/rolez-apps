@@ -15,7 +15,7 @@ public class LinearMovement extends SimpleAnimation {
     }
     
     @Override
-    public void animationStep(double time, int framerate) {
-        obj.move(deltaPerS.scale(1.0 / framerate));
+    public void animationStep(double time, double timeStep) {
+        obj.move(deltaPerS.scale(timeStep));
     }
 }

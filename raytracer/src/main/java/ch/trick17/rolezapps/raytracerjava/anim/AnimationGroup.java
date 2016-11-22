@@ -41,11 +41,11 @@ public class AnimationGroup extends Animation {
     }
     
     @Override
-    public void animationStep(double time, int framerate) {
+    public void animationStep(double time, double timeStep) {
         for(Animation element : animations) {
             final Animation animation = element;
             if(animation.begun(time) && (!animation.finished(time)))
-                animation.animationStep(time, framerate);
+                animation.animationStep(time, timeStep);
         }
     }
     

@@ -25,9 +25,8 @@ public class RaytracerBenchmarkSetupJava extends RaytracerBenchmarkSetup {
     
     public Scene createBenchmarkScene(final Random random) {
         AnimatedScene scene = AnimatorApp.createScene(random, 30.0);
-        int framerate = 25;
-        for(int f = 1; f <= (8 * framerate); f += 1)
-            scene.animate(((double) f) / framerate, framerate);
+        for(int t = 1; t <= 8; t += 1)
+            scene.animationStep(1.0);
         return scene;
     }
     

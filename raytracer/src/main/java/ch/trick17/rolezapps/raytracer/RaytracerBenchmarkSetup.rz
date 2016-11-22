@@ -27,9 +27,8 @@ class RaytracerBenchmarkSetupRolez extends RaytracerBenchmarkSetup {
     
     def pure createBenchmarkScene(random: readwrite Random): readwrite Scene {
         val scene = the AnimatorApp.createScene(random, 30.0);
-        val framerate = 25;
-        for(var f = 1; f <= 8 * framerate; f += 1)
-            scene.animate(f as double / framerate, framerate);
+        for(var t = 1; t <= 8; t += 1)
+            scene.animationStep(1.0);
         return scene;
     }
     

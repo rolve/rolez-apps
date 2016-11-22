@@ -14,5 +14,5 @@ public class Animation {
         return false;
     }
     
-    public void animationStep(double time, int framerate) {}
+    public void animationStep(double time, double timeStep) {}
 }

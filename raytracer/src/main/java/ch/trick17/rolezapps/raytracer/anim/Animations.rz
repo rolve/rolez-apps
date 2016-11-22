@@ -16,8 +16,8 @@ class LinearMovement extends SimpleAnimation {
         this.deltaPerS = deltaPerS;
     }
     
-    override readwrite animationStep(time: double, framerate: int): {
-        this.obj.move(this.deltaPerS.scale(1.0 / framerate));
+    override readwrite animationStep(time: double, timeStep: double): {
+        this.obj.move(this.deltaPerS.scale(timeStep));
     }
 }
 
@@ -37,8 +37,8 @@ class CircularMovement extends SimpleAnimation {
         this.thetaPerS = thetaPerS;
     }
     
-    override readwrite animationStep(time: double, framerate: int): {
-        val oldTheta = (time - this.duration.begin - 1.0 / framerate) * this.thetaPerS;
+    override readwrite animationStep(time: double, timeStep: double): {
+        val oldTheta = (time - this.duration.begin - timeStep) * this.thetaPerS;
         val newTheta = (time - this.duration.begin) * this.thetaPerS;
         val delta = this.u1.scale(the Math.cos(newTheta) - the Math.cos(oldTheta))
                 .plus(this.u2.scale(the Math.sin(newTheta) - the Math.sin(oldTheta)));
@@ -57,8 +57,8 @@ class BrightnessChange extends SimpleAnimation {
         this.changePerS = changePerS;
     }
     
-    override readwrite animationStep(time: double, f: int): {
-        this.light.brightness = the Math.max(0.0, this.light.brightness + this.changePerS / f);
+    override readwrite animationStep(time: double, timeStep: double): {
+        this.light.brightness = the Math.max(0.0, this.light.brightness + this.changePerS * timeStep);
     }
 }
 
@@ -73,8 +73,8 @@ class AmbientLightChange extends SimpleAnimation {
         this.changePerS = changePerS;
     }
     
-    override readwrite animationStep(time: double, framerate: int): {
-        this.scene.ambientLight += this.changePerS / framerate;
+    override readwrite animationStep(time: double, timeStep: double): {
+        this.scene.ambientLight += this.changePerS * timeStep;
     }
 }
 
@@ -94,12 +94,12 @@ class BackgroundChange extends SimpleAnimation {
         this.bChangePerS = bChangePerS;
     }
     
-    override readwrite animationStep(time: double, f: int): {
+    override readwrite animationStep(time: double, timeStep: double): {
         val bg = this.scene.background;
         this.scene.background = new Color(
-            bg.r + this.rChangePerS / f,
-            bg.g + this.gChangePerS / f,
-            bg.b + this.bChangePerS / f
+            bg.r + this.rChangePerS * timeStep,
+            bg.g + this.gChangePerS * timeStep,
+            bg.b + this.bChangePerS * timeStep
         );
     }
 }

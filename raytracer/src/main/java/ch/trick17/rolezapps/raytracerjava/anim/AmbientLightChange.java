@@ -15,7 +15,7 @@ public class AmbientLightChange extends SimpleAnimation {
     }
     
     @Override
-    public void animationStep(double time, int framerate) {
-        scene.ambientLight += changePerS / framerate;
+    public void animationStep(double time, double timeStep) {
+        scene.ambientLight += changePerS * timeStep;
     }
 }

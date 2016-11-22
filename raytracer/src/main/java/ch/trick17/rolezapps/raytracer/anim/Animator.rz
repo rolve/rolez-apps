@@ -14,35 +14,26 @@ class Animator {
     
     var printProgress: boolean = false
     
-    val frames: int
-    var frame: int
-    
     new(raytracer: readwrite Raytracer, scene: readwrite AnimatedScene, writer: readwrite VideoWriter) {
         this.raytracer = raytracer;
         this.scene = scene;
         this.writer = writer;
-        
-        this.frames = the Math.ceil(scene.length * writer.framerate) as int;
     }
     
-    def readonly time: double { return this.frame as double / this.writer.framerate; }
-    
     def readwrite render: {
-        this.frame = 0;
         this.raytracer.scene = this.scene;
         
         val image = new Array[readwrite Array[int]](this.writer.height);
         for(var i = 0; i < image.length; i += 1)
             image.set(i, new Array[int](this.writer.width));
         
-        while(this.frame < this.frames) {
+        while(this.scene.time < this.scene.length) {
             this.raytracer.render(image);
             this.writer.writeFrame(image);
             
-            this.frame += 1;
-            this.scene.animate(this.time, this.writer.framerate);
+            this.scene.animationStep(1.0 / this.writer.framerate);
             if(this.printProgress)
-                the System.out.println("Frame " + this.frame + "/" + this.frames);
+                the System.out.println(this.scene.time + "/" + this.scene.length);
         }
         this.writer.close;
     }

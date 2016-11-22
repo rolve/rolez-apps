@@ -24,11 +24,11 @@ public class CircularMovement extends SimpleAnimation {
     }
     
     @Override
-    public void animationStep(double time, int framerate) {
-        double oldTheta = ((time - duration.begin) - (1.0 / framerate)) * thetaPerS;
+    public void animationStep(double time, double timeStep) {
+        double oldTheta = (time - duration.begin - timeStep) * thetaPerS;
         double newTheta = (time - duration.begin) * thetaPerS;
-        Vector3D delta = u1.scale(cos(newTheta) - cos(oldTheta)).plus(u2.scale(sin(newTheta) - sin(
-                oldTheta)));
+        Vector3D delta = u1.scale(cos(newTheta) - cos(oldTheta))
+                .plus(u2.scale(sin(newTheta) - sin(oldTheta)));
         obj.move(delta);
     }
 }

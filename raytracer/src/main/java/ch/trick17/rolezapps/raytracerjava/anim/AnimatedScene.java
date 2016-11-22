@@ -9,15 +9,18 @@ public class AnimatedScene extends Scene {
     public final double length;
     public final ArrayList<Animation> animations = new ArrayList<Animation>();
     
+    public double time = 0;
+    
     public AnimatedScene(double length) {
         this.length = length;
     }
     
-    public void animate(double time, int framerate) {
+    public void animationStep(double timeStep) {
+        time += timeStep;
         for(int i = 0; i < animations.size(); i += 1) {
             Animation animation = animations.get(i);
             if(animation.begun(time) && (!animation.finished(time)))
-                animation.animationStep(time, framerate);
+                animation.animationStep(time, timeStep);
         }
     }
 }

@@ -15,7 +15,7 @@ public class BrightnessChange extends SimpleAnimation {
     }
     
     @Override
-    public void animationStep(double time, int f) {
-        light.brightness = Math.max(0.0, light.brightness + (changePerS / f));
+    public void animationStep(double time, double timeStep) {
+        light.brightness = Math.max(0.0, light.brightness + changePerS * timeStep);
     }
 }

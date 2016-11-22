@@ -8,15 +8,20 @@ class AnimatedScene extends Scene {
     val length: double
     val animations: readwrite ArrayList[readwrite Animation] = new ArrayList[readwrite Animation]
     
+    var time: double = 0.0
+    
     new(length: double) {
         this.length = length;
     }
     
-    def readwrite animate(time: double, framerate: int): {
+    def readwrite animationStep(timeStep: double): {
+        this.time += timeStep;
         for(var i = 0; i < this.animations.size; i += 1) {
             val animation = this.animations.get(i);
-            if(animation.begun(time) && !animation.finished(time))
-                animation.animationStep(time, framerate);
+            if(animation.begun(this.time) && !animation.finished(this.time))
+                animation.animationStep(this.time, timeStep);
         }
     }
+    
+    // TODO: make result of animations independent of animation step sizes
 }

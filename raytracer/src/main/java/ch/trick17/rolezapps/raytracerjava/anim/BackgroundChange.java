@@ -21,9 +21,11 @@ public class BackgroundChange extends SimpleAnimation {
     }
     
     @Override
-    public void animationStep(double time, int f) {
+    public void animationStep(double time, double timeStep) {
         final Color bg = scene.background;
-        scene.background = new Color(bg.r + (rChangePerS / f), bg.g + (gChangePerS / f),
-                bg.b + (bChangePerS / f));
+        scene.background = new Color(
+                bg.r + rChangePerS * timeStep,
+                bg.g + gChangePerS * timeStep,
+                bg.b + bChangePerS * timeStep);
     }
 }

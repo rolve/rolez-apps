@@ -20,12 +20,9 @@ public class LightAnimation extends AnimationGroup {
             double riseSpeed, double circularSpeed) {
         Vector3D up = new Vector3D(0.0, 0.0, 1.0);
         LinearMovement linear = new LinearMovement(duration, light, up.scale(riseSpeed));
-        CircularMovement circular = new CircularMovement(duration, light, center.minus(
-                light.position), up, circularSpeed);
-        Animation[] result = new Animation[2];
-        result[0] = linear;
-        result[1] = circular;
-        return result;
+        CircularMovement circular = new CircularMovement(duration, light,
+                center.minus(light.position), up, circularSpeed);
+        return new Animation[]{linear, circular};
     }
     
     @Override
