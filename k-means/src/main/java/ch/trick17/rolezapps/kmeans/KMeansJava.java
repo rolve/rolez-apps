@@ -44,9 +44,9 @@ public class KMeansJava extends KMeans {
             }
             
             changed = false;
-            for(FutureTask<Boolean> element : tasks)
+            for(FutureTask<Boolean> task : tasks)
                 try {
-                    changed |= element.get();
+                    changed |= task.get();
                 } catch(InterruptedException | ExecutionException e) {
                     throw new RuntimeException(e);
                 }
