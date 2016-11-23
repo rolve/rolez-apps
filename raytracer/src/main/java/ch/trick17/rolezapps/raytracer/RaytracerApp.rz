@@ -4,11 +4,12 @@ import ch.trick17.rolezapps.raytracer.anim.AnimatorApp
 import ch.trick17.rolezapps.raytracer.util.ImageWriter
 import rolez.util.Random
 import rolez.util.Scanner
+import rolez.util.StopWatch
 
 object RaytracerApp {
     
     task pure main(args: readonly Array[pure String]): {
-        val scene = the AnimatorApp.createScene(new Random, 30.0);
+        val scene = the AnimatorApp.createScene(new Random(42), 30.0);
         for(var i = 0; i < 8; i += 1)
             scene.animationStep(1.0);
         
@@ -18,15 +19,18 @@ object RaytracerApp {
         raytracer.oversample = 2;
         raytracer.scene = scene;
         
-        val height = 360;
-        val width = (scene.view.aspect * 360) as int;
+        val height = 180;
+        val width = (scene.view.aspect * height) as int;
         val image = new Array[readwrite Array[int]](height);
         for(var i = 0; i < height; i += 1)
             image.set(i, new Array[int](width));
         
         the System.out.println("Press Enter to start");
         new Scanner(the System.in).nextLine;
+        
+        val watch = new StopWatch.go;
         raytracer.render(image);
+        the System.out.println(watch.get);
         
         the ImageWriter.write(image, "png", "image.png");
     }

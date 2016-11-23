@@ -2,14 +2,13 @@ package ch.trick17.rolezapps.kmeans;
 
 import static rolez.lang.GuardedArray.wrap;
 
-import java.util.Random;
-
 import rolez.lang.ContiguousPartitioner;
 import rolez.lang.GuardedArray;
 import rolez.lang.GuardedSlice;
 import rolez.lang.GuardedVectorBuilder;
 import rolez.lang.Task;
 import rolez.lang.TaskSystem;
+import rolez.util.Random;
 
 /**
  * A manually optimized version of {@link KMeans}. Guarding ops were moved out of loops and removed
