@@ -14,5 +14,6 @@
         <module>k-means</module>
         <module>raytracer</module>
         <module>benchmark-suite</module>
+        <module>montecarlo</module>
     </modules>
 </project>
