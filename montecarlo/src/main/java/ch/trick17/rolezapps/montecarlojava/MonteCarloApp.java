@@ -21,11 +21,12 @@
 
 package ch.trick17.rolezapps.montecarlojava;
 
-import static java.util.Collections.unmodifiableList;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 /**
  * Code, a test-harness for invoking and driving the Applications Demonstrator
@@ -46,19 +47,16 @@ public class MonteCarloApp {
     private static final double pathStartValue = 100.0;
     
     private final int runs;
-    private final int nthreads;
+    private final int numTasks;
     
     private final PathParameters pathParams;
     
-    public List<Long> seeds;
-    public List<Double> results;
+    private final List<Long> seeds = new ArrayList<>();
+    private final List<Double> results = new ArrayList<>();
     
-    public MonteCarloApp(File ratesFile, int timeSteps, int runs, int nthreads) {
+    public MonteCarloApp(File ratesFile, int timeSteps, int runs, int numTasks) {
         this.runs = runs;
-        this.nthreads = nthreads;
-        
-        seeds = new ArrayList<>(runs);
-        results = new ArrayList<>(runs);
+        this.numTasks = numTasks;
         
         // Measure the requested path rate.
         RatePath rateP = RatePath.readRatesFile(ratesFile);
@@ -74,23 +72,20 @@ public class MonteCarloApp {
     }
     
     public void run() {
-        AppDemoTask tasks[] = new AppDemoTask[nthreads];
-        Thread threads[] = new Thread[nthreads];
-        for(int i = 1; i < nthreads; i++) {
-            tasks[i] = new AppDemoTask(i, runs, nthreads, seeds, pathParams);
-            threads[i] = new Thread(tasks[i]);
-            threads[i].start();
+        List<FutureTask<List<Double>>> tasks = new ArrayList<FutureTask<List<Double>>>();
+        for(int i = 1; i < numTasks; i++) {
+            FutureTask<List<Double>> task = new FutureTask<List<Double>>(new MonteCarloTask(i, runs,
+                    numTasks, seeds, pathParams));
+            new Thread(task).start();
+            tasks.add(task);
         }
+        List<Double> ownResults = new MonteCarloTask(0, runs, numTasks, seeds, pathParams).call();
+        results.addAll(ownResults);
         
-        AppDemoTask task = new AppDemoTask(0, runs, nthreads, seeds, pathParams);
-        task.run();
-        results.addAll(task.getResults());
-        
-        for(int i = 1; i < nthreads; i++)
+        for(FutureTask<List<Double>> task : tasks)
             try {
-                threads[i].join();
-                results.addAll(tasks[i].getResults());
-            } catch(final InterruptedException e) {
+                results.addAll(task.get());
+            } catch(final InterruptedException | ExecutionException e) {
                 throw new AssertionError(e);
             }
     }
@@ -112,34 +107,33 @@ public class MonteCarloApp {
         return result;
     }
     
-    private static class AppDemoTask implements Runnable {
+    private static class MonteCarloTask implements Callable<List<Double>> {
         
-        private final int id, runs, nthreads;
-        private final List<Double> results = new ArrayList<>();
+        private final int id, runs, numTasks;
         private final List<Long> seeds;
         private final PathParameters pathParams;
         
-        public AppDemoTask(int id, int runs, int nthreads, List<Long> seeds,
+        public MonteCarloTask(int id, int runs, int numTasks, List<Long> seeds,
                 PathParameters pathParams) {
             this.id = id;
             this.runs = runs;
-            this.nthreads = nthreads;
+            this.numTasks = numTasks;
             this.seeds = seeds;
             this.pathParams = pathParams;
         }
         
-        public void run() {
-            int slice = (runs + nthreads - 1) / nthreads;
-            int ilow = id * slice;
+        public List<Double> call() {
+            int slice = (runs + numTasks - 1) / numTasks;
+            int minIndex = id * slice;
             
-            int iupper;
-            iupper = (id + 1) * slice;
-            if(id == nthreads - 1)
-                iupper = runs;
+            int maxIndex = (id + 1) * slice;
+            if(id == numTasks - 1)
+                maxIndex = runs;
             
-            for(int iRun = ilow; iRun < iupper; iRun++) {
+            List<Double> results = new ArrayList<>();
+            for(int i = minIndex; i < maxIndex; i++) {
                 MonteCarloPath mcPath = new MonteCarloPath(pathParams);
-                mcPath.computeFluctuationsGaussian(seeds.get(iRun));
+                mcPath.computeFluctuationsGaussian(seeds.get(i));
                 mcPath.computePathValue(pathStartValue);
                 RatePath rateP = new RatePath(mcPath.name, mcPath.startDate, mcPath.endDate,
                         mcPath.dTime, mcPath.getPathValue());
@@ -148,10 +142,7 @@ public class MonteCarloApp {
                 
                 results.add(returnP.getExpectedReturnRate());
             }
-        }
-        
-        public List<Double> getResults() {
-            return unmodifiableList(results);
+            return results;
         }
     }
 }
