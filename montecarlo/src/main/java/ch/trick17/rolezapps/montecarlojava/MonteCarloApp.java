@@ -28,6 +28,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
+import rolez.lang.ContiguousPartitioner;
+import rolez.lang.SliceRange;
+
 /**
  * Code, a test-harness for invoking and driving the Applications Demonstrator
  * classes.
@@ -72,14 +75,17 @@ public class MonteCarloApp {
     }
     
     public void run() {
+        SliceRange fullRange = new SliceRange(0, runs, 1);
+        SliceRange[] ranges = ContiguousPartitioner.INSTANCE.partition(fullRange, numTasks).data;
+        
         List<FutureTask<List<Double>>> tasks = new ArrayList<FutureTask<List<Double>>>();
         for(int i = 1; i < numTasks; i++) {
-            FutureTask<List<Double>> task = new FutureTask<List<Double>>(new MonteCarloTask(i, runs,
-                    numTasks, seeds, pathParams));
+            FutureTask<List<Double>> task = new FutureTask<List<Double>>(new MonteCarloTask(
+                    ranges[i], seeds, pathParams));
             new Thread(task).start();
             tasks.add(task);
         }
-        List<Double> ownResults = new MonteCarloTask(0, runs, numTasks, seeds, pathParams).call();
+        List<Double> ownResults = new MonteCarloTask(ranges[0], seeds, pathParams).call();
         results.addAll(ownResults);
         
         for(FutureTask<List<Double>> task : tasks)
@@ -109,29 +115,19 @@ public class MonteCarloApp {
     
     private static class MonteCarloTask implements Callable<List<Double>> {
         
-        private final int id, runs, numTasks;
+        private final SliceRange range;
         private final List<Long> seeds;
         private final PathParameters pathParams;
         
-        public MonteCarloTask(int id, int runs, int numTasks, List<Long> seeds,
-                PathParameters pathParams) {
-            this.id = id;
-            this.runs = runs;
-            this.numTasks = numTasks;
+        public MonteCarloTask(SliceRange sliceRange, List<Long> seeds, PathParameters pathParams) {
+            this.range = sliceRange;
             this.seeds = seeds;
             this.pathParams = pathParams;
         }
         
         public List<Double> call() {
-            int slice = (runs + numTasks - 1) / numTasks;
-            int minIndex = id * slice;
-            
-            int maxIndex = (id + 1) * slice;
-            if(id == numTasks - 1)
-                maxIndex = runs;
-            
             List<Double> results = new ArrayList<>();
-            for(int i = minIndex; i < maxIndex; i++) {
+            for(int i = range.begin; i < range.end; i += range.step) {
                 MonteCarloPath mcPath = new MonteCarloPath(pathParams);
                 mcPath.computeFluctuationsGaussian(seeds.get(i));
                 mcPath.computePathValue(pathStartValue);
