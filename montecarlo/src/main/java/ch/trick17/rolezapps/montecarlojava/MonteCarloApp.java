@@ -53,8 +53,6 @@ public class MonteCarloApp {
     public List<Long> seeds;
     public List<Double> results;
     
-    public double JGFavgExpectedReturnRateMC = 0.0;
-    
     public MonteCarloApp(File ratesFile, int timeSteps, int runs, int nthreads) {
         this.runs = runs;
         this.nthreads = nthreads;
@@ -75,7 +73,7 @@ public class MonteCarloApp {
             seeds.add((long) i * 11);
     }
     
-    public void runTasks() {
+    public void run() {
         AppDemoTask tasks[] = new AppDemoTask[nthreads];
         Thread threads[] = new Thread[nthreads];
         for(int i = 1; i < nthreads; i++) {
@@ -98,21 +96,20 @@ public class MonteCarloApp {
     }
     
     /**
-     * Method for doing something with the Monte Carlo simulations. It's
-     * probably not mathematically correct, but shall take an average over all
-     * the simulated rate paths.
+     * Method for doing something with the Monte Carlo simulations. It's probably not mathematically
+     * correct, but shall take an average over all the simulated rate paths.
      */
-    public void processResults() {
-        double avgExpectedReturnRateMC = 0.0;
+    public double avgExpectedReturnRate() {
+        double result = 0.0;
         if(runs != results.size())
             throw new AssertionError(
                     "Fatal: TaskRunner managed to finish with no all the results gathered in!");
         
         for(int i = 0; i < runs; i++)
-            avgExpectedReturnRateMC += results.get(i);
+            result += results.get(i);
         
-        avgExpectedReturnRateMC /= runs;
-        JGFavgExpectedReturnRateMC = avgExpectedReturnRateMC;
+        result /= runs;
+        return result;
     }
     
     private static class AppDemoTask implements Runnable {
@@ -132,8 +129,8 @@ public class MonteCarloApp {
         }
         
         public void run() {
-            final int slice = (runs + nthreads - 1) / nthreads;
-            final int ilow = id * slice;
+            int slice = (runs + nthreads - 1) / nthreads;
+            int ilow = id * slice;
             
             int iupper;
             iupper = (id + 1) * slice;
