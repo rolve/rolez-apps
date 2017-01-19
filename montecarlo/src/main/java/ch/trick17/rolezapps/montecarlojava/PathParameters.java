@@ -28,13 +28,14 @@ package ch.trick17.rolezapps.montecarlojava;
  * @version $Revision: 1.10 $ $Date: 1999/02/16 18:52:53 $
  */
 public class PathParameters {
-    private final String name;
-    private final int startDate;
-    private final int endDate;
-    private final double dTime;
-    private final double expectedReturnRate;
-    private final double volatility;
-    private final int timeSteps;
+    
+    public final String name;
+    public final int startDate;
+    public final int endDate;
+    public final double dTime;
+    public final double expectedReturnRate;
+    public final double volatility;
+    public final int timeSteps;
     
     /**
      * Another constructor, slightly easier to use by having slightly fewer
@@ -47,79 +48,13 @@ public class PathParameters {
      *            The number of time steps which the Monte Carlo generator
      *            should make.
      */
-    public PathParameters(final ReturnPath obj, final int timeSteps) {
-        this.name = obj.get_name();
-        this.startDate = obj.get_startDate();
-        this.endDate = obj.get_endDate();
-        this.dTime = obj.get_dTime();
-        this.expectedReturnRate = obj.get_expectedReturnRate();
-        this.volatility = obj.get_volatility();
-        
+    public PathParameters(ReturnPath obj, int timeSteps) {
+        this.name = obj.name;
+        this.startDate = obj.startDate;
+        this.endDate = obj.endDate;
+        this.dTime = obj.dTime;
+        this.expectedReturnRate = obj.getExpectedReturnRate();
+        this.volatility = obj.getVolatility();
         this.timeSteps = timeSteps;
     }
-    
-    /**
-     * Accessor method for private instance variable <code>name</code>.
-     *
-     * @return Value of instance variable <code>name</code>.
-     */
-    public String get_name() {
-        return(this.name);
-    }
-    
-    /**
-     * Accessor method for private instance variable <code>startDate</code>.
-     *
-     * @return Value of instance variable <code>startDate</code>.
-     */
-    public int get_startDate() {
-        return(this.startDate);
-    }
-    
-    /**
-     * Accessor method for private instance variable <code>endDate</code>.
-     *
-     * @return Value of instance variable <code>endDate</code>.
-     */
-    public int get_endDate() {
-        return(this.endDate);
-    }
-    
-    /**
-     * Accessor method for private instance variable <code>dTime</code>.
-     *
-     * @return Value of instance variable <code>dTime</code>.
-     */
-    public double get_dTime() {
-        return(this.dTime);
-    }
-    
-    /**
-     * Accessor method for private instance variable
-     * <code>expectedReturnRate</code>.
-     *
-     * @return Value of instance variable <code>expectedReturnRate</code>.
-     */
-    public double get_expectedReturnRate() {
-        return(this.expectedReturnRate);
-    }
-    
-    /**
-     * Accessor method for private instance variable <code>volatility</code>.
-     *
-     * @return Value of instance variable <code>volatility</code>.
-     */
-    public double get_volatility() {
-        return(this.volatility);
-    }
-    
-    /**
-     * Accessor method for private instance variable <code>timeSteps</code>.
-     *
-     * @return Value of instance variable <code>timeSteps</code>.
-     */
-    public int get_timeSteps() {
-        return(this.timeSteps);
-    }
-    // ------------------------------------------------------------------------
 }

@@ -21,13 +21,17 @@
 
 package ch.trick17.rolezapps.montecarlojava;
 
+import static java.lang.Double.parseDouble;
+import static java.lang.Integer.parseInt;
+import static java.lang.Math.abs;
+import static java.lang.Math.log;
+
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class for recording the values in the time-dependent path of a security.
@@ -46,12 +50,12 @@ public class RatePath extends Path {
      * Class variable for determining which field in the stock data should be
      * used. This is currently set to point to the 'closing price'.
      */
-    public static final int DATUMFIELD = 4;
+    public static final int DATUM_FIELD = 4;
     /**
      * Class variable to represent the minimal date, whence the stock prices
      * appear. Used to trap any potential problems with the data.
      */
-    public static final int MINIMUMDATE = 19000101;
+    public static final int MIN_DATE = 19000101;
     /**
      * Class variable for defining what is meant by a small number, small enough
      * to cause an arithmetic overflow when dividing. According to the Java
@@ -68,10 +72,8 @@ public class RatePath extends Path {
     // Constructors.
     // ------------------------------------------------------------------------
     
-    public RatePath(final String name, final int startDate, final int endDate,
-            final double dTime, final double[] pathValue) {
+    public RatePath(String name, int startDate, int endDate, double dTime, double[] pathValue) {
         super(name, startDate, endDate, dTime);
-        
         this.pathValue = pathValue;
     }
     
@@ -83,13 +85,12 @@ public class RatePath extends Path {
      * @return the return, as defined.
      */
     public ReturnPath getReturnCompounded() {
-        final double[] returnPathValue = new double[pathValue.length];
+        double[] returnPathValue = new double[pathValue.length];
         returnPathValue[0] = 0.0;
         for(int i = 1; i < pathValue.length; i++) {
-            returnPathValue[i] = Math.log(pathValue[i] / pathValue[i - 1]);
+            returnPathValue[i] = log(pathValue[i] / pathValue[i - 1]);
         }
-        final ReturnPath rPath = new ReturnPath(get_name(), get_startDate(),
-                get_endDate(), get_dTime(), returnPathValue);
+        ReturnPath rPath = new ReturnPath(name, startDate, endDate, dTime, returnPathValue);
         rPath.estimatePath();
         return(rPath);
     }
@@ -122,60 +123,39 @@ public class RatePath extends Path {
      * good place to trap for zero values in the data, which will cause all
      * sorts of problems.
      *
-     * @param dirName
-     *            the directory in which to search for the data file.
-     * @param filename
-     *            the data filename itself.
+     * @param file
+     *            the data file
      * @return A rate path with the read data
      */
-    public static RatePath readRatesFile(final String dirName,
-            final String filename) {
-        final File ratesFile = new File(dirName, filename);
-        BufferedReader in;
-        try {
-            in = new BufferedReader(new FileReader(ratesFile));
-        } catch(final FileNotFoundException e) {
-            throw new AssertionError(e);
-        }
-        
-        // Proceed to read all the lines of data into a Vector object.
-        int iLine = 0;
-        
-        String aLine;
-        final Vector<String> allLines = new Vector<String>(100);
-        try {
-            while((aLine = in.readLine()) != null) {
-                iLine++;
-                allLines.addElement(aLine);
-            }
-            in.close();
+    public static RatePath readRatesFile(File file) {
+        // Read all the lines of data into a list.        
+        List<String> lines = new ArrayList<String>(100);
+        try(BufferedReader in = new BufferedReader(new FileReader(file))) {
+            String line;
+            while((line = in.readLine()) != null)
+                lines.add(line);
         } catch(final IOException e) {
             throw new RuntimeException("Problem reading data from the file", e);
         }
         
         // Now create an array to store the rates data.
-        final double[] pathValue = new double[iLine];
-        final int[] pathDate = new int[iLine];
+        double[] pathValue = new double[lines.size()];
+        int[] pathDate = new int[lines.size()];
         
-        iLine = 0;
-        for(final Enumeration<String> e = allLines.elements(); e
-                .hasMoreElements();) {
-            aLine = e.nextElement();
-            final String[] field = aLine.split(",");
-            final int aDate = Integer.parseInt("19" + field[0]);
+        for(int i = 0; i < lines.size(); i++) {
+            String[] field = lines.get(i).split(",");
+            int date = parseInt("19" + field[0]);
             
-            final double aPathValue = Double.parseDouble(field[DATUMFIELD]);
-            if((aDate <= MINIMUMDATE) || (Math.abs(aPathValue) < EPSILON))
-                throw new AssertionError("erroneous data in " + filename
-                        + " indexed by date=" + field[0] + ".");
-            else {
-                pathDate[iLine] = aDate;
-                pathValue[iLine] = aPathValue;
-                iLine++;
-            }
+            double aPathValue = parseDouble(field[DATUM_FIELD]);
+            if(date <= MIN_DATE || abs(aPathValue) < EPSILON)
+                throw new AssertionError("erroneous data in " + file + " indexed by date="
+                        + field[0] + ".");
+            
+            pathDate[i] = date;
+            pathValue[i] = aPathValue;
         }
         
-        return new RatePath(filename, pathDate[0], pathDate[iLine - 1],
-                1.0 / 365.0, pathValue);
+        return new RatePath(file.getName(), pathDate[0], pathDate[lines.size() - 1], 1.0 / 365.0,
+                pathValue);
     }
 }

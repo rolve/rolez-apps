@@ -23,6 +23,7 @@ package ch.trick17.rolezapps.montecarlojava;
 
 import static java.util.Collections.unmodifiableList;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,8 +55,7 @@ public class MonteCarloApp {
     
     public double JGFavgExpectedReturnRateMC = 0.0;
     
-    public MonteCarloApp(final String dataDirname, final String dataFilename,
-            final int timeSteps, final int runs, final int nthreads) {
+    public MonteCarloApp(File ratesFile, int timeSteps, int runs, int nthreads) {
         this.runs = runs;
         this.nthreads = nthreads;
         
@@ -63,9 +63,8 @@ public class MonteCarloApp {
         results = new ArrayList<>(runs);
         
         // Measure the requested path rate.
-        final RatePath rateP = RatePath
-                .readRatesFile(dataDirname, dataFilename);
-        final ReturnPath returnP = rateP.getReturnCompounded();
+        RatePath rateP = RatePath.readRatesFile(ratesFile);
+        ReturnPath returnP = rateP.getReturnCompounded();
         returnP.estimatePath();
         
         // Now prepare for MC runs.
@@ -77,25 +76,25 @@ public class MonteCarloApp {
     }
     
     public void runTasks() {
-        final AppDemoTask tasks[] = new AppDemoTask[nthreads];
-        final Thread threads[] = new Thread[nthreads];
+        AppDemoTask tasks[] = new AppDemoTask[nthreads];
+        Thread threads[] = new Thread[nthreads];
         for(int i = 1; i < nthreads; i++) {
             tasks[i] = new AppDemoTask(i, runs, nthreads, seeds, pathParams);
             threads[i] = new Thread(tasks[i]);
             threads[i].start();
         }
         
-        final AppDemoTask task = new AppDemoTask(0, runs, nthreads, seeds,
-                pathParams);
+        AppDemoTask task = new AppDemoTask(0, runs, nthreads, seeds, pathParams);
         task.run();
         results.addAll(task.getResults());
         
-        for(int i = 1; i < nthreads; i++) {
+        for(int i = 1; i < nthreads; i++)
             try {
                 threads[i].join();
                 results.addAll(tasks[i].getResults());
-            } catch(final InterruptedException e) {}
-        }
+            } catch(final InterruptedException e) {
+                throw new AssertionError(e);
+            }
     }
     
     /**
@@ -123,8 +122,8 @@ public class MonteCarloApp {
         private final List<Long> seeds;
         private final PathParameters pathParams;
         
-        public AppDemoTask(final int id, final int runs, final int nthreads,
-                final List<Long> seeds, final PathParameters pathParams) {
+        public AppDemoTask(int id, int runs, int nthreads, List<Long> seeds,
+                PathParameters pathParams) {
             this.id = id;
             this.runs = runs;
             this.nthreads = nthreads;
@@ -142,16 +141,15 @@ public class MonteCarloApp {
                 iupper = runs;
             
             for(int iRun = ilow; iRun < iupper; iRun++) {
-                final MonteCarloPath mcPath = new MonteCarloPath(pathParams);
+                MonteCarloPath mcPath = new MonteCarloPath(pathParams);
                 mcPath.computeFluctuationsGaussian(seeds.get(iRun));
                 mcPath.computePathValue(pathStartValue);
-                final RatePath rateP = new RatePath(mcPath.get_name(), mcPath
-                        .get_startDate(), mcPath.get_endDate(), mcPath
-                        .get_dTime(), mcPath.get_pathValue());
-                final ReturnPath returnP = rateP.getReturnCompounded();
+                RatePath rateP = new RatePath(mcPath.name, mcPath.startDate, mcPath.endDate,
+                        mcPath.dTime, mcPath.getPathValue());
+                ReturnPath returnP = rateP.getReturnCompounded();
                 returnP.estimatePath();
                 
-                results.add(returnP.get_expectedReturnRate());
+                results.add(returnP.getExpectedReturnRate());
             }
         }
         

@@ -21,6 +21,8 @@
 
 package ch.trick17.rolezapps.montecarlojava;
 
+import static java.lang.Double.isNaN;
+
 /**
  * Class for representing the returns of a given security.
  * <p>
@@ -74,8 +76,7 @@ public class ReturnPath extends Path {
      *            for creating a return path with a precomputed path value.
      *            Indexed from 1 to <code>nPathArray-1</code>.
      */
-    public ReturnPath(final String name, final int startDate,
-            final int endDate, final double dTime, final double[] pathValue) {
+    public ReturnPath(String name, int startDate, int endDate, double dTime, double[] pathValue) {
         super(name, startDate, endDate, dTime);
         this.pathValue = pathValue;
     }
@@ -86,11 +87,10 @@ public class ReturnPath extends Path {
      *
      * @return Value of instance variable <code>expectedReturnRate</code>.
      */
-    public double get_expectedReturnRate() {
-        if(this.expectedReturnRate == Double.NaN)
-            throw new AssertionError(
-                    "Variable expectedReturnRate is undefined!");
-        return(this.expectedReturnRate);
+    public double getExpectedReturnRate() {
+        if(isNaN(expectedReturnRate))
+            throw new AssertionError("Variable expectedReturnRate is undefined!");
+        return(expectedReturnRate);
     }
     
     /**
@@ -98,10 +98,10 @@ public class ReturnPath extends Path {
      *
      * @return Value of instance variable <code>volatility</code>.
      */
-    public double get_volatility() {
-        if(this.volatility == Double.NaN)
+    public double getVolatility() {
+        if(isNaN(volatility))
             throw new AssertionError("Variable volatility is undefined!");
-        return(this.volatility);
+        return(volatility);
     }
     
     /**
@@ -120,7 +120,7 @@ public class ReturnPath extends Path {
      * the relationship: \mu = \frac{\bar{u}}{\Delta t} + \frac{\sigma^2}{2}
      */
     private void computeExpectedReturnRate() {
-        this.expectedReturnRate = mean / get_dTime() + 0.5 * volatility2;
+        expectedReturnRate = mean / (dTime) + 0.5 * volatility2;
     }
     
     /**
@@ -129,8 +129,8 @@ public class ReturnPath extends Path {
      * precomputed <code>variance</code>. \sigma^2 = s^2\Delta t
      */
     private void computeVolatility() {
-        this.volatility2 = variance / get_dTime();
-        this.volatility = Math.sqrt(volatility2);
+        volatility2 = variance / (dTime);
+        volatility = Math.sqrt(volatility2);
     }
     
     /**
@@ -138,11 +138,10 @@ public class ReturnPath extends Path {
      * calculations.
      */
     private void computeMean() {
-        this.mean = 0.0;
-        for(int i = 1; i < pathValue.length; i++) {
+        mean = 0.0;
+        for(int i = 1; i < pathValue.length; i++)
             mean += pathValue[i];
-        }
-        this.mean /= (pathValue.length - 1.0);
+        mean /= (pathValue.length - 1.0);
     }
     
     /**
@@ -150,10 +149,9 @@ public class ReturnPath extends Path {
      * calculations.
      */
     private void computeVariance() {
-        this.variance = 0.0;
-        for(int i = 1; i < pathValue.length; i++) {
+        variance = 0.0;
+        for(int i = 1; i < pathValue.length; i++)
             variance += (pathValue[i] - mean) * (pathValue[i] - mean);
-        }
-        this.variance /= (pathValue.length - 1.0);
+        variance /= (pathValue.length - 1.0);
     }
 }

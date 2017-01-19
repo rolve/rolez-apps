@@ -20,10 +20,11 @@
 
 package ch.trick17.rolezapps.montecarlojava;
 
+import java.io.File;
+
 public class JGFMonteCarloBench {
     
-    private static final String DIR_NAME = "Data";
-    private static final String FILE_NAME = "hitData";
+    private static final File FILE = new File("Data/hitData");
     
     private static final int TIME_STEPS = 1000;
     private static final int DATA_SIZES[] = {10000, 60000};
@@ -61,7 +62,7 @@ public class JGFMonteCarloBench {
     }
     
     public void initialize() {
-        app = new MonteCarloApp(DIR_NAME, FILE_NAME, TIME_STEPS, runs, nthreads);
+        app = new MonteCarloApp(FILE, TIME_STEPS, runs, nthreads);
     }
     
     public void run() {
