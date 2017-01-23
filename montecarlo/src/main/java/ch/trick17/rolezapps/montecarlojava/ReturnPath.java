@@ -21,7 +21,7 @@
 
 package ch.trick17.rolezapps.montecarlojava;
 
-import static java.lang.Double.isNaN;
+import static java.lang.Math.log;
 
 /**
  * Class for representing the returns of a given security.
@@ -37,121 +37,32 @@ import static java.lang.Double.isNaN;
  */
 public class ReturnPath extends Path {
     
-    /**
-     * An instance variable, for storing the return values.
-     */
-    private final double[] pathValue;
-    /**
-     * Value for the expected return rate.
-     */
-    private double expectedReturnRate = Double.NaN;
-    /**
-     * Value for the volatility, calculated from the return data.
-     */
-    private double volatility = Double.NaN;
-    /**
-     * Value for the volatility-squared, a more natural quantity to use for many
-     * of the calculations.
-     */
-    private double volatility2 = Double.NaN;
-    /**
-     * Value for the mean of this return.
-     */
-    private double mean = Double.NaN;
-    /**
-     * Value for the variance of this return.
-     */
-    private double variance = Double.NaN;
+    public final double volatility;
+    public final double expectedReturnRate;
     
-    /**
-     * @param name
-     *            name of the path
-     * @param startDate
-     *            start date
-     * @param endDate
-     *            end date
-     * @param dTime
-     *            dTime
-     * @param pathValue
-     *            for creating a return path with a precomputed path value.
-     *            Indexed from 1 to <code>nPathArray-1</code>.
-     */
-    public ReturnPath(String name, int startDate, int endDate, double dTime, double[] pathValue) {
-        super(name, startDate, endDate, dTime);
-        this.pathValue = pathValue;
-    }
-    
-    /**
-     * Accessor method for private instance variable
-     * <code>expectedReturnRate</code>.
-     *
-     * @return Value of instance variable <code>expectedReturnRate</code>.
-     */
-    public double getExpectedReturnRate() {
-        if(isNaN(expectedReturnRate))
-            throw new AssertionError("Variable expectedReturnRate is undefined!");
-        return(expectedReturnRate);
-    }
-    
-    /**
-     * Accessor method for private instance variable <code>volatility</code>.
-     *
-     * @return Value of instance variable <code>volatility</code>.
-     */
-    public double getVolatility() {
-        if(isNaN(volatility))
-            throw new AssertionError("Variable volatility is undefined!");
-        return(volatility);
-    }
-    
-    /**
-     * A single method for invoking all the necessary methods which estimate the
-     * parameters.
-     */
-    public void estimatePath() {
-        computeMean();
-        computeVariance();
-        computeExpectedReturnRate();
-        computeVolatility();
-    }
-    
-    /**
-     * Method to calculate the expected return rate from the return data, using
-     * the relationship: \mu = \frac{\bar{u}}{\Delta t} + \frac{\sigma^2}{2}
-     */
-    private void computeExpectedReturnRate() {
-        expectedReturnRate = mean / (dTime) + 0.5 * volatility2;
-    }
-    
-    /**
-     * Method to calculate <code>volatility</code> and <code>volatility2</code>
-     * from the return path data, using the relationship, based on the
-     * precomputed <code>variance</code>. \sigma^2 = s^2\Delta t
-     */
-    private void computeVolatility() {
-        volatility2 = variance / (dTime);
+    public ReturnPath(RatePath ratePath) {
+        super(ratePath.name, ratePath.startDate, ratePath.endDate, ratePath.dTime);
+        
+        /* Calculate the returns on a given rate path, via the definition for the instantaneous
+         * compounded return. u_i = \ln{\frac{S_i}{S_{i-1}}} */
+        double[] ratePathValues = ratePath.getPathValues();
+        double[] returnPathValue = new double[ratePathValues.length];
+        returnPathValue[0] = 0.0;
+        for(int i = 1; i < ratePathValues.length; i++)
+            returnPathValue[i] = log(ratePathValues[i] / ratePathValues[i - 1]);
+        
+        double mean = 0.0;
+        for(int i1 = 1; i1 < returnPathValue.length; i1++)
+            mean += returnPathValue[i1];
+        mean /= (returnPathValue.length - 1.0);
+        
+        double variance = 0.0;
+        for(int i = 1; i < returnPathValue.length; i++)
+            variance += (returnPathValue[i] - mean) * (returnPathValue[i] - mean);
+        variance /= (returnPathValue.length - 1.0);
+        
+        double volatility2 = variance / (dTime);
         volatility = Math.sqrt(volatility2);
-    }
-    
-    /**
-     * Method to calculate the mean of the return, for use by other
-     * calculations.
-     */
-    private void computeMean() {
-        mean = 0.0;
-        for(int i = 1; i < pathValue.length; i++)
-            mean += pathValue[i];
-        mean /= (pathValue.length - 1.0);
-    }
-    
-    /**
-     * Method to calculate the variance of the retrun, for use by other
-     * calculations.
-     */
-    private void computeVariance() {
-        variance = 0.0;
-        for(int i = 1; i < pathValue.length; i++)
-            variance += (pathValue[i] - mean) * (pathValue[i] - mean);
-        variance /= (pathValue.length - 1.0);
+        expectedReturnRate = mean / dTime + 0.5 * volatility2;
     }
 }

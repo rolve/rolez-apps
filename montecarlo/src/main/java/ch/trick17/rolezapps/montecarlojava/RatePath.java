@@ -24,7 +24,6 @@ package ch.trick17.rolezapps.montecarlojava;
 import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
 import static java.lang.Math.abs;
-import static java.lang.Math.log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -66,33 +65,15 @@ public class RatePath extends Path {
     /**
      * An instance variable, for storing the rate's path values itself.
      */
-    private final double[] pathValue;
-    
-    // ------------------------------------------------------------------------
-    // Constructors.
-    // ------------------------------------------------------------------------
+    private final double[] pathValues;
     
     public RatePath(String name, int startDate, int endDate, double dTime, double[] pathValue) {
         super(name, startDate, endDate, dTime);
-        this.pathValue = pathValue;
+        this.pathValues = pathValue;
     }
     
-    /**
-     * Method for calculating the returns on a given rate path, via the
-     * definition for the instantaneous compounded return. u_i =
-     * \ln{\frac{S_i}{S_{i-1}}}
-     * 
-     * @return the return, as defined.
-     */
-    public ReturnPath getReturnCompounded() {
-        double[] returnPathValue = new double[pathValue.length];
-        returnPathValue[0] = 0.0;
-        for(int i = 1; i < pathValue.length; i++) {
-            returnPathValue[i] = log(pathValue[i] / pathValue[i - 1]);
-        }
-        ReturnPath rPath = new ReturnPath(name, startDate, endDate, dTime, returnPathValue);
-        rPath.estimatePath();
-        return(rPath);
+    public double[] getPathValues() {
+        return pathValues;
     }
     
     /**

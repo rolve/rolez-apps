@@ -47,7 +47,7 @@ public class MonteCarloPath extends Path {
     /**
      * The path values from which the random fluctuations are used to update.
      */
-    private final double[] pathValue;
+    private final double[] pathValues;
     /**
      * Value for the mean drift, for use in the generation of the random path.
      */
@@ -57,13 +57,13 @@ public class MonteCarloPath extends Path {
      */
     private final double volatility;
     
-    public MonteCarloPath(PathParameters pathParams) {
-        super(pathParams.name, pathParams.startDate, pathParams.endDate, pathParams.dTime);
+    public MonteCarloPath(ReturnPath returnPath, int timeSteps) {
+        super(returnPath.name, returnPath.startDate, returnPath.endDate, returnPath.dTime);
         
-        this.expectedReturnRate = pathParams.expectedReturnRate;
-        this.volatility = pathParams.volatility;
-        this.pathValue = new double[pathParams.timeSteps];
-        this.fluctuations = new double[pathParams.timeSteps];
+        this.expectedReturnRate = returnPath.expectedReturnRate;
+        this.volatility = returnPath.volatility;
+        this.pathValues = new double[timeSteps];
+        this.fluctuations = new double[timeSteps];
     }
     
     /**
@@ -71,8 +71,8 @@ public class MonteCarloPath extends Path {
      *
      * @return Value of instance variable <code>pathValue</code>.
      */
-    public double[] getPathValue() {
-        return this.pathValue;
+    public double[] getPathValues() {
+        return this.pathValues;
     }
     
     /**
@@ -108,8 +108,8 @@ public class MonteCarloPath extends Path {
      *            precomputed fluctuations.
      */
     public void computePathValue(double startValue) {
-        pathValue[0] = startValue;
-        for(int i = 1; i < pathValue.length; i++)
-            pathValue[i] = pathValue[i - 1] * exp(fluctuations[i]);
+        pathValues[0] = startValue;
+        for(int i = 1; i < pathValues.length; i++)
+            pathValues[i] = pathValues[i - 1] * exp(fluctuations[i]);
     }
 }

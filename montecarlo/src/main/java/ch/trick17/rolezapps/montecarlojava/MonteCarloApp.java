@@ -52,22 +52,23 @@ public class MonteCarloApp {
     private final int runs;
     private final int numTasks;
     
-    private final PathParameters pathParams;
+    private final ReturnPath returnPath;
+    private final int timeSteps;
     
     private final List<Long> seeds = new ArrayList<>();
     private final List<Double> results = new ArrayList<>();
+
     
     public MonteCarloApp(File ratesFile, int timeSteps, int runs, int numTasks) {
+        this.timeSteps = timeSteps;
         this.runs = runs;
         this.numTasks = numTasks;
         
         // Measure the requested path rate.
-        RatePath rateP = RatePath.readRatesFile(ratesFile);
-        ReturnPath returnP = rateP.getReturnCompounded();
-        returnP.estimatePath();
+        RatePath ratePath = RatePath.readRatesFile(ratesFile);
         
         // Now prepare for MC runs.
-        pathParams = new PathParameters(returnP, timeSteps);
+        returnPath = new ReturnPath(ratePath);
         
         // Now create the seeds for the tasks.
         for(int i = 0; i < runs; i++)
@@ -80,12 +81,13 @@ public class MonteCarloApp {
         
         List<FutureTask<List<Double>>> tasks = new ArrayList<FutureTask<List<Double>>>();
         for(int i = 1; i < numTasks; i++) {
-            FutureTask<List<Double>> task = new FutureTask<List<Double>>(new MonteCarloTask(
-                    ranges[i], seeds, pathParams));
+            FutureTask<List<Double>> task = new FutureTask<List<Double>>(
+                    new MonteCarloTask(ranges[i], seeds, returnPath, timeSteps));
             new Thread(task).start();
             tasks.add(task);
         }
-        List<Double> ownResults = new MonteCarloTask(ranges[0], seeds, pathParams).call();
+        List<Double> ownResults = new MonteCarloTask(ranges[0], seeds, returnPath, timeSteps)
+                .call();
         results.addAll(ownResults);
         
         for(FutureTask<List<Double>> task : tasks)
@@ -102,10 +104,6 @@ public class MonteCarloApp {
      */
     public double avgExpectedReturnRate() {
         double result = 0.0;
-        if(runs != results.size())
-            throw new AssertionError(
-                    "Fatal: TaskRunner managed to finish with no all the results gathered in!");
-        
         for(int i = 0; i < runs; i++)
             result += results.get(i);
         
@@ -117,26 +115,26 @@ public class MonteCarloApp {
         
         private final SliceRange range;
         private final List<Long> seeds;
-        private final PathParameters pathParams;
+        private final ReturnPath returnPath;
+        private final int timeSteps;
         
-        public MonteCarloTask(SliceRange sliceRange, List<Long> seeds, PathParameters pathParams) {
+        public MonteCarloTask(SliceRange sliceRange, List<Long> seeds, ReturnPath returnPath,
+                int timeSteps) {
             this.range = sliceRange;
             this.seeds = seeds;
-            this.pathParams = pathParams;
+            this.returnPath = returnPath;
+            this.timeSteps = timeSteps;
         }
         
         public List<Double> call() {
             List<Double> results = new ArrayList<>();
             for(int i = range.begin; i < range.end; i += range.step) {
-                MonteCarloPath mcPath = new MonteCarloPath(pathParams);
+                MonteCarloPath mcPath = new MonteCarloPath(returnPath, timeSteps);
                 mcPath.computeFluctuationsGaussian(seeds.get(i));
                 mcPath.computePathValue(pathStartValue);
                 RatePath rateP = new RatePath(mcPath.name, mcPath.startDate, mcPath.endDate,
-                        mcPath.dTime, mcPath.getPathValue());
-                ReturnPath returnP = rateP.getReturnCompounded();
-                returnP.estimatePath();
-                
-                results.add(returnP.getExpectedReturnRate());
+                        mcPath.dTime, mcPath.getPathValues());
+                results.add(new ReturnPath(rateP).expectedReturnRate);
             }
             return results;
         }

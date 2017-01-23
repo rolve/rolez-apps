@@ -36,7 +36,7 @@ public class MonteCarloBenchmark {
         put(60000, -0.03215796752868655);
     }};
     
-    @Param({"10000", "60000"})
+    @Param({"10000", /* "60000" */})
     int runs;
     
     @Param({"1", "2", "4", "8", "32", "128"})
@@ -70,7 +70,7 @@ public class MonteCarloBenchmark {
 
     public static void main(String[] args) throws RunnerException {
         Options options = new OptionsBuilder().include(MonteCarloBenchmark.class.getSimpleName())
-                .warmupIterations(5).measurementIterations(30).build();
+                .warmupIterations(5).measurementIterations(5).build();
         new Runner(options).run();
     }
 }
