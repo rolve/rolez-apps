@@ -35,21 +35,20 @@ import static java.lang.Math.log;
  * @author H W Yau
  * @version $Revision: 1.21 $ $Date: 1999/02/16 18:52:41 $
  */
-public class ReturnPath extends Path {
+public class Returns extends Path {
     
     public final double volatility;
     public final double expectedReturnRate;
     
-    public ReturnPath(RatePath ratePath) {
+    public Returns(RatePath ratePath) {
         super(ratePath.name, ratePath.startDate, ratePath.endDate, ratePath.dTime);
         
         /* Calculate the returns on a given rate path, via the definition for the instantaneous
          * compounded return. u_i = \ln{\frac{S_i}{S_{i-1}}} */
-        double[] ratePathValues = ratePath.getPathValues();
-        double[] returnPathValue = new double[ratePathValues.length];
+        double[] returnPathValue = new double[ratePath.pathValues.length];
         returnPathValue[0] = 0.0;
-        for(int i = 1; i < ratePathValues.length; i++)
-            returnPathValue[i] = log(ratePathValues[i] / ratePathValues[i - 1]);
+        for(int i = 1; i < ratePath.pathValues.length; i++)
+            returnPathValue[i] = log(ratePath.pathValues[i] / ratePath.pathValues[i - 1]);
         
         double mean = 0.0;
         for(int i1 = 1; i1 < returnPathValue.length; i1++)

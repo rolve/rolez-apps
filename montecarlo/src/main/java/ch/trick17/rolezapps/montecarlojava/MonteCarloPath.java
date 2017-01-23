@@ -57,13 +57,13 @@ public class MonteCarloPath extends Path {
      */
     private final double volatility;
     
-    public MonteCarloPath(ReturnPath returnPath, int timeSteps) {
-        super(returnPath.name, returnPath.startDate, returnPath.endDate, returnPath.dTime);
+    public MonteCarloPath(Returns returns, int steps) {
+        super(returns.name, returns.startDate, returns.endDate, returns.dTime);
         
-        this.expectedReturnRate = returnPath.expectedReturnRate;
-        this.volatility = returnPath.volatility;
-        this.pathValues = new double[timeSteps];
-        this.fluctuations = new double[timeSteps];
+        this.expectedReturnRate = returns.expectedReturnRate;
+        this.volatility = returns.volatility;
+        this.pathValues = new double[steps];
+        this.fluctuations = new double[steps];
     }
     
     /**

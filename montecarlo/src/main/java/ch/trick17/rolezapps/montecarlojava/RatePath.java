@@ -65,15 +65,11 @@ public class RatePath extends Path {
     /**
      * An instance variable, for storing the rate's path values itself.
      */
-    private final double[] pathValues;
+    public final double[] pathValues;
     
     public RatePath(String name, int startDate, int endDate, double dTime, double[] pathValue) {
         super(name, startDate, endDate, dTime);
         this.pathValues = pathValue;
-    }
-    
-    public double[] getPathValues() {
-        return pathValues;
     }
     
     /**

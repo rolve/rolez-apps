@@ -47,20 +47,20 @@ import rolez.lang.SliceRange;
  */
 public class MonteCarloApp {
     
-    private static final double pathStartValue = 100.0;
+    private static final double PATH_START_VALUE = 100.0;
     
     private final int runs;
     private final int numTasks;
     
-    private final ReturnPath returnPath;
-    private final int timeSteps;
+    private final Returns returns;
+    private final int steps;
     
     private final List<Long> seeds = new ArrayList<>();
     private final List<Double> results = new ArrayList<>();
 
     
-    public MonteCarloApp(File ratesFile, int timeSteps, int runs, int numTasks) {
-        this.timeSteps = timeSteps;
+    public MonteCarloApp(File ratesFile, int steps, int runs, int numTasks) {
+        this.steps = steps;
         this.runs = runs;
         this.numTasks = numTasks;
         
@@ -68,7 +68,7 @@ public class MonteCarloApp {
         RatePath ratePath = RatePath.readRatesFile(ratesFile);
         
         // Now prepare for MC runs.
-        returnPath = new ReturnPath(ratePath);
+        returns = new Returns(ratePath);
         
         // Now create the seeds for the tasks.
         for(int i = 0; i < runs; i++)
@@ -82,12 +82,11 @@ public class MonteCarloApp {
         List<FutureTask<List<Double>>> tasks = new ArrayList<FutureTask<List<Double>>>();
         for(int i = 1; i < numTasks; i++) {
             FutureTask<List<Double>> task = new FutureTask<List<Double>>(
-                    new MonteCarloTask(ranges[i], seeds, returnPath, timeSteps));
+                    new MonteCarloTask(ranges[i], seeds, returns, steps));
             new Thread(task).start();
             tasks.add(task);
         }
-        List<Double> ownResults = new MonteCarloTask(ranges[0], seeds, returnPath, timeSteps)
-                .call();
+        List<Double> ownResults = new MonteCarloTask(ranges[0], seeds, returns, steps).call();
         results.addAll(ownResults);
         
         for(FutureTask<List<Double>> task : tasks)
@@ -115,26 +114,25 @@ public class MonteCarloApp {
         
         private final SliceRange range;
         private final List<Long> seeds;
-        private final ReturnPath returnPath;
+        private final Returns returns;
         private final int timeSteps;
         
-        public MonteCarloTask(SliceRange sliceRange, List<Long> seeds, ReturnPath returnPath,
-                int timeSteps) {
+        public MonteCarloTask(SliceRange sliceRange, List<Long> seeds, Returns returns, int steps) {
             this.range = sliceRange;
             this.seeds = seeds;
-            this.returnPath = returnPath;
-            this.timeSteps = timeSteps;
+            this.returns = returns;
+            this.timeSteps = steps;
         }
         
         public List<Double> call() {
             List<Double> results = new ArrayList<>();
             for(int i = range.begin; i < range.end; i += range.step) {
-                MonteCarloPath mcPath = new MonteCarloPath(returnPath, timeSteps);
+                MonteCarloPath mcPath = new MonteCarloPath(returns, timeSteps);
                 mcPath.computeFluctuationsGaussian(seeds.get(i));
-                mcPath.computePathValue(pathStartValue);
+                mcPath.computePathValue(PATH_START_VALUE);
                 RatePath rateP = new RatePath(mcPath.name, mcPath.startDate, mcPath.endDate,
                         mcPath.dTime, mcPath.getPathValues());
-                results.add(new ReturnPath(rateP).expectedReturnRate);
+                results.add(new Returns(rateP).expectedReturnRate);
             }
             return results;
         }
