@@ -21,7 +21,6 @@
 
 package ch.trick17.rolezapps.montecarlojava;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -59,7 +58,7 @@ public class MonteCarloApp {
     private final List<Double> results = new ArrayList<>();
 
     
-    public MonteCarloApp(File ratesFile, int steps, int runs, int numTasks) {
+    public MonteCarloApp(String ratesFile, int steps, int runs, int numTasks) {
         this.steps = steps;
         this.runs = runs;
         this.numTasks = numTasks;

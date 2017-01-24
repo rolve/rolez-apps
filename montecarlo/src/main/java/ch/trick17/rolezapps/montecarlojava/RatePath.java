@@ -25,12 +25,11 @@ import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
 import static java.lang.Math.abs;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Class for recording the values in the time-dependent path of a security.
@@ -105,17 +104,17 @@ public class RatePath extends Path {
      * good place to trap for zero values in the data, which will cause all
      * sorts of problems.
      *
-     * @param file
+     * @param ratesFile
      *            the data file
      * @return A rate path with the read data
      */
-    public static RatePath readRatesFile(File file) {
-        // Read all the lines of data into a list.        
+    public static RatePath readRatesFile(String ratesFile) {
+        // Read all the lines of data into a list.
         List<String> lines = new ArrayList<String>(100);
-        try(BufferedReader in = new BufferedReader(new FileReader(file))) {
-            String line;
-            while((line = in.readLine()) != null)
-                lines.add(line);
+        
+        try(Scanner scanner = new Scanner(new FileInputStream(ratesFile))) {
+            while(scanner.hasNextLine())
+                lines.add(scanner.nextLine());
         } catch(final IOException e) {
             throw new RuntimeException("Problem reading data from the file", e);
         }
@@ -130,14 +129,14 @@ public class RatePath extends Path {
             
             double value = parseDouble(fields[DATUM_FIELD]);
             if(date <= MIN_DATE || abs(value) < EPSILON)
-                throw new AssertionError("erroneous data in " + file + " indexed by date="
+                throw new AssertionError("erroneous data in " + ratesFile + " indexed by date="
                         + fields[0] + ".");
             
             pathDates[i] = date;
             pathValues[i] = value;
         }
         
-        return new RatePath(file.getName(), pathDates[0], pathDates[lines.size() - 1],
+        return new RatePath(ratesFile, pathDates[0], pathDates[lines.size() - 1],
                 1.0 / 365.0, pathValues);
     }
 }

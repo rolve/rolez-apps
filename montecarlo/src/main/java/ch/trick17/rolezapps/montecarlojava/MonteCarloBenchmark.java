@@ -5,7 +5,6 @@ import static java.lang.Math.abs;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +28,7 @@ import rolez.lang.Task;
 @State(Thread)
 public class MonteCarloBenchmark {
     
-    private static final File FILE = new File("Data/hitData");
+    private static final String FILE = "Data/hitData";
     private static final int TIME_STEPS = 1000;
     private static final Map<Integer, Double> REF_VALS = new HashMap<Integer, Double>() {{
         put(10000, -0.0333976656762814);
