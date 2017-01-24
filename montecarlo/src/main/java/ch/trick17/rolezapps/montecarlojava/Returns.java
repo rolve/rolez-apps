@@ -45,22 +45,22 @@ public class Returns extends Path {
         
         /* Calculate the returns on a given rate path, via the definition for the instantaneous
          * compounded return. u_i = \ln{\frac{S_i}{S_{i-1}}} */
-        double[] returnPathValue = new double[ratePath.pathValues.length];
-        returnPathValue[0] = 0.0;
+        double[] returnPathValues = new double[ratePath.pathValues.length];
+        returnPathValues[0] = 0.0;
         for(int i = 1; i < ratePath.pathValues.length; i++)
-            returnPathValue[i] = log(ratePath.pathValues[i] / ratePath.pathValues[i - 1]);
+            returnPathValues[i] = log(ratePath.pathValues[i] / ratePath.pathValues[i - 1]);
         
         double mean = 0.0;
-        for(int i1 = 1; i1 < returnPathValue.length; i1++)
-            mean += returnPathValue[i1];
-        mean /= (returnPathValue.length - 1.0);
+        for(int i = 1; i < returnPathValues.length; i++)
+            mean += returnPathValues[i];
+        mean /= returnPathValues.length - 1.0;
         
         double variance = 0.0;
-        for(int i = 1; i < returnPathValue.length; i++)
-            variance += (returnPathValue[i] - mean) * (returnPathValue[i] - mean);
-        variance /= (returnPathValue.length - 1.0);
+        for(int i = 1; i < returnPathValues.length; i++)
+            variance += (returnPathValues[i] - mean) * (returnPathValues[i] - mean);
+        variance /= returnPathValues.length - 1.0;
         
-        double volatility2 = variance / (dTime);
+        double volatility2 = variance / dTime;
         volatility = Math.sqrt(volatility2);
         expectedReturnRate = mean / dTime + 0.5 * volatility2;
     }

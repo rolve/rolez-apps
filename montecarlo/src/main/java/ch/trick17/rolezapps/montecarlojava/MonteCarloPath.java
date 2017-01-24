@@ -86,7 +86,7 @@ public class MonteCarloPath extends Path {
      *            The psuedo-random number seed value, to start off a given
      *            sequence of Gaussian fluctuations.
      */
-    public void computeFluctuationsGaussian(long randomSeed) {
+    public void computeFluctuationsGaussian(int randomSeed) {
         // First, make use of the passed in seed value.
         Random rnd = new Random(randomSeed);
         

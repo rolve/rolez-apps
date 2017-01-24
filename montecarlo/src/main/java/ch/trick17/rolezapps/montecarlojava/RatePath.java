@@ -67,9 +67,9 @@ public class RatePath extends Path {
      */
     public final double[] pathValues;
     
-    public RatePath(String name, int startDate, int endDate, double dTime, double[] pathValue) {
+    public RatePath(String name, int startDate, int endDate, double dTime, double[] pathValues) {
         super(name, startDate, endDate, dTime);
-        this.pathValues = pathValue;
+        this.pathValues = pathValues;
     }
     
     /**
@@ -116,23 +116,23 @@ public class RatePath extends Path {
         }
         
         // Now create an array to store the rates data.
-        double[] pathValue = new double[lines.size()];
-        int[] pathDate = new int[lines.size()];
+        double[] pathValues = new double[lines.size()];
+        int[] pathDates = new int[lines.size()];
         
         for(int i = 0; i < lines.size(); i++) {
-            String[] field = lines.get(i).split(",");
-            int date = parseInt("19" + field[0]);
+            String[] fields = lines.get(i).split(",");
+            int date = parseInt("19" + fields[0]);
             
-            double aPathValue = parseDouble(field[DATUM_FIELD]);
-            if(date <= MIN_DATE || abs(aPathValue) < EPSILON)
+            double value = parseDouble(fields[DATUM_FIELD]);
+            if(date <= MIN_DATE || abs(value) < EPSILON)
                 throw new AssertionError("erroneous data in " + file + " indexed by date="
-                        + field[0] + ".");
+                        + fields[0] + ".");
             
-            pathDate[i] = date;
-            pathValue[i] = aPathValue;
+            pathDates[i] = date;
+            pathValues[i] = value;
         }
         
-        return new RatePath(file.getName(), pathDate[0], pathDate[lines.size() - 1], 1.0 / 365.0,
-                pathValue);
+        return new RatePath(file.getName(), pathDates[0], pathDates[lines.size() - 1], 1.0 / 365.0,
+                pathValues);
     }
 }
