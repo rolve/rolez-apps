@@ -5,7 +5,7 @@ class Returns extends Path {
     val volatility: double
     val expectedReturnRate: double
     
-    new(ratePath: pure RatePath) {
+    new(ratePath: readonly RatePath) {
         super(ratePath);
         
         val returnPathValues = new Array[double](ratePath.pathValues.length);

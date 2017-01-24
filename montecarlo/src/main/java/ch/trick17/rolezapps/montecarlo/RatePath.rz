@@ -26,7 +26,7 @@ object RatePathReader {
     val minDate: int = 19000101
     val epsilon: double = 10.0 * the Double.MIN_VALUE
     
-    def pure readRatesFile(ratesFile: pure String): pure RatePath {
+    def pure readRatesFile(ratesFile: pure String): readwrite RatePath {
         val scanner = new Scanner(new FileInputStream(ratesFile));
         
         val lines = new ArrayList[pure String];
