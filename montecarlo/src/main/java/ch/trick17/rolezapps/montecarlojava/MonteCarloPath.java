@@ -37,7 +37,7 @@ import java.util.Random;
  * @author H W Yau
  * @version $Revision: 1.18 $ $Date: 1999/02/16 18:51:28 $
  */
-public class MonteCarloPath extends Path {
+public class MonteCarloPath extends RatePath {
     
     /**
      * Value for the volatility, for use in the generation of the random path.
@@ -52,18 +52,13 @@ public class MonteCarloPath extends Path {
      * distribution.
      */
     private final double[] fluctuations;
-    /**
-     * The path values from which the random fluctuations are used to update.
-     */
-    private final double[] pathValues;
     
     public MonteCarloPath(Returns returns, int steps) {
-        super(returns);
+        super(returns, new double[steps]);
         
         this.volatility = returns.volatility;
         this.expectedReturnRate = returns.expectedReturnRate;
         this.fluctuations = new double[steps];
-        this.pathValues = new double[steps];
     }
     
     /**
@@ -102,9 +97,5 @@ public class MonteCarloPath extends Path {
         pathValues[0] = startValue;
         for(int i = 1; i < pathValues.length; i++)
             pathValues[i] = pathValues[i - 1] * exp(fluctuations[i]);
-    }
-    
-    public double[] getPathValues() {
-        return this.pathValues;
     }
 }

@@ -118,8 +118,7 @@ public class MonteCarloApp {
                 MonteCarloPath mcPath = new MonteCarloPath(returns, steps);
                 mcPath.computeFluctuations(seeds[i]);
                 mcPath.computePathValues(PATH_START_VALUE);
-                RatePath ratePath = new RatePath(mcPath, mcPath.getPathValues());
-                localResults.add(new Returns(ratePath).expectedReturnRate);
+                localResults.add(new Returns(mcPath).expectedReturnRate);
             }
             return localResults;
         }
