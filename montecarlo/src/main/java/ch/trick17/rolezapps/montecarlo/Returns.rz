@@ -1,0 +1,31 @@
+package ch.trick17.rolezapps.montecarlo
+
+class Returns extends Path {
+    
+    val volatility: double
+    val expectedReturnRate: double
+    
+    new(ratePath: pure RatePath) {
+        super(ratePath);
+        
+        val returnPathValues = new Array[double](ratePath.pathValues.length);
+        returnPathValues.set(0, 0.0);
+        for(var i = 1; i < ratePath.pathValues.length; i += 1)
+            returnPathValues.set(i,
+                    the Math.log(ratePath.pathValues.get(i) / ratePath.pathValues.get(i - 1)));
+        
+        var mean = 0.0;
+        for(var i = 1; i < returnPathValues.length; i += 1)
+            mean += returnPathValues.get(i);
+        mean /= returnPathValues.length - 1;
+        
+        var variance = 0.0;
+        for(var i = 1; i < returnPathValues.length; i += 1)
+            variance += (returnPathValues.get(i) - mean) * (returnPathValues.get(i) - mean);
+        variance /= returnPathValues.length - 1;
+        
+        val volatility2 = variance / ratePath.dTime;
+        this.volatility = the Math.sqrt(volatility2);
+        this.expectedReturnRate = mean / ratePath.dTime + 0.5 * volatility2;
+    }
+}

@@ -1,0 +1,23 @@
+package ch.trick17.rolezapps.montecarlo
+
+class Path {
+    
+    val name: pure String
+    val startDate: int
+    val endDate: int
+    val dTime: double
+    
+    new(name: pure String, startDate: int, endDate: int, dTime: double) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.dTime = dTime;
+    }
+    
+    new(other: pure Path) {
+        this.name = other.name;
+        this.startDate = other.startDate;
+        this.endDate = other.endDate;
+        this.dTime = other.dTime;
+    }
+}

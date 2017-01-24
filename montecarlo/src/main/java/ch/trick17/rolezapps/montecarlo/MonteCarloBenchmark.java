@@ -1,4 +1,4 @@
-package ch.trick17.rolezapps.montecarlojava;
+package ch.trick17.rolezapps.montecarlo;
 
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
 import static java.lang.Math.abs;
@@ -28,8 +28,8 @@ import rolez.lang.Task;
 @State(Thread)
 public class MonteCarloBenchmark {
     
-    private static final String FILE = "Data/hitData";
-    private static final int TIME_STEPS = 1000;
+    private static final String FILE = MonteCarloAppRunner.INSTANCE.file;
+    private static final int TIME_STEPS = MonteCarloAppRunner.INSTANCE.steps;
     private static final Map<Integer, Double> REF_VALS = new HashMap<Integer, Double>() {{
         put(10000, -0.0333976656762814);
         put(60000, -0.03215796752868655);
@@ -41,7 +41,7 @@ public class MonteCarloBenchmark {
     @Param({"1", "2", "4", "8", "32", "128"})
     int tasks;
     
-    @Param({""})
+    @Param({"", "Java"})
     String impl;
     
     MonteCarloApp app;

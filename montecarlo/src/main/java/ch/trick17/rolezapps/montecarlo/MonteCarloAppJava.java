@@ -19,7 +19,7 @@
  *                                                                         *
  **************************************************************************/
 
-package ch.trick17.rolezapps.montecarlojava;
+package ch.trick17.rolezapps.montecarlo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +27,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
+import ch.trick17.rolezapps.montecarlojava.MonteCarloPath;
+import ch.trick17.rolezapps.montecarlojava.RatePath;
+import ch.trick17.rolezapps.montecarlojava.Returns;
 import rolez.lang.ContiguousPartitioner;
 import rolez.lang.SliceRange;
 
@@ -44,24 +47,18 @@ import rolez.lang.SliceRange;
  * @author H W Yau
  * @version $Revision: 1.12 $ $Date: 1999/02/16 19:13:38 $
  */
-public class MonteCarloApp {
+public class MonteCarloAppJava extends MonteCarloApp {
     
     private static final double PATH_START_VALUE = 100.0;
     
-    private final int runs;
-    private final int numTasks;
-    
     private final Returns returns;
-    private final int steps;
     
     private final int[] seeds;
     private final List<Double> results = new ArrayList<>();
 
-    
-    public MonteCarloApp(String ratesFile, int steps, int runs, int numTasks) {
-        this.steps = steps;
-        this.runs = runs;
-        this.numTasks = numTasks;
+    public MonteCarloAppJava(String ratesFile, int steps, int runs, int numTasks) {
+        // super constr will duplicate the work below, but doesn't matter in initialization
+        super(ratesFile, steps, runs, numTasks);
         
         returns = new Returns(RatePath.readRatesFile(ratesFile));
         
@@ -70,6 +67,7 @@ public class MonteCarloApp {
             seeds[i] = i * 11;
     }
     
+    @Override
     public void run() {
         SliceRange fullRange = new SliceRange(0, runs, 1);
         SliceRange[] ranges = ContiguousPartitioner.INSTANCE.partition(fullRange, numTasks).data;
@@ -95,6 +93,7 @@ public class MonteCarloApp {
      * Method for doing something with the Monte Carlo simulations. It's probably not mathematically
      * correct, but shall take an average over all the simulated rate paths.
      */
+    @Override
     public double avgExpectedReturnRate() {
         double result = 0.0;
         for(int i = 0; i < runs; i++)

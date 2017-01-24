@@ -1,0 +1,35 @@
+package ch.trick17.rolezapps.montecarlo
+
+import rolez.util.Random
+
+class MonteCarloPath extends RatePath {
+    
+    val volatility: double
+    val expectedReturnRate: double
+    
+    val fluctuations: readwrite Array[double]
+    
+    new(returns: pure Returns, steps: int) {
+        super(returns, new Array[double](steps));
+        
+        this.volatility = returns.volatility;
+        this.expectedReturnRate = returns.expectedReturnRate;
+        this.fluctuations = new Array[double](steps);
+    }
+    
+    def readwrite computeFluctuations(randomSeed: int): {
+        val random = new Random(randomSeed);
+        
+        val mean = (this.expectedReturnRate - 0.5 * this.volatility * this.volatility) * this.dTime;
+        val stdDev = this.volatility * the Math.sqrt(this.dTime);
+        
+        for(var i = 0; i < this.fluctuations.length; i += 1)
+            this.fluctuations.set(i, mean + stdDev * random.nextGaussian);
+    }
+    
+    def readwrite computePathValues(startValue: double): {
+        this.pathValues.set(0, startValue);
+        for(var i = 1; i < this.pathValues.length; i += 1)
+            this.pathValues.set(i, this.pathValues.get(i - 1) * the Math.exp(this.fluctuations.get(i)));
+    }
+}
