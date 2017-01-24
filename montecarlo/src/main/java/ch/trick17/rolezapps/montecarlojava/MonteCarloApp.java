@@ -116,11 +116,10 @@ public class MonteCarloApp {
             List<Double> localResults = new ArrayList<>();
             for(int i = range.begin; i < range.end; i += range.step) {
                 MonteCarloPath mcPath = new MonteCarloPath(returns, steps);
-                mcPath.computeFluctuationsGaussian(seeds[i]);
-                mcPath.computePathValue(PATH_START_VALUE);
-                RatePath rateP = new RatePath(mcPath.name, mcPath.startDate, mcPath.endDate,
-                        mcPath.dTime, mcPath.getPathValues());
-                localResults.add(new Returns(rateP).expectedReturnRate);
+                mcPath.computeFluctuations(seeds[i]);
+                mcPath.computePathValues(PATH_START_VALUE);
+                RatePath ratePath = new RatePath(mcPath, mcPath.getPathValues());
+                localResults.add(new Returns(ratePath).expectedReturnRate);
             }
             return localResults;
         }

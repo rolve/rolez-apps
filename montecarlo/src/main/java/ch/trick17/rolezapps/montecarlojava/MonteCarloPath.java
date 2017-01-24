@@ -40,6 +40,14 @@ import java.util.Random;
 public class MonteCarloPath extends Path {
     
     /**
+     * Value for the volatility, for use in the generation of the random path.
+     */
+    private final double volatility;
+    /**
+     * Value for the mean drift, for use in the generation of the random path.
+     */
+    private final double expectedReturnRate;
+    /**
      * Random fluctuations generated as a series of random numbers with given
      * distribution.
      */
@@ -48,31 +56,14 @@ public class MonteCarloPath extends Path {
      * The path values from which the random fluctuations are used to update.
      */
     private final double[] pathValues;
-    /**
-     * Value for the mean drift, for use in the generation of the random path.
-     */
-    private final double expectedReturnRate;
-    /**
-     * Value for the volatility, for use in the generation of the random path.
-     */
-    private final double volatility;
     
     public MonteCarloPath(Returns returns, int steps) {
-        super(returns.name, returns.startDate, returns.endDate, returns.dTime);
+        super(returns);
         
-        this.expectedReturnRate = returns.expectedReturnRate;
         this.volatility = returns.volatility;
-        this.pathValues = new double[steps];
+        this.expectedReturnRate = returns.expectedReturnRate;
         this.fluctuations = new double[steps];
-    }
-    
-    /**
-     * Accessor method for private instance variable <code>pathValue</code>.
-     *
-     * @return Value of instance variable <code>pathValue</code>.
-     */
-    public double[] getPathValues() {
-        return this.pathValues;
+        this.pathValues = new double[steps];
     }
     
     /**
@@ -86,14 +77,14 @@ public class MonteCarloPath extends Path {
      *            The psuedo-random number seed value, to start off a given
      *            sequence of Gaussian fluctuations.
      */
-    public void computeFluctuationsGaussian(int randomSeed) {
+    public void computeFluctuations(int randomSeed) {
         // First, make use of the passed in seed value.
         Random rnd = new Random(randomSeed);
         
         // Determine the mean and standard-deviation, from the mean-drift and
         // volatility.
-        double mean = (expectedReturnRate - 0.5 * volatility * volatility) * this.dTime;
-        double sd = volatility * sqrt(this.dTime);
+        double mean = (expectedReturnRate - 0.5 * volatility * volatility) * dTime;
+        double sd = volatility * sqrt(dTime);
         for(int i = 0; i < fluctuations.length; i++)
             // Now map this onto a general Gaussian of given mean and variance.
             fluctuations[i] = mean + sd * rnd.nextGaussian();
@@ -107,9 +98,13 @@ public class MonteCarloPath extends Path {
      *            the starting value of the rate path, to be updated with the
      *            precomputed fluctuations.
      */
-    public void computePathValue(double startValue) {
+    public void computePathValues(double startValue) {
         pathValues[0] = startValue;
         for(int i = 1; i < pathValues.length; i++)
             pathValues[i] = pathValues[i - 1] * exp(fluctuations[i]);
+    }
+    
+    public double[] getPathValues() {
+        return this.pathValues;
     }
 }

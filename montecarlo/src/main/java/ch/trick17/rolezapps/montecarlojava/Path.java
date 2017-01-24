@@ -53,4 +53,11 @@ public class Path {
         this.endDate = endDate;
         this.dTime = dTime;
     }
+    
+    public Path(Path other) {
+        this.name = other.name;
+        this.startDate = other.startDate;
+        this.endDate = other.endDate;
+        this.dTime = other.dTime;
+    }
 }

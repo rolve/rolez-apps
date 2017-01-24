@@ -72,6 +72,11 @@ public class RatePath extends Path {
         this.pathValues = pathValues;
     }
     
+    public RatePath(Path other, double[] pathValues) {
+        super(other);
+        this.pathValues = pathValues;
+    }
+    
     /**
      * Method for reading in data file, in a given format. Namely:
      * 
@@ -132,7 +137,7 @@ public class RatePath extends Path {
             pathValues[i] = value;
         }
         
-        return new RatePath(file.getName(), pathDates[0], pathDates[lines.size() - 1], 1.0 / 365.0,
-                pathValues);
+        return new RatePath(file.getName(), pathDates[0], pathDates[lines.size() - 1],
+                1.0 / 365.0, pathValues);
     }
 }

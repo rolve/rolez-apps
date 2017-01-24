@@ -41,7 +41,7 @@ public class Returns extends Path {
     public final double expectedReturnRate;
     
     public Returns(RatePath ratePath) {
-        super(ratePath.name, ratePath.startDate, ratePath.endDate, ratePath.dTime);
+        super(ratePath);
         
         /* Calculate the returns on a given rate path, via the definition for the instantaneous
          * compounded return. u_i = \ln{\frac{S_i}{S_{i-1}}} */
