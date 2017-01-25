@@ -2,6 +2,7 @@ package ch.trick17.rolezapps.montecarlo
 
 import rolez.io.File
 import rolez.util.ArrayList
+import rolez.util.Scanner
 
 class MonteCarloApp {
     
@@ -67,7 +68,11 @@ object MonteCarloAppRunner {
     val steps: int = 1000
     
     task pure main: {
-        val app = new MonteCarloApp(this.file, this.steps, 1000, 2);
+        val app = new MonteCarloApp(this.file, this.steps, 100000, 8);
+        
+        the System.out.println("Press Enter to start");
+        new Scanner(the System.in).nextLine;
+        
         app.run;
         the System.out.println(app.avgExpectedReturnRate);
     }
