@@ -52,7 +52,7 @@ class Quicksort {
         return array;
     }
     
-    task pure sort(s: readwrite Array[int]): {
+    def pure sort(s: readwrite Array[int]): {
         this.doSort(s, s.range.begin, s.range.end, 0);
     }
     

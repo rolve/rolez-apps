@@ -29,7 +29,7 @@ public class QuicksortBenchmark {
     @Param({"2000000"})
     int n;
     
-    @Param({"LocalOpt", "Java"})
+    @Param({"", "LocalOpt", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "16", "64", "256"})
