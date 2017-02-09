@@ -131,13 +131,13 @@ class BallAnimation extends LinearMovement {
     
     val scene: readwrite AnimatedScene
     
-    new(duration: pure Duration, sphere: readwrite Sphere, speed: double, scene: readwrite AnimatedScene) {
-        super(duration, sphere, new Vector3D(0.0, 0.0, 1.0).scale(speed));
+    new(duration: pure Duration, obj: readwrite Primitive, speed: double, scene: readwrite AnimatedScene) {
+        super(duration, obj, new Vector3D(0.0, 0.0, 1.0).scale(speed));
         this.scene = scene;
     }
     
     override readwrite onBegin: {
-        this.scene.objects.add(this.obj as readwrite Sphere);
+        this.scene.objects.add(this.obj as readwrite Primitive);
     }
 
     override readwrite onFinish: {

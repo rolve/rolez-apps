@@ -13,6 +13,11 @@ public class Scene extends ch.trick17.rolezapps.raytracer.Scene {
     public double ambientLight;
     public Color background;
     
+    @Override
+    public ch.trick17.rolezapps.raytracer.Intersection intersect(Ray ray) {
+        throw new AssertionError();
+    }
+    
     public Intersection intersectJava(final Ray ray) {
         Intersection closest = null;
         for(int i = 0; i < this.objects.size(); i += 1) {

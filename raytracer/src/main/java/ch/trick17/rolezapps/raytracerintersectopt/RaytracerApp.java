@@ -1,4 +1,4 @@
-package ch.trick17.rolezapps.raytracer;
+package ch.trick17.rolezapps.raytracerintersectopt;
 
 import static rolez.lang.Guarded.guardReadOnly;
 import static rolez.lang.GuardedArray.unwrap;
@@ -6,37 +6,38 @@ import static rolez.lang.GuardedArray.unwrap;
 import java.io.IOException;
 import java.util.Scanner;
 
-import ch.trick17.rolezapps.raytracer.anim.AnimatedScene;
-import ch.trick17.rolezapps.raytracer.anim.AnimatedSceneIntersectOpt;
-import ch.trick17.rolezapps.raytracer.anim.AnimatorApp;
+import ch.trick17.rolezapps.raytracer.Raytracer;
 import ch.trick17.rolezapps.raytracer.util.ImageWriterJava;
+import ch.trick17.rolezapps.raytracerintersectopt.anim.AnimatedScene;
+import ch.trick17.rolezapps.raytracerintersectopt.anim.AnimatorApp;
 import rolez.lang.GuardedArray;
 import rolez.lang.Task;
 import rolez.lang.TaskSystem;
 import rolez.util.Random;
 import rolez.util.StopWatch;
 
-public final class RaytracerAppIntersectOpt {
+public final class RaytracerApp {
     
-    public static final RaytracerAppIntersectOpt INSTANCE = new RaytracerAppIntersectOpt();
+    public static final RaytracerApp INSTANCE = new RaytracerApp();
     
-    private RaytracerAppIntersectOpt() {}
+    private RaytracerApp() {}
     
     public static Task<Void> $mainTask(final GuardedArray<String[]> args) {
         return new Task<Void>(new Object[]{}, new Object[]{args}) {
             @Override
             protected Void runRolez() {
                 try {
-                    AnimatedScene scene = new AnimatedSceneIntersectOpt(30.0);
-                    
+                    AnimatedScene scene = new AnimatedScene(30.0);
                     AnimatorApp.INSTANCE.buildScene(scene, new Random(42));
                     for(int i = 0; i < 8; i += 1)
                         scene.animationStep(1.0);
+                    
                     Raytracer raytracer = new Raytracer();
                     raytracer.numTasks = 8;
                     raytracer.maxRecursions = 5;
                     raytracer.oversample = 2;
                     raytracer.scene = scene;
+                    
                     int height = 180;
                     int width = (int) (guardReadOnly(scene.view).aspect * height);
                     GuardedArray<GuardedArray<int[]>[]> image = new GuardedArray<GuardedArray<int[]>[]>(
