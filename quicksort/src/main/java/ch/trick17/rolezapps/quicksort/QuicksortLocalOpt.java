@@ -57,7 +57,6 @@ public class QuicksortLocalOpt extends Quicksort {
                 int pivot = pivot(s, begin, end);
                 int left = begin;
                 int right = end - 1;
-                guardReadWrite(s);
                 while(left <= right) {
                     while(s.getInt(left) < pivot)
                         left += 1;
