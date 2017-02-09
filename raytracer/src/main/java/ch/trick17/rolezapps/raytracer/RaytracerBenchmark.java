@@ -4,8 +4,6 @@ import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
 
-import java.util.Random;
-
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -20,6 +18,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import rolez.lang.Task;
+import rolez.util.Random;
 
 @BenchmarkMode(SingleShotTime)
 @Fork(1)
@@ -29,10 +28,10 @@ public class RaytracerBenchmark {
     @Param({"180", "360"})
     int height;
     
-    @Param({"1", "2", "4", "8", "32", "128"})
+    @Param({"1", "2", "8", "32"})
     int tasks;
     
-    @Param({"Rolez", "Java"})
+    @Param({"Rolez", "IntersectOpt", "Java"})
     String impl;
     
     RaytracerBenchmarkSetup setup;
@@ -56,7 +55,7 @@ public class RaytracerBenchmark {
 
     public static void main(String[] args) throws RunnerException {
         Options options = new OptionsBuilder().include(RaytracerBenchmark.class.getSimpleName())
-                .warmupIterations(20).measurementIterations(30).build();
+                .warmupIterations(10).measurementIterations(30).build();
         new Runner(options).run();
     }
 }
