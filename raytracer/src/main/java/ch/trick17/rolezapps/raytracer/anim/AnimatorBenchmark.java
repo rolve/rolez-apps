@@ -45,7 +45,8 @@ public class AnimatorBenchmark {
     @Setup(Level.Iteration)
     public void setup() throws IOException {
         Task.registerNewRootTask();
-        AnimatedScene scene = AnimatorApp.INSTANCE.createScene(new Random(42), 3.0);
+        AnimatedScene scene = new AnimatedScene(3.0);
+        AnimatorApp.INSTANCE.buildScene(scene, new Random(42));
         int width = (int) (height * scene.view.aspect);
         
         Raytracer raytracer = instantiateBenchmark(Raytracer.class, impl);

@@ -1,6 +1,7 @@
 package ch.trick17.rolezapps.raytracer
 
 import ch.trick17.rolezapps.raytracer.anim.AnimatorApp
+import ch.trick17.rolezapps.raytracer.anim.AnimatedScene
 import rolez.util.Random
 
 class RaytracerBenchmarkSetup {
@@ -26,7 +27,8 @@ class RaytracerBenchmarkSetupRolez extends RaytracerBenchmarkSetup {
     }
     
     def pure createBenchmarkScene(random: readwrite Random): readwrite Scene {
-        val scene = the AnimatorApp.createScene(random, 30.0);
+        val scene = new AnimatedScene(30.0);
+        the AnimatorApp.buildScene(scene, random);
         for(var t = 1; t <= 8; t += 1)
             scene.animationStep(1.0);
         return scene;

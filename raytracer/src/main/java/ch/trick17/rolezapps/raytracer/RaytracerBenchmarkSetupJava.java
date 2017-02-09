@@ -1,17 +1,15 @@
 package ch.trick17.rolezapps.raytracer;
 
-import java.util.Random;
-
 import ch.trick17.rolezapps.raytracerjava.Raytracer;
 import ch.trick17.rolezapps.raytracerjava.Scene;
 import ch.trick17.rolezapps.raytracerjava.anim.AnimatedScene;
 import ch.trick17.rolezapps.raytracerjava.anim.AnimatorApp;
+import rolez.util.Random;
 
 public class RaytracerBenchmarkSetupJava extends RaytracerBenchmarkSetup {
     
-    public final Raytracer raytracer = new Raytracer();
-    
-    public final int[][] image;
+    private final Raytracer raytracer = new Raytracer();
+    private final int[][] image;
     
     public RaytracerBenchmarkSetupJava(int height, int numTasks, Random random) {
         Scene scene = createBenchmarkScene(random);
@@ -23,8 +21,9 @@ public class RaytracerBenchmarkSetupJava extends RaytracerBenchmarkSetup {
         raytracer.scene = scene;
     }
     
-    public Scene createBenchmarkScene(final Random random) {
-        AnimatedScene scene = AnimatorApp.createScene(random, 30.0);
+    public Scene createBenchmarkScene(Random random) {
+        AnimatedScene scene = new AnimatedScene(30);
+        AnimatorApp.buildScene(scene, random);
         for(int t = 1; t <= 8; t += 1)
             scene.animationStep(1.0);
         return scene;

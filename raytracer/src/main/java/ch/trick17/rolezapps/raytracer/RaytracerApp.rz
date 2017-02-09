@@ -1,6 +1,7 @@
 package ch.trick17.rolezapps.raytracer
 
 import ch.trick17.rolezapps.raytracer.anim.AnimatorApp
+import ch.trick17.rolezapps.raytracer.anim.AnimatedScene
 import ch.trick17.rolezapps.raytracer.util.ImageWriter
 import rolez.util.Random
 import rolez.util.Scanner
@@ -9,7 +10,8 @@ import rolez.util.StopWatch
 object RaytracerApp {
     
     task pure main(args: readonly Array[pure String]): {
-        val scene = the AnimatorApp.createScene(new Random(42), 30.0);
+        val scene = new AnimatedScene(30.0);
+        the AnimatorApp.buildScene(scene, new Random(42));
         for(var i = 0; i < 8; i += 1)
             scene.animationStep(1.0);
         
@@ -28,10 +30,11 @@ object RaytracerApp {
         the System.out.println("Press Enter to start");
         new Scanner(the System.in).nextLine;
         
-        val watch = new StopWatch.go;
-        raytracer.render(image);
-        the System.out.println(watch.get);
-        
+        for(var i = 0; i < 10; i += 1) {
+            val watch = new StopWatch.go;
+            raytracer.render(image);
+            the System.out.println(watch.get);
+        }
         the ImageWriter.write(image, "png", "image.png");
     }
 }

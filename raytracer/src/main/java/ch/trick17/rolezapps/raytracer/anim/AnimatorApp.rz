@@ -13,7 +13,8 @@ object AnimatorApp {
         raytracer.numTasks = 8;
         raytracer.oversample = 2;
         
-        val scene = this.createScene(new Random, 30.0);
+        val scene = new AnimatedScene(30.0);
+        this.buildScene(scene, new Random);
         val width = 800;
         val height = (width / scene.view.aspect) as int;
         val writer = new VideoWriter("movie.mp4", width, height, 25, 12);
@@ -23,7 +24,7 @@ object AnimatorApp {
         animator.render;
     }
     
-    def pure createScene(random: readwrite Random, length: double): readwrite AnimatedScene {
+    def pure buildScene(scene: readwrite AnimatedScene, random: readwrite Random): {
         /* Parameters */
         val height  = 22.0;
         val side    = 40.0;
@@ -32,8 +33,6 @@ object AnimatorApp {
         
         val dimLength = 11.0;
         val darkLength = 1.0;
-
-        var scene = new AnimatedScene(length);
         
         /* View */
         val view = new View;
@@ -125,8 +124,6 @@ object AnimatorApp {
             scene.animations.add(new BrightnessChange(lilLightsDimDuration, light,
                 -light.brightness / (0.5*dimLength)));
         }
-        
-        return scene;
     }
 }
 
