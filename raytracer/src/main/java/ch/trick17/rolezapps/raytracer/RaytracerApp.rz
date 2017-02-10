@@ -18,7 +18,6 @@ object RaytracerApp {
         val raytracer = new Raytracer;
         raytracer.numTasks = 8;
         raytracer.maxRecursions = 5;
-        raytracer.oversample = 2;
         raytracer.scene = scene;
         
         val height = 180;

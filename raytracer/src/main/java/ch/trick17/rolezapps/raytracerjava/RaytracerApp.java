@@ -20,11 +20,10 @@ public final class RaytracerApp {
         Raytracer raytracer = new Raytracer();
         raytracer.numTasks = 8;
         raytracer.maxRecursions = 5;
-        raytracer.oversample = 2;
         raytracer.scene = scene;
         
         int height = 180;
-        int width = (int) scene.view.aspect * height;
+        int width = (int) (scene.view.aspect * height);
         int[][] image = new int[height][width];
         
         System.out.println("Press Enter to start");
