@@ -46,6 +46,7 @@ public class KMeansBenchmark {
     
     @Setup(Level.Iteration)
     public void setup() {
+        Task.resetTaskIdCounter();
         Task.registerNewRootTask();
         clusters = n / 100;
         kMeans = instantiateBenchmark(KMeans.class, impl, dim, clusters, tasks);

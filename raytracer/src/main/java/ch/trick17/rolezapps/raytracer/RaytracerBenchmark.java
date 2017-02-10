@@ -38,6 +38,7 @@ public class RaytracerBenchmark {
     
     @Setup(Level.Iteration)
     public void setup() {
+        Task.resetTaskIdCounter();
         Task.registerNewRootTask();
         Random random = new Random(42);
         setup = instantiateBenchmark(RaytracerBenchmarkSetup.class, impl, height, tasks, random);
@@ -55,7 +56,7 @@ public class RaytracerBenchmark {
 
     public static void main(String[] args) throws RunnerException {
         Options options = new OptionsBuilder().include(RaytracerBenchmark.class.getSimpleName())
-                .warmupIterations(10).measurementIterations(30).build();
+                .warmupIterations(10).measurementIterations(20).build();
         new Runner(options).run();
     }
 }

@@ -44,6 +44,7 @@ public class AnimatorBenchmark {
     
     @Setup(Level.Iteration)
     public void setup() throws IOException {
+        Task.resetTaskIdCounter();
         Task.registerNewRootTask();
         AnimatedScene scene = new AnimatedScene(3.0);
         AnimatorApp.INSTANCE.buildScene(scene, new Random(42));

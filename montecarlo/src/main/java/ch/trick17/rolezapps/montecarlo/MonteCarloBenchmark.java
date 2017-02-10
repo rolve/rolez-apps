@@ -48,6 +48,7 @@ public class MonteCarloBenchmark {
     
     @Setup(Level.Iteration)
     public void setup() {
+        Task.resetTaskIdCounter();
         Task.registerNewRootTask();
         app = instantiateBenchmark(MonteCarloApp.class, impl, FILE, TIME_STEPS, runs, tasks);
     }

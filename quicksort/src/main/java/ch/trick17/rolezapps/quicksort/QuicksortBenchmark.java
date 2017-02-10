@@ -40,6 +40,7 @@ public class QuicksortBenchmark {
     
     @Setup(Level.Iteration)
     public void setup() {
+        Task.resetTaskIdCounter();
         Task.registerNewRootTask();
         int maxLevel = MathExtra.INSTANCE.log2(tasks);
         quicksort = instantiateBenchmark(Quicksort.class, impl, maxLevel);
