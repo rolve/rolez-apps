@@ -25,7 +25,7 @@ import rolez.util.Random;
 @State(Thread)
 public class RaytracerBenchmark {
     
-    @Param({"180", "360"})
+    @Param({"90", "180"})
     int height;
     
     @Param({"1", "2", "8", "32"})
@@ -38,7 +38,6 @@ public class RaytracerBenchmark {
     
     @Setup(Level.Iteration)
     public void setup() {
-        Task.resetTaskIdCounter();
         Task.registerNewRootTask();
         Random random = new Random(42);
         setup = instantiateBenchmark(RaytracerBenchmarkSetup.class, impl, height, tasks, random);

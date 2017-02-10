@@ -38,7 +38,7 @@ public class MonteCarloBenchmark {
     @Param({"10000", /* "60000" */})
     int runs;
     
-    @Param({"1", "2", "4", "8", "32", "128"})
+    @Param({"1", "2", "4", "8", "32", "64"})
     int tasks;
     
     @Param({"", "Java"})
@@ -48,7 +48,6 @@ public class MonteCarloBenchmark {
     
     @Setup(Level.Iteration)
     public void setup() {
-        Task.resetTaskIdCounter();
         Task.registerNewRootTask();
         app = instantiateBenchmark(MonteCarloApp.class, impl, FILE, TIME_STEPS, runs, tasks);
     }

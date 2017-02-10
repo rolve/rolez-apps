@@ -32,7 +32,7 @@ public class QuicksortBenchmark {
     @Param({"", "LocalOpt", "Java"})
     String impl;
     
-    @Param({"1", "2", "4", "16", "64", "256"})
+    @Param({"1", "2", "4", "16", "64"})
     int tasks;
     
     Quicksort quicksort;
@@ -40,7 +40,6 @@ public class QuicksortBenchmark {
     
     @Setup(Level.Iteration)
     public void setup() {
-        Task.resetTaskIdCounter();
         Task.registerNewRootTask();
         int maxLevel = MathExtra.INSTANCE.log2(tasks);
         quicksort = instantiateBenchmark(Quicksort.class, impl, maxLevel);
