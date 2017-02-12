@@ -19,7 +19,7 @@ public final class BenchmarkUtils {
     public static <T> T instantiateBenchmark(Class<T> baseClass, String impl, Object... args) {
         Class<?>[] paramTypes = new Class<?>[args.length];
         for(int i = 0; i < args.length; i++)
-            paramTypes[i] = convertType(args[i]);
+            paramTypes[i] = primitiveTypeOf(args[i]);
             
         try {
             Class<?> implClass = baseClass.getClassLoader().loadClass(baseClass.getName() + impl);
@@ -29,7 +29,7 @@ public final class BenchmarkUtils {
         }
     }
     
-    private static Class<?> convertType(Object object) {
+    private static Class<?> primitiveTypeOf(Object object) {
         Class<?> c = object.getClass();
         
         if(c == Boolean.class)
@@ -48,8 +48,6 @@ public final class BenchmarkUtils {
             return Long.TYPE;
         else if(c == Short.class)
             return Short.TYPE;
-        else if(c.isAnonymousClass())
-            return c.getSuperclass();
         else
             return c;
     }

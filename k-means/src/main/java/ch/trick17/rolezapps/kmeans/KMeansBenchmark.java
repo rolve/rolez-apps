@@ -49,13 +49,14 @@ public class KMeansBenchmark {
     public void setup() {
         Task.registerNewRootTask();
         clusters = n / 100;
-        kMeans = instantiateBenchmark(KMeans.class, impl, dim, clusters, tasks, currentTask());
-        data = kMeans.createDataSet(n, currentTask());
+        kMeans = instantiateBenchmark(KMeans.class, impl, dim, clusters, tasks,
+                currentTask().idBits());
+        data = kMeans.createDataSet(n, currentTask().idBits());
     }
     
     @Benchmark
     public Object kMeans() {
-        return kMeans.kMeans(data, maxIters, currentTask());
+        return kMeans.kMeans(data, maxIters, currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)

@@ -12,11 +12,11 @@ public class QuicksortTest {
     public void testSort() {
         // Only tests the single-threaded sort implementation. Since nothing is ever passed around,
         // guarding is never initialized, and the $task parameter is never really used
-        Quicksort quicksort = new Quicksort(0, null);
+        Quicksort quicksort = new Quicksort(0, 0L);
         
         int n = 1000;
-        GuardedArray<int[]> ints = quicksort.shuffledInts(n, null);
-        quicksort.sort(ints, null);
+        GuardedArray<int[]> ints = quicksort.shuffledInts(n, 0L);
+        quicksort.sort(ints, 0L);
         for(int i = 0; i < n; i++)
             assertEquals(i, ints.data[i]);
     }

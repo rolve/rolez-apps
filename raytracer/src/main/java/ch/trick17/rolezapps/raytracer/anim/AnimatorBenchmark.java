@@ -46,11 +46,11 @@ public class AnimatorBenchmark {
     @Setup(Level.Iteration)
     public void setup() throws IOException {
         Task.registerNewRootTask();
-        AnimatedScene scene = new AnimatedScene(3.0, currentTask());
-        AnimatorApp.INSTANCE.buildScene(scene, new Random(42), currentTask());
+        AnimatedScene scene = new AnimatedScene(3.0, currentTask().idBits());
+        AnimatorApp.INSTANCE.buildScene(scene, new Random(42), currentTask().idBits());
         int width = (int) (height * scene.view.aspect);
         
-        Raytracer raytracer = instantiateBenchmark(Raytracer.class, impl, currentTask());
+        Raytracer raytracer = instantiateBenchmark(Raytracer.class, impl, currentTask().idBits());
         raytracer.numTasks = tasks;
         raytracer.maxRecursions = 3;
         
@@ -61,7 +61,7 @@ public class AnimatorBenchmark {
     
     @Benchmark
     public void animator() {
-        animator.render(currentTask());
+        animator.render(currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)

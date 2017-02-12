@@ -20,14 +20,14 @@ public class QuicksortJavaPerfectPivot extends QuicksortJava {
         
         System.out.println("Warming up...");
         for(int i = 0; i < 2; i++) {
-            ints = quicksort.shuffledInts(n, null);
-            quicksort.sort(ints, null);
+            ints = quicksort.shuffledInts(n, 0L);
+            quicksort.sort(ints, 0L);
         }
-        ints = quicksort.shuffledInts(n, null);
+        ints = quicksort.shuffledInts(n, 0L);
         
         System.out.println("Enter to start");
         new Scanner(System.in).nextLine();
-        quicksort.sort(ints, null);
+        quicksort.sort(ints, 0L);
     }
     
     public QuicksortJavaPerfectPivot(int maxLevel) {

@@ -42,14 +42,14 @@ public class QuicksortBenchmark {
     @Setup(Level.Iteration)
     public void setup() {
         Task.registerNewRootTask();
-        int maxLevel = MathExtra.INSTANCE.log2(tasks, currentTask());
-        quicksort = instantiateBenchmark(Quicksort.class, impl, maxLevel);
-        data = quicksort.shuffledInts(n, currentTask());
+        int maxLevel = MathExtra.INSTANCE.log2(tasks, currentTask().idBits());
+        quicksort = instantiateBenchmark(Quicksort.class, impl, maxLevel, currentTask().idBits());
+        data = quicksort.shuffledInts(n, currentTask().idBits());
     }
     
     @Benchmark
     public void quicksort() {
-        quicksort.sort(data, currentTask());
+        quicksort.sort(data, currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)

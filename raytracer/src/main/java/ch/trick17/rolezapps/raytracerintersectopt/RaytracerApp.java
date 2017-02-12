@@ -27,7 +27,7 @@ public final class RaytracerApp {
             @Override
             protected Void runRolez() {
                 try {
-                    Task<?> $task = this;
+                    long $task = idBits();
                     AnimatedScene scene = new AnimatedScene(30.0, $task);
                     AnimatorApp.INSTANCE.buildScene(scene, new Random(42), $task);
                     for(int i = 0; i < 8; i += 1)

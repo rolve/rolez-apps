@@ -59,13 +59,13 @@ public final class AnimatorApp {
                 (-(height - 2)) / scene.length)));
         
         Material red = new Material();
-        red.color = new Color(0.9, 0.1, 0.1, null);
+        red.color = new Color(0.9, 0.1, 0.1, 0L);
         red.kd = 0.9;
         red.shine = 15.0;
         red.ks = 0.5;
         
         Material white = new Material();
-        white.color = new Color(0.9, 0.9, 1.0, null);
+        white.color = new Color(0.9, 0.9, 1.0, 0L);
         white.kd = 1.2;
         white.shine = 100.0;
         white.ks = 0.25;
@@ -79,7 +79,7 @@ public final class AnimatorApp {
         glass.ior = 1.05;
         
         Material blue = new Material();
-        blue.color = new Color(0.0, 0.0, 0.5, null);
+        blue.color = new Color(0.0, 0.0, 0.5, 0L);
         blue.kd = 0.5;
         blue.shine = 10.0;
         blue.ks = 0.2;
@@ -106,14 +106,14 @@ public final class AnimatorApp {
         Light mainLight = new Light(new Vector3D(0.0, 0.0, 0.0), 5.0);
         scene.lights.add(mainLight);
         scene.animations.add(new BrightnessChange(new Duration((scene.length - dimLength)
-                - darkLength, null), mainLight, (-mainLight.brightness) / (0.5 * dimLength)));
+                - darkLength, 0L), mainLight, (-mainLight.brightness) / (0.5 * dimLength)));
         
         scene.ambientLight = 0.2;
         scene.animations.add(new AmbientLightChange(new Duration((scene.length - (0.75 * dimLength))
-                - darkLength, null), scene, (-scene.ambientLight) / (0.5 * dimLength)));
+                - darkLength, 0L), scene, (-scene.ambientLight) / (0.5 * dimLength)));
         
         Duration lilLightsDimDuration = new Duration((scene.length - (0.5 * dimLength))
-                - darkLength, null);
+                - darkLength, 0L);
         for(double t = 0.0; t < scene.length; t += 1.0 / ballsPerS) {
             double r = Math.abs(1.5 + (0.75 * random.nextGaussian()));
             
@@ -123,7 +123,7 @@ public final class AnimatorApp {
             double y = dist * Math.sin(angle);
             
             double speed = Math.abs(6 + (3 * random.nextGaussian()));
-            Duration duration = new Duration(t, t + ((height + (2 * r)) / speed), null);
+            Duration duration = new Duration(t, t + ((height + (2 * r)) / speed), 0L);
             
             Sphere ball = new Sphere(new Vector3D(x, y, ((-height) / 2) - r), r, red);
             Light light = new Light(new Vector3D(x, y + (1.2 * r), ((-height) / 2) - r), 0.2);

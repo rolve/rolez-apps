@@ -42,12 +42,12 @@ public class RaytracerBenchmark {
         Task.registerNewRootTask();
         Random random = new Random(42);
         setup = instantiateBenchmark(RaytracerBenchmarkSetup.class, impl, height, tasks, random,
-                currentTask());
+                currentTask().idBits());
     }
     
     @Benchmark
     public int raytracer() {
-        return setup.runRaytracer(currentTask());
+        return setup.runRaytracer(currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)

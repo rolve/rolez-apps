@@ -50,18 +50,18 @@ public class MonteCarloBenchmark {
     @Setup(Level.Iteration)
     public void setup() {
         Task.registerNewRootTask();
-        app = instantiateBenchmark(MonteCarloApp.class, impl, FILE, TIME_STEPS, runs, tasks,
-                currentTask());
+        app = instantiateBenchmark(MonteCarloApp.class, impl, FILE, TIME_STEPS, runs,
+                tasks, currentTask().idBits());
     }
     
     @Benchmark
     public void monteCarlo() {
-        app.run(currentTask());
+        app.run(currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)
     public void tearDown() {
-        double expectedReturnRate = app.avgExpectedReturnRate(currentTask());
+        double expectedReturnRate = app.avgExpectedReturnRate(currentTask().idBits());
         double dev = abs(expectedReturnRate - REF_VALS.get(runs));
         if(dev > 1.0e-12)
             throw new AssertionError("Validation failed");

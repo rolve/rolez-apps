@@ -51,7 +51,7 @@ public class Raytracer {
         for(int y = range.begin; y < range.end; y += range.step)
             for(int x = 0; x < width; x += 1) {
                 Color color = this.renderPixel(x, y, width, height, viewDir, viewLeft, viewDown);
-                image[y][x] = color.toRgbInt(null);
+                image[y][x] = color.toRgbInt(0L);
             }
     }
     

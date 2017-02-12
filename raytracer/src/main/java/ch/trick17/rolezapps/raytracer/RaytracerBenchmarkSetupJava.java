@@ -4,7 +4,6 @@ import ch.trick17.rolezapps.raytracerjava.Raytracer;
 import ch.trick17.rolezapps.raytracerjava.Scene;
 import ch.trick17.rolezapps.raytracerjava.anim.AnimatedScene;
 import ch.trick17.rolezapps.raytracerjava.anim.AnimatorApp;
-import rolez.lang.Task;
 import rolez.util.Random;
 
 public class RaytracerBenchmarkSetupJava extends RaytracerBenchmarkSetup {
@@ -12,7 +11,7 @@ public class RaytracerBenchmarkSetupJava extends RaytracerBenchmarkSetup {
     private final Raytracer raytracer = new Raytracer();
     private final int[][] image;
     
-    public RaytracerBenchmarkSetupJava(int height, int numTasks, Random random, Task<?> $task) {
+    public RaytracerBenchmarkSetupJava(int height, int numTasks, Random random, long $task) {
         super($task);
         Scene scene = createBenchmarkScene(random);
         int width = (int) (height * scene.view.aspect);
@@ -32,7 +31,7 @@ public class RaytracerBenchmarkSetupJava extends RaytracerBenchmarkSetup {
     }
     
     @Override
-    public int runRaytracer(Task<?> task) {
+    public int runRaytracer(long task) {
         raytracer.render(image);
         return image[0][0];
     }

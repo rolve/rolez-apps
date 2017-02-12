@@ -3,7 +3,6 @@ package ch.trick17.rolezapps.quicksort;
 import static rolez.lang.GuardedArray.wrap;
 
 import rolez.lang.GuardedArray;
-import rolez.lang.Task;
 
 /**
  * Shuffles the data in a way that causes the maximum number of swaps, i.e., it does the reverse of
@@ -24,7 +23,7 @@ public class QuicksortJavaDesorted extends QuicksortJavaPerfectPivot {
     }
     
     @Override
-    public GuardedArray<int[]> shuffledInts(int n, Task<?> $task) {
+    public GuardedArray<int[]> shuffledInts(int n, long $task) {
         int[] array = new int[n];
         for(int i = 0; i < n; i += 1)
             array[i] = i;

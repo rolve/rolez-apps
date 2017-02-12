@@ -6,12 +6,12 @@ import rolez.lang.TaskSystem;
 
 public class QuicksortLocalOpt extends Quicksort {
     
-    public QuicksortLocalOpt(final int maxLevel, Task<?> $task) {
+    public QuicksortLocalOpt(final int maxLevel, long $task) {
         super(maxLevel, $task);
     }
     
     @Override
-    public void doSort(GuardedSlice<int[]> s, int begin, int end, int level, Task<?> $task) {
+    public void doSort(GuardedSlice<int[]> s, int begin, int end, int level, long $task) {
         final int pivot = this.pivot(s, begin, end, $task);
         int left = begin;
         int right = end - 1;
@@ -54,7 +54,7 @@ public class QuicksortLocalOpt extends Quicksort {
         return new Task<Void>(new Object[]{s}, new Object[]{}) {
             @Override
             protected Void runRolez() {
-                Task<?> $task = this;
+                long $task = idBits();
                 int pivot = pivot(s, begin, end, $task);
                 int left = begin;
                 int right = end - 1;
@@ -94,7 +94,7 @@ public class QuicksortLocalOpt extends Quicksort {
     }
     
     @Override
-    public int pivot(final GuardedSlice<int[]> s, int begin, int end, Task<?> $task) {
+    public int pivot(final GuardedSlice<int[]> s, int begin, int end, long $task) {
         guardReadOnly(s, $task);
         int l = s.getInt(begin);
         int m = s.getInt(begin + ((end - begin) / 2));

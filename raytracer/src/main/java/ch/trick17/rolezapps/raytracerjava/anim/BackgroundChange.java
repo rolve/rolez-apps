@@ -27,6 +27,6 @@ public class BackgroundChange extends SimpleAnimation {
                 bg.r + rChangePerS * timeStep,
                 bg.g + gChangePerS * timeStep,
                 bg.b + bChangePerS * timeStep,
-                null);
+                0L);
     }
 }
