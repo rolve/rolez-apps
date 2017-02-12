@@ -17,16 +17,17 @@ import rolez.util.Random;
  */
 public class KMeansLocalOpt extends KMeans {
     
-    public KMeansLocalOpt(final int dim, final int clusters, final int numTasks) {
-        super(dim, clusters, numTasks);
+    public KMeansLocalOpt(int dim, int clusters, int numTasks, Task<?> $task) {
+        super(dim, clusters, numTasks, $task);
     }
     
     @Override
-    public GuardedArray<double[][]> kMeans(GuardedArray<double[][]> dataSet, int maxIterations) {
+    public GuardedArray<double[][]> kMeans(GuardedArray<double[][]> dataSet, int maxIterations,
+            Task<?> $task) {
         Random random = new Random();
         GuardedArray<double[][]> centroids = new GuardedArray<double[][]>(new double[clusters][]);
         for(int i = 0; i < clusters; i += 1)
-            centroids.data[i] = newRandomVector(random);
+            centroids.data[i] = newRandomVector(random, $task);
         
         GuardedArray<int[]> assignments = new GuardedArray<int[]>(new int[dataSet.data.length]);
         
@@ -54,8 +55,8 @@ public class KMeansLocalOpt extends KMeans {
                 newCentroids.data[i] = new GuardedVectorBuilder<double[]>(new double[dim]);
             
             GuardedArray<int[]> counts = new GuardedArray<int[]>(new int[clusters]);
-            guardReadOnly(dataSet);
-            guardReadOnly(assignments);
+            guardReadOnly(dataSet, $task);
+            guardReadOnly(assignments, $task);
             for(int i = 0; i < dataSet.data.length; i += 1) {
                 double[] vector = dataSet.data[i];
                 int centroidIndex = assignments.data[i];
@@ -65,7 +66,7 @@ public class KMeansLocalOpt extends KMeans {
                 counts.data[centroidIndex]++;
             }
             
-            guardReadWrite(centroids);
+            guardReadWrite(centroids, $task);
             for(int i = 0; i < centroids.data.length; i += 1) {
                 GuardedVectorBuilder<double[]> centroid = newCentroids.data[i];
                 int count = counts.data[i];
@@ -85,12 +86,14 @@ public class KMeansLocalOpt extends KMeans {
         return new Task<Boolean>(new Object[]{assignments}, new Object[]{dataSet, centroids}) {
             @Override
             protected Boolean runRolez() {
+                Task<?> $task = this;
                 boolean changed = false;
                 for(int i = dataSet.range.begin; i < dataSet.range.end; i += dataSet.range.step) {
                     double min = Double.POSITIVE_INFINITY;
                     int minIndex = -1;
                     for(int c = 0; c < centroids.data.length; c += 1) {
-                        double distance2 = distance2(dataSet.<double[]> get(i), centroids.data[c]);
+                        double distance2 = distance2(dataSet.<double[]> get(i), centroids.data[c],
+                                $task);
                         if(distance2 < min) {
                             min = distance2;
                             minIndex = c;
@@ -107,7 +110,7 @@ public class KMeansLocalOpt extends KMeans {
     }
     
     @Override
-    public double[] newRandomVector(Random random) {
+    public double[] newRandomVector(Random random, Task<?> $task) {
         final GuardedVectorBuilder<double[]> vec = new GuardedVectorBuilder<>(new double[this.dim]);
         for(int d = 0; d < dim; d += 1)
             vec.setDouble(d, random.nextDouble());
@@ -117,6 +120,6 @@ public class KMeansLocalOpt extends KMeans {
     public static void main(final String[] args) {
         int numTasks = 1;
         GuardedArray<String[]> wrapped = wrap(args);
-        TaskSystem.getDefault().run(new KMeansLocalOpt(10, 10, numTasks).$mainTask(wrapped));
+        TaskSystem.getDefault().run(new KMeansLocalOpt(10, 10, numTasks, null).$mainTask(wrapped));
     }
 }

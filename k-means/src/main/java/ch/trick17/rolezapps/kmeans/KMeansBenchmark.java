@@ -3,6 +3,7 @@ package ch.trick17.rolezapps.kmeans;
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
+import static rolez.lang.Task.currentTask;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -48,13 +49,13 @@ public class KMeansBenchmark {
     public void setup() {
         Task.registerNewRootTask();
         clusters = n / 100;
-        kMeans = instantiateBenchmark(KMeans.class, impl, dim, clusters, tasks);
-        data = kMeans.createDataSet(n);
+        kMeans = instantiateBenchmark(KMeans.class, impl, dim, clusters, tasks, currentTask());
+        data = kMeans.createDataSet(n, currentTask());
     }
     
     @Benchmark
     public Object kMeans() {
-        return kMeans.kMeans(data, maxIters);
+        return kMeans.kMeans(data, maxIters, currentTask());
     }
     
     @TearDown(Level.Iteration)

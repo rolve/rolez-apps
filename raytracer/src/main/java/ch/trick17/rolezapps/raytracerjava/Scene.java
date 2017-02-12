@@ -3,7 +3,7 @@ package ch.trick17.rolezapps.raytracerjava;
 import java.util.ArrayList;
 
 import ch.trick17.rolezapps.raytracer.Color;
-import ch.trick17.rolezapps.raytracer.Ray;
+import rolez.lang.Task;
 
 public class Scene extends ch.trick17.rolezapps.raytracer.Scene {
     
@@ -13,8 +13,13 @@ public class Scene extends ch.trick17.rolezapps.raytracer.Scene {
     public double ambientLight;
     public Color background;
     
+    public Scene() {
+        super(null);
+    }
+    
     @Override
-    public ch.trick17.rolezapps.raytracer.Intersection intersect(Ray ray) {
+    public ch.trick17.rolezapps.raytracer.Intersection intersect(
+            ch.trick17.rolezapps.raytracer.Ray ray, Task<?> $task) {
         throw new AssertionError();
     }
     

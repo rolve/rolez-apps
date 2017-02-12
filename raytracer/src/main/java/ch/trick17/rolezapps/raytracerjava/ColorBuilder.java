@@ -15,7 +15,7 @@ public class ColorBuilder {
     }
     
     public Color build() {
-        return new Color(this.r, this.g, this.b);
+        return new Color(this.r, this.g, this.b, null);
     }
     
     public void add(final Color color, final double multiplier) {

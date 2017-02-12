@@ -1,6 +1,5 @@
 package ch.trick17.rolezapps.raytracerjava;
 
-import ch.trick17.rolezapps.raytracer.Vector3D;
 import ch.trick17.rolezapps.raytracerjava.anim.Moveable;
 
 public class Light extends Moveable {

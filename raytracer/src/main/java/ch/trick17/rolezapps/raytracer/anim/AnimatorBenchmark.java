@@ -3,6 +3,7 @@ package ch.trick17.rolezapps.raytracer.anim;
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
+import static rolez.lang.Task.currentTask;
 
 import java.io.IOException;
 
@@ -45,11 +46,11 @@ public class AnimatorBenchmark {
     @Setup(Level.Iteration)
     public void setup() throws IOException {
         Task.registerNewRootTask();
-        AnimatedScene scene = new AnimatedScene(3.0);
-        AnimatorApp.INSTANCE.buildScene(scene, new Random(42));
+        AnimatedScene scene = new AnimatedScene(3.0, currentTask());
+        AnimatorApp.INSTANCE.buildScene(scene, new Random(42), currentTask());
         int width = (int) (height * scene.view.aspect);
         
-        Raytracer raytracer = instantiateBenchmark(Raytracer.class, impl);
+        Raytracer raytracer = instantiateBenchmark(Raytracer.class, impl, currentTask());
         raytracer.numTasks = tasks;
         raytracer.maxRecursions = 3;
         
@@ -60,7 +61,7 @@ public class AnimatorBenchmark {
     
     @Benchmark
     public void animator() {
-        animator.render();
+        animator.render(currentTask());
     }
     
     @TearDown(Level.Iteration)

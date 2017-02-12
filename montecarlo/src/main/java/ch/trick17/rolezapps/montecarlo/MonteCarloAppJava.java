@@ -32,6 +32,7 @@ import ch.trick17.rolezapps.montecarlojava.RatePath;
 import ch.trick17.rolezapps.montecarlojava.Returns;
 import rolez.lang.ContiguousPartitioner;
 import rolez.lang.SliceRange;
+import rolez.lang.Task;
 
 /**
  * Code, a test-harness for invoking and driving the Applications Demonstrator
@@ -56,9 +57,9 @@ public class MonteCarloAppJava extends MonteCarloApp {
     private final int[] seeds;
     private final List<Double> results = new ArrayList<>();
 
-    public MonteCarloAppJava(String ratesFile, int steps, int runs, int numTasks) {
+    public MonteCarloAppJava(String ratesFile, int steps, int runs, int numTasks, Task<?> $task) {
         // super constr will duplicate the work below, but doesn't matter in initialization
-        super(ratesFile, steps, runs, numTasks);
+        super(ratesFile, steps, runs, numTasks, $task);
         
         returns = new Returns(RatePath.readRatesFile(ratesFile));
         
@@ -68,7 +69,7 @@ public class MonteCarloAppJava extends MonteCarloApp {
     }
     
     @Override
-    public void run() {
+    public void run(Task<?> $task) {
         SliceRange fullRange = new SliceRange(0, runs, 1);
         SliceRange[] ranges = ContiguousPartitioner.INSTANCE.partition(fullRange, numTasks).data;
         
@@ -94,7 +95,7 @@ public class MonteCarloAppJava extends MonteCarloApp {
      * correct, but shall take an average over all the simulated rate paths.
      */
     @Override
-    public double avgExpectedReturnRate() {
+    public double avgExpectedReturnRate(Task<?> $task) {
         double result = 0.0;
         for(int i = 0; i < runs; i++)
             result += results.get(i);

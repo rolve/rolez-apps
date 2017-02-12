@@ -3,6 +3,7 @@ package ch.trick17.rolezapps.raytracer;
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
+import static rolez.lang.Task.currentTask;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -40,12 +41,13 @@ public class RaytracerBenchmark {
     public void setup() {
         Task.registerNewRootTask();
         Random random = new Random(42);
-        setup = instantiateBenchmark(RaytracerBenchmarkSetup.class, impl, height, tasks, random);
+        setup = instantiateBenchmark(RaytracerBenchmarkSetup.class, impl, height, tasks, random,
+                currentTask());
     }
     
     @Benchmark
     public int raytracer() {
-        return setup.runRaytracer();
+        return setup.runRaytracer(currentTask());
     }
     
     @TearDown(Level.Iteration)

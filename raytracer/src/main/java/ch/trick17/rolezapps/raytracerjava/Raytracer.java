@@ -7,8 +7,6 @@ import java.util.concurrent.FutureTask;
 
 import ch.trick17.rolezapps.raytracer.Color;
 import ch.trick17.rolezapps.raytracer.Colors;
-import ch.trick17.rolezapps.raytracer.Ray;
-import ch.trick17.rolezapps.raytracer.Vector3D;
 import rolez.lang.SliceRange;
 import rolez.lang.StripedPartitioner;
 
@@ -53,7 +51,7 @@ public class Raytracer {
         for(int y = range.begin; y < range.end; y += range.step)
             for(int x = 0; x < width; x += 1) {
                 Color color = this.renderPixel(x, y, width, height, viewDir, viewLeft, viewDown);
-                image[y][x] = color.toRgbInt();
+                image[y][x] = color.toRgbInt(null);
             }
     }
     

@@ -12,16 +12,18 @@ import java.util.concurrent.FutureTask;
 import rolez.lang.ContiguousPartitioner;
 import rolez.lang.GuardedArray;
 import rolez.lang.SliceRange;
+import rolez.lang.Task;
 import rolez.lang.TaskSystem;
 
 public class KMeansJava extends KMeans {
     
-    public KMeansJava(final int dim, final int clusters, final int numTasks) {
-        super(dim, clusters, numTasks);
+    public KMeansJava(int dim, int clusters, int numTasks, Task<?> $task) {
+        super(dim, clusters, numTasks, $task);
     }
     
     @Override
-    public GuardedArray<double[][]> kMeans(GuardedArray<double[][]> dataSet, int maxIterations) {
+    public GuardedArray<double[][]> kMeans(GuardedArray<double[][]> dataSet, int maxIterations,
+            Task<?> $task) {
         int n = dataSet.data.length;
         Random random = new Random();
         double[][] centroids = new double[clusters][];
@@ -106,7 +108,6 @@ public class KMeansJava extends KMeans {
         });
     }
     
-    @Override
     public double distance2(double[] data, final double[] centroids) {
         double sum = 0.0;
         for(int d = 0; d < dim; d += 1) {
@@ -126,6 +127,6 @@ public class KMeansJava extends KMeans {
     public static void main(final String[] args) {
         int numTasks = 1;
         GuardedArray<String[]> wrapped = wrap(args);
-        TaskSystem.getDefault().run(new KMeansJava(10, 10, numTasks).$mainTask(wrapped));
+        TaskSystem.getDefault().run(new KMeansJava(10, 10, numTasks, null).$mainTask(wrapped));
     }
 }

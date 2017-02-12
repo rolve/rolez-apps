@@ -1,8 +1,5 @@
 package ch.trick17.rolezapps.raytracerjava;
 
-import ch.trick17.rolezapps.raytracer.Ray;
-import ch.trick17.rolezapps.raytracer.Vector3D;
-
 public class Plane extends Primitive {
     
     public Vector3D normal;
@@ -15,16 +12,16 @@ public class Plane extends Primitive {
         this.distance = distance;
     }
     
-    @java.lang.Override
+    @Override
     public void move(final Vector3D delta) {
     }
     
-    @java.lang.Override
+    @Override
     public Vector3D normal(final Vector3D point) {
         return this.normal.normalize();
     }
     
-    @java.lang.Override
+    @Override
     public Intersection intersect(final Ray ray) {
         final Vector3D n = this.normal.normalize();
         final double divisor = ray.direction.dot(n);

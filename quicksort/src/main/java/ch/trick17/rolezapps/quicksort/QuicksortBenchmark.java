@@ -3,6 +3,7 @@ package ch.trick17.rolezapps.quicksort;
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
+import static rolez.lang.Task.currentTask;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -41,14 +42,14 @@ public class QuicksortBenchmark {
     @Setup(Level.Iteration)
     public void setup() {
         Task.registerNewRootTask();
-        int maxLevel = MathExtra.INSTANCE.log2(tasks);
+        int maxLevel = MathExtra.INSTANCE.log2(tasks, currentTask());
         quicksort = instantiateBenchmark(Quicksort.class, impl, maxLevel);
-        data = quicksort.shuffledInts(n);
+        data = quicksort.shuffledInts(n, currentTask());
     }
     
     @Benchmark
     public void quicksort() {
-        quicksort.sort(data);
+        quicksort.sort(data, currentTask());
     }
     
     @TearDown(Level.Iteration)

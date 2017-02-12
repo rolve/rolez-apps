@@ -1,18 +1,10 @@
 package ch.trick17.rolezapps.raytracerjava.anim;
 
-public class Animation {
+public abstract class Animation {
     
-    public Animation() {
-        super();
-    }
+    public abstract boolean begun(double time);
     
-    public boolean begun(double time) {
-        return false;
-    }
+    public abstract boolean finished(double time);
     
-    public boolean finished(double time) {
-        return false;
-    }
-    
-    public void animationStep(double time, double timeStep) {}
+    public abstract void animationStep(double time, double timeStep);
 }

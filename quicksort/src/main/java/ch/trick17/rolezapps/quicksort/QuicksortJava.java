@@ -5,15 +5,16 @@ import static rolez.lang.GuardedArray.wrap;
 import java.util.Random;
 
 import rolez.lang.GuardedArray;
+import rolez.lang.Task;
 
 public class QuicksortJava extends Quicksort {
     
     public QuicksortJava(final int maxLevel) {
-        super(maxLevel);
+        super(maxLevel, null);
     }
     
     @Override
-    public GuardedArray<int[]> shuffledInts(int n) {
+    public GuardedArray<int[]> shuffledInts(int n, Task<?> $task) {
         int[] array = new int[n];
         for(int i = 0; i < n; i += 1)
             array[i] = i;
@@ -28,7 +29,7 @@ public class QuicksortJava extends Quicksort {
     }
     
     @Override
-    public void sort(final GuardedArray<int[]> s) {
+    public void sort(final GuardedArray<int[]> s, Task<?> $task) {
         doSort(s.data, 0, s.data.length, 0);
     }
     

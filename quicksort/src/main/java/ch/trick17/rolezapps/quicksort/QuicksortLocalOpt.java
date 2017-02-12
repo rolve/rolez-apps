@@ -6,16 +6,16 @@ import rolez.lang.TaskSystem;
 
 public class QuicksortLocalOpt extends Quicksort {
     
-    public QuicksortLocalOpt(final int maxLevel) {
-        super(maxLevel);
+    public QuicksortLocalOpt(final int maxLevel, Task<?> $task) {
+        super(maxLevel, $task);
     }
     
     @Override
-    public void doSort(GuardedSlice<int[]> s, int begin, int end, int level) {
-        final int pivot = this.pivot(s, begin, end);
+    public void doSort(GuardedSlice<int[]> s, int begin, int end, int level, Task<?> $task) {
+        final int pivot = this.pivot(s, begin, end, $task);
         int left = begin;
         int right = end - 1;
-        guardReadWrite(s);
+        guardReadWrite(s, $task);
         while(left <= right) {
             while(s.getInt(left) < pivot)
                 left += 1;
@@ -37,14 +37,14 @@ public class QuicksortLocalOpt extends Quicksort {
                         + 1, level + 1));
             
             if(sortRight)
-                this.doSort(s.slice(left, end, 1), left, end, level + 1);
+                this.doSort(s.slice(left, end, 1), left, end, level + 1, $task);
         }
         else {
             if(sortLeft)
-                this.doSort(s, begin, right + 1, level + 1);
+                this.doSort(s, begin, right + 1, level + 1, $task);
             
             if(sortRight)
-                this.doSort(s, left, end, level + 1);
+                this.doSort(s, left, end, level + 1, $task);
         }
     }
     
@@ -54,7 +54,8 @@ public class QuicksortLocalOpt extends Quicksort {
         return new Task<Void>(new Object[]{s}, new Object[]{}) {
             @Override
             protected Void runRolez() {
-                int pivot = pivot(s, begin, end);
+                Task<?> $task = this;
+                int pivot = pivot(s, begin, end, $task);
                 int left = begin;
                 int right = end - 1;
                 while(left <= right) {
@@ -78,14 +79,14 @@ public class QuicksortLocalOpt extends Quicksort {
                                 begin, right + 1, level + 1));
                     
                     if(sortRight)
-                        doSort(s.slice(left, end, 1), left, end, level + 1);
+                        doSort(s.slice(left, end, 1), left, end, level + 1, $task);
                 }
                 else {
                     if(sortLeft)
-                        doSort(s, begin, right + 1, level + 1);
+                        doSort(s, begin, right + 1, level + 1, $task);
                     
                     if(sortRight)
-                        doSort(s, left, end, level + 1);
+                        doSort(s, left, end, level + 1, $task);
                 }
                 return null;
             }
@@ -93,8 +94,8 @@ public class QuicksortLocalOpt extends Quicksort {
     }
     
     @Override
-    public int pivot(final GuardedSlice<int[]> s, int begin, int end) {
-        guardReadOnly(s);
+    public int pivot(final GuardedSlice<int[]> s, int begin, int end, Task<?> $task) {
+        guardReadOnly(s, $task);
         int l = s.getInt(begin);
         int m = s.getInt(begin + ((end - begin) / 2));
         int r = s.getInt(end - 1);

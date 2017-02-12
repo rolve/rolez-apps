@@ -2,7 +2,7 @@ package ch.trick17.rolezapps.raytracerjava.anim;
 
 import ch.trick17.rolezapps.raytracer.anim.Duration;
 
-public class SimpleAnimation extends Animation {
+public abstract class SimpleAnimation extends Animation {
     
     public final Duration duration;
     public boolean begun = false;

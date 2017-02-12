@@ -1,8 +1,5 @@
 package ch.trick17.rolezapps.raytracerjava;
 
-import ch.trick17.rolezapps.raytracer.Ray;
-import ch.trick17.rolezapps.raytracer.Vector3D;
-
 public class Sphere extends Primitive {
     
     public Vector3D center;

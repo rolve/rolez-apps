@@ -26,6 +26,7 @@ public class BackgroundChange extends SimpleAnimation {
         scene.background = new Color(
                 bg.r + rChangePerS * timeStep,
                 bg.g + gChangePerS * timeStep,
-                bg.b + bChangePerS * timeStep);
+                bg.b + bChangePerS * timeStep,
+                null);
     }
 }

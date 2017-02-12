@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import ch.trick17.rolezapps.raytracer.Raytracer;
+import ch.trick17.rolezapps.raytracer.anim.AnimatorApp;
 import ch.trick17.rolezapps.raytracer.util.ImageWriterJava;
 import ch.trick17.rolezapps.raytracerintersectopt.anim.AnimatedScene;
-import ch.trick17.rolezapps.raytracerintersectopt.anim.AnimatorApp;
 import rolez.lang.GuardedArray;
 import rolez.lang.Task;
 import rolez.lang.TaskSystem;
@@ -27,18 +27,19 @@ public final class RaytracerApp {
             @Override
             protected Void runRolez() {
                 try {
-                    AnimatedScene scene = new AnimatedScene(30.0);
-                    AnimatorApp.INSTANCE.buildScene(scene, new Random(42));
+                    Task<?> $task = this;
+                    AnimatedScene scene = new AnimatedScene(30.0, $task);
+                    AnimatorApp.INSTANCE.buildScene(scene, new Random(42), $task);
                     for(int i = 0; i < 8; i += 1)
-                        scene.animationStep(1.0);
+                        scene.animationStep(1.0, $task);
                     
-                    Raytracer raytracer = new Raytracer();
+                    Raytracer raytracer = new Raytracer($task);
                     raytracer.numTasks = 8;
                     raytracer.maxRecursions = 5;
                     raytracer.scene = scene;
                     
                     int height = 180;
-                    int width = (int) (guardReadOnly(scene.view).aspect * height);
+                    int width = (int) (guardReadOnly(scene.view, $task).aspect * height);
                     GuardedArray<GuardedArray<int[]>[]> image = new GuardedArray<GuardedArray<int[]>[]>(
                             new GuardedArray[height]);
                     for(int i = 0; i < height; i += 1)
@@ -48,7 +49,7 @@ public final class RaytracerApp {
                     new Scanner(System.in).nextLine();
                     for(int i = 0; i < 10; i += 1) {
                         StopWatch watch = new StopWatch().go();
-                        raytracer.render(image);
+                        raytracer.render(image, $task);
                         System.out.println(watch.get());
                     }
                     ImageWriterJava.write(unwrap(image, int[][].class), "png", "image.png");

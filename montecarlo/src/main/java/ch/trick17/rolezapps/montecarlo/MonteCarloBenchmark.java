@@ -4,6 +4,7 @@ import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
 import static java.lang.Math.abs;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
+import static rolez.lang.Task.currentTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,17 +50,18 @@ public class MonteCarloBenchmark {
     @Setup(Level.Iteration)
     public void setup() {
         Task.registerNewRootTask();
-        app = instantiateBenchmark(MonteCarloApp.class, impl, FILE, TIME_STEPS, runs, tasks);
+        app = instantiateBenchmark(MonteCarloApp.class, impl, FILE, TIME_STEPS, runs, tasks,
+                currentTask());
     }
     
     @Benchmark
     public void monteCarlo() {
-        app.run();
+        app.run(currentTask());
     }
     
     @TearDown(Level.Iteration)
     public void tearDown() {
-        double expectedReturnRate = app.avgExpectedReturnRate();
+        double expectedReturnRate = app.avgExpectedReturnRate(currentTask());
         double dev = abs(expectedReturnRate - REF_VALS.get(runs));
         if(dev > 1.0e-12)
             throw new AssertionError("Validation failed");

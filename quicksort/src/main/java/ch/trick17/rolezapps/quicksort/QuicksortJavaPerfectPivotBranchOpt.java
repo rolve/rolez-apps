@@ -19,14 +19,14 @@ public class QuicksortJavaPerfectPivotBranchOpt extends QuicksortJava {
         
         System.out.println("Warming up...");
         for(int i = 0; i < 2; i++) {
-            ints = quicksort.shuffledInts(n);
-            quicksort.sort(ints);
+            ints = quicksort.shuffledInts(n, null);
+            quicksort.sort(ints, null);
         }
-        ints = quicksort.shuffledInts(n);
+        ints = quicksort.shuffledInts(n, null);
         
         System.out.println("Enter to start");
         new Scanner(System.in).nextLine();
-        quicksort.sort(ints);
+        quicksort.sort(ints, null);
     }
     
     public QuicksortJavaPerfectPivotBranchOpt(int maxLevel) {

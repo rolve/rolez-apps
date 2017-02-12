@@ -1,10 +1,8 @@
 package ch.trick17.rolezapps.raytracerjava;
 
-import ch.trick17.rolezapps.raytracer.Ray;
-import ch.trick17.rolezapps.raytracer.Vector3D;
 import ch.trick17.rolezapps.raytracerjava.anim.Moveable;
 
-public class Primitive extends Moveable {
+public abstract class Primitive extends Moveable {
     
     public Material mat;
     
@@ -13,11 +11,7 @@ public class Primitive extends Moveable {
         this.mat = mat;
     }
     
-    public Vector3D normal(final Vector3D point) {
-        return null;
-    }
+    public abstract Vector3D normal(Vector3D point);
     
-    public Intersection intersect(final Ray ray) {
-        return null;
-    }
+    public abstract Intersection intersect(Ray ray);
 }

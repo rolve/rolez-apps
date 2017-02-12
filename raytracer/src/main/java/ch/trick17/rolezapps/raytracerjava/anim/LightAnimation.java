@@ -1,8 +1,8 @@
 package ch.trick17.rolezapps.raytracerjava.anim;
 
-import ch.trick17.rolezapps.raytracer.Vector3D;
 import ch.trick17.rolezapps.raytracer.anim.Duration;
 import ch.trick17.rolezapps.raytracerjava.Light;
+import ch.trick17.rolezapps.raytracerjava.Vector3D;
 
 public class LightAnimation extends AnimationGroup {
     
