@@ -59,7 +59,7 @@ public class QuicksortBenchmark {
     
     public static void main(String[] args) throws RunnerException {
         Options options = new OptionsBuilder().include(QuicksortBenchmark.class.getSimpleName())
-                .warmupIterations(20).measurementIterations(30).build();
+                .warmupIterations(10).measurementIterations(30).build();
         new Runner(options).run();
     }
 }
