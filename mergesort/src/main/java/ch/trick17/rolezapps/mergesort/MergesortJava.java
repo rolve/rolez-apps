@@ -7,11 +7,8 @@ import rolez.util.Random;
 
 public class MergesortJava extends Mergesort {
     
-    public final int maxLevel;
-    
     public MergesortJava(int maxLevel, long $task) {
-        super($task);
-        this.maxLevel = maxLevel;
+        super(maxLevel, $task);
     }
     
     @Override

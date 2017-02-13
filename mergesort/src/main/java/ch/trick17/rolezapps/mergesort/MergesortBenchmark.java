@@ -48,7 +48,7 @@ public class MergesortBenchmark {
     }
     
     @Benchmark
-    public void quicksort() {
+    public void mergesort() {
         mergesort.sort(data, currentTask().idBits());
     }
     
