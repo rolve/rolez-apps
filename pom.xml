@@ -15,5 +15,6 @@
         <module>raytracer</module>
         <module>benchmark-suite</module>
         <module>montecarlo</module>
+        <module>mergesort</module>
     </modules>
 </project>
