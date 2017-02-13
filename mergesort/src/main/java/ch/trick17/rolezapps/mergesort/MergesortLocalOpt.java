@@ -1,11 +1,17 @@
 package ch.trick17.rolezapps.mergesort;
 
+import rolez.lang.GuardedArray;
 import rolez.lang.GuardedSlice;
+import rolez.lang.TaskSystem;
 
 public class MergesortLocalOpt extends Mergesort {
     
     public MergesortLocalOpt(int maxLevel, long $task) {
         super(maxLevel, $task);
+    }
+    
+    public static void main(String[] args) {
+        TaskSystem.getDefault().run(new Mergesort(0L).$mainTask(GuardedArray.<String[]> wrap(args)));
     }
     
     @Override
