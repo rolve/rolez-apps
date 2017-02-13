@@ -8,8 +8,8 @@ import rolez.lang.GuardedArray;
 
 public class QuicksortJava extends Quicksort {
     
-    public QuicksortJava(final int maxLevel) {
-        super(maxLevel, 0L);
+    public QuicksortJava(final int maxLevel, long $task) {
+        super(maxLevel, $task);
     }
     
     @Override
@@ -19,8 +19,8 @@ public class QuicksortJava extends Quicksort {
             array[i] = i;
         Random random = new Random();
         for(int i = n - 1; i > 0; i -= 1) {
-            final int index = random.nextInt(i + 1);
-            final int t = array[index];
+            int index = random.nextInt(i + 1);
+            int t = array[index];
             array[index] = array[i];
             array[i] = t;
         }

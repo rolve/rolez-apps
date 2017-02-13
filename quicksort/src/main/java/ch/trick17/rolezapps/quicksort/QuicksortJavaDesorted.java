@@ -18,8 +18,8 @@ import rolez.lang.GuardedArray;
  */
 public class QuicksortJavaDesorted extends QuicksortJavaPerfectPivot {
     
-    public QuicksortJavaDesorted(final int maxLevel) {
-        super(maxLevel);
+    public QuicksortJavaDesorted(int maxLevel, long $task) {
+        super(maxLevel, $task);
     }
     
     @Override

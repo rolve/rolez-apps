@@ -14,7 +14,7 @@ import rolez.lang.GuardedArray;
 public class QuicksortJavaPerfectPivot extends QuicksortJava {
     
     public static void main(String[] args) {
-        QuicksortJava quicksort = new QuicksortJavaPerfectPivot(0);
+        QuicksortJava quicksort = new QuicksortJavaPerfectPivot(0, 0L);
         int n = 50000000;
         GuardedArray<int[]> ints;
         
@@ -30,8 +30,8 @@ public class QuicksortJavaPerfectPivot extends QuicksortJava {
         quicksort.sort(ints, 0L);
     }
     
-    public QuicksortJavaPerfectPivot(int maxLevel) {
-        super(maxLevel);
+    public QuicksortJavaPerfectPivot(int maxLevel, long $task) {
+        super(maxLevel, $task);
     }
     
     @Override
