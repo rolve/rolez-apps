@@ -33,8 +33,16 @@ public class MergesortJava extends Mergesort {
     }
     
     private void doSort(int[] b, int[] a, int begin, int end, int level) {
-        if((end - begin) < 2)
+        if(end - begin < 2)
             return;
+        
+        if(end - begin == 2) {
+            if(b[begin] > b[begin + 1]) {
+                a[begin] = b[begin + 1];
+                a[begin + 1] = b[begin];
+            }
+            return;
+        }
         
         int middle = (begin + end) / 2;
         Thread child = null;
