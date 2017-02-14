@@ -1,10 +1,11 @@
 package ch.trick17.rolezapps.raytracer;
 
+import java.util.Random;
+
 import ch.trick17.rolezapps.raytracerjava.Raytracer;
 import ch.trick17.rolezapps.raytracerjava.Scene;
 import ch.trick17.rolezapps.raytracerjava.anim.AnimatedScene;
 import ch.trick17.rolezapps.raytracerjava.anim.AnimatorApp;
-import rolez.util.Random;
 
 public class RaytracerBenchmarkSetupJava extends RaytracerBenchmarkSetup {
     

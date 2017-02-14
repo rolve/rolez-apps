@@ -4,6 +4,7 @@ import static rolez.lang.Guarded.guardReadOnly;
 import static rolez.lang.GuardedArray.unwrap;
 
 import java.io.IOException;
+import java.util.Random;
 import java.util.Scanner;
 
 import ch.trick17.rolezapps.raytracer.Raytracer;
@@ -13,7 +14,6 @@ import ch.trick17.rolezapps.raytracerintersectopt.anim.AnimatedScene;
 import rolez.lang.GuardedArray;
 import rolez.lang.Task;
 import rolez.lang.TaskSystem;
-import rolez.util.Random;
 import rolez.util.StopWatch;
 
 public final class RaytracerApp {

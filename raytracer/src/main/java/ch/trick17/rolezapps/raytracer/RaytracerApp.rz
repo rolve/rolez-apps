@@ -11,7 +11,7 @@ object RaytracerApp {
     
     task pure main(args: readonly Array[pure String]): {
         val scene = new AnimatedScene(30.0);
-        the AnimatorApp.buildScene(scene, new Random(42));
+        the AnimatorApp.buildScene(scene, new Random(42L));
         for(var i = 0; i < 8; i += 1)
             scene.animationStep(1.0);
         

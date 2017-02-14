@@ -1,12 +1,12 @@
 package ch.trick17.rolezapps.raytracerjava;
 
 import java.io.IOException;
+import java.util.Random;
 import java.util.Scanner;
 
 import ch.trick17.rolezapps.raytracer.util.ImageWriterJava;
 import ch.trick17.rolezapps.raytracerjava.anim.AnimatedScene;
 import ch.trick17.rolezapps.raytracerjava.anim.AnimatorApp;
-import rolez.util.Random;
 import rolez.util.StopWatch;
 
 public final class RaytracerApp {

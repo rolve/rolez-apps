@@ -2,8 +2,9 @@ package ch.trick17.rolezapps.mergesort;
 
 import static rolez.lang.GuardedArray.wrap;
 
+import java.util.Random;
+
 import rolez.lang.GuardedArray;
-import rolez.util.Random;
 
 public class MergesortJava extends Mergesort {
     

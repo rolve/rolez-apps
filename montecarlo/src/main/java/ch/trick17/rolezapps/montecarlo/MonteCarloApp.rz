@@ -14,7 +14,7 @@ class MonteCarloApp {
     val returns: pure Returns
     val steps: int
     
-    val seeds: readwrite Array[int]
+    val seeds: readwrite Array[long]
     val results: readwrite ArrayList[double] = new ArrayList[double]
     
     new(ratesFile: pure String, steps: int, runs: int, numTasks: int) {
@@ -24,9 +24,9 @@ class MonteCarloApp {
         
         this.returns = new Returns(the RatePathReader.readRatesFile(ratesFile));
         
-        this.seeds = new Array[int](runs);
+        this.seeds = new Array[long](runs);
         for(var i = 0; i < runs; i += 1)
-            this.seeds.set(i, i * 11);
+            this.seeds.set(i, i * 11 as long);
     }
     
     def readwrite run: {
@@ -42,7 +42,7 @@ class MonteCarloApp {
             this.results.addAll(tasks.get(i).get);
     }
     
-    task pure simulate(seeds: readonly Slice[int]): readwrite ArrayList[double] {
+    task pure simulate(seeds: readonly Slice[long]): readwrite ArrayList[double] {
         val results = new ArrayList[double];
         for(var i = seeds.range.begin; i < seeds.range.end; i += seeds.range.step) {
             val mcPath = new MonteCarloPath(this.returns, this.steps);

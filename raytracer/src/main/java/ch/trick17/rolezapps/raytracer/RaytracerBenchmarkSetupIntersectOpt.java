@@ -1,8 +1,9 @@
 package ch.trick17.rolezapps.raytracer;
 
+import java.util.Random;
+
 import ch.trick17.rolezapps.raytracer.anim.AnimatorApp;
 import ch.trick17.rolezapps.raytracerintersectopt.anim.AnimatedScene;
-import rolez.util.Random;
 
 public class RaytracerBenchmarkSetupIntersectOpt extends RaytracerBenchmarkSetupRolez {
     

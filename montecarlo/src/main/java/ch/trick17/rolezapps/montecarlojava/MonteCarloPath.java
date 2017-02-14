@@ -68,13 +68,13 @@ public class MonteCarloPath extends RatePath {
      * (mean-drift,volatility) is done via Ito's lemma on the log of the stock
      * price.
      * 
-     * @param randomSeed
+     * @param seed
      *            The psuedo-random number seed value, to start off a given
      *            sequence of Gaussian fluctuations.
      */
-    public void computeFluctuations(int randomSeed) {
+    public void computeFluctuations(long seed) {
         // First, make use of the passed in seed value.
-        Random rnd = new Random(randomSeed);
+        Random rnd = new Random(seed);
         
         // Determine the mean and standard-deviation, from the mean-drift and
         // volatility.

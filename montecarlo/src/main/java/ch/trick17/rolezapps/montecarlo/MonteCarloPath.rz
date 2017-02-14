@@ -17,7 +17,7 @@ class MonteCarloPath extends RatePath {
         this.fluctuations = new Array[double](steps);
     }
     
-    def readwrite computeFluctuations(randomSeed: int): {
+    def readwrite computeFluctuations(randomSeed: long): {
         val random = new Random(randomSeed);
         
         val mean = (this.expectedReturnRate - 0.5 * this.volatility * this.volatility) * this.dTime;

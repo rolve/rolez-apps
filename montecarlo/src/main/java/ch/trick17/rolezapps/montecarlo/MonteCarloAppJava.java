@@ -53,7 +53,7 @@ public class MonteCarloAppJava extends MonteCarloApp {
     
     private final Returns returns;
     
-    private final int[] seeds;
+    private final long[] seeds;
     private final List<Double> results = new ArrayList<>();
 
     public MonteCarloAppJava(String ratesFile, int steps, int runs, int numTasks, long $task) {
@@ -62,7 +62,7 @@ public class MonteCarloAppJava extends MonteCarloApp {
         
         returns = new Returns(RatePath.readRatesFile(ratesFile));
         
-        seeds = new int[runs];
+        seeds = new long[runs];
         for(int i = 0; i < runs; i++)
             seeds[i] = i * 11;
     }

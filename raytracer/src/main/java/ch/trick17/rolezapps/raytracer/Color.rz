@@ -24,13 +24,13 @@ pure class Color {
     }
     
     def pure toByte(value: double): int {
-        val byte = (value * 255) as int;
-        if(byte > 255)
+        val b = (value * 255) as int;
+        if(b > 255)
             return 255;
-        else if(byte < 0)
+        else if(b < 0)
             return 0;
         else
-            return byte;
+            return b;
     }
     
     def pure toRgbInt: int {
