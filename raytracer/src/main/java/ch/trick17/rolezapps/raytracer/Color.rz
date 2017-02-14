@@ -34,7 +34,7 @@ pure class Color {
     }
     
     def pure toRgbInt: int {
-        return this.red*256*256 + this.green*256 + this.blue; // We need shifting ops...
+        return this.red << 16 | this.green << 8 | this.blue;
     }
 }
 
