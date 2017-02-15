@@ -23,7 +23,6 @@ public class IdeaEncryption {
     private int[] encryptKey; // userkey derived
     private int[] decryptKey; // userkey derived
     
-    
     public IdeaEncryption(int size, int threads) {
         this.size = size;
         this.threads = threads;
@@ -32,12 +31,10 @@ public class IdeaEncryption {
     /**
      * Builds the data used for the test
      */
-    public void buildTestData() {
-        plain = new byte[size];
+    public void buildTestData(Random random) {
+        plain     = new byte[size];
         encrypted = new byte[size];
         decrypted = new byte[size];
-        
-        Random random = new Random(136506717L); // Create random number generator.
         
         // Allocate three arrays to hold keys: userkey is the 128-bit key.
         // encryptKey is the set of 16-bit encryption subkeys derived from userkey,
@@ -52,12 +49,11 @@ public class IdeaEncryption {
         userKey = new short[8]; // User key has 8 16-bit shorts.
         
         // Generate user key randomly; eight 16-bit values in an array.
-        for(int i = 0; i < 8; i++) {
+        for(int i = 0; i < 8; i++)
             // Again, the random number function returns int. Converting
             // to a short type preserves the bit pattern in the lower 16
             // bits of the int and discards the rest.
             userKey[i] = (short) random.nextInt();
-        }
         
         // Compute encryption and decryption subkeys.
         encryptKey = calcEncryptKey(userKey);
@@ -120,39 +116,33 @@ public class IdeaEncryption {
      */
     private static int[] calcDecryptKey(int[] encryptKey) {
         int[] decryptKey = new int[52];
-        int j, k; // Index counters.
-        int t1, t2, t3; // Temps to hold decrypt subkeys.
         
-        t1 = inv(encryptKey[0]); // Multiplicative inverse (mod x10001).
-        t2 = -encryptKey[1] & 0xffff; // Additive inverse, 2nd encrypt subkey.
-        t3 = -encryptKey[2] & 0xffff; // Additive inverse, 3rd encrypt subkey.
+        decryptKey[51] = inv(encryptKey[3]);
+        decryptKey[50] = -encryptKey[2] & 0xffff;
+        decryptKey[49] = -encryptKey[1] & 0xffff;
+        decryptKey[48] = inv(encryptKey[0]);
         
-        decryptKey[51] = inv(encryptKey[3]); // Multiplicative inverse (mod x10001).
-        decryptKey[50] = t3;
-        decryptKey[49] = t2;
-        decryptKey[48] = t1;
-        
-        j = 47; // Indices into temp and encrypt arrays.
-        k = 4;
+        int j = 47; // Indices into temp and encrypt arrays.
+        int k = 4;
         for(int i = 0; i < 7; i++) {
-            t1 = encryptKey[k++];
+            int t0 = encryptKey[k++];
             decryptKey[j--] = encryptKey[k++];
-            decryptKey[j--] = t1;
-            t1 = inv(encryptKey[k++]);
-            t2 = -encryptKey[k++] & 0xffff;
-            t3 = -encryptKey[k++] & 0xffff;
+            decryptKey[j--] = t0;
+            int t1 = inv(encryptKey[k++]);
+            int t2 = -encryptKey[k++] & 0xffff;
+            int t3 = -encryptKey[k++] & 0xffff;
             decryptKey[j--] = inv(encryptKey[k++]);
             decryptKey[j--] = t2;
             decryptKey[j--] = t3;
             decryptKey[j--] = t1;
         }
         
-        t1 = encryptKey[k++];
+        int t0 = encryptKey[k++];
         decryptKey[j--] = encryptKey[k++];
-        decryptKey[j--] = t1;
-        t1 = inv(encryptKey[k++]);
-        t2 = -encryptKey[k++] & 0xffff;
-        t3 = -encryptKey[k++] & 0xffff;
+        decryptKey[j--] = t0;
+        int t1 = inv(encryptKey[k++]);
+        int t2 = -encryptKey[k++] & 0xffff;
+        int t3 = -encryptKey[k++] & 0xffff;
         decryptKey[j--] = inv(encryptKey[k++]);
         decryptKey[j--] = t3;
         decryptKey[j--] = t2;
@@ -202,30 +192,28 @@ public class IdeaEncryption {
      * the interpretation of the bits within is strictly unsigned 16-bit.
      */
     private static int inv(int x) {
-        int t0, t1;
-        int q, y;
-        
         if(x <= 1) // Assumes positive x.
-            return(x); // 0 and 1 are self-inverse.
+            return x; // 0 and 1 are self-inverse.
             
-        t1 = 0x10001 / x; // (2**16+1)/x; x is >= 2, so fits 16 bits.
-        y = 0x10001 % x;
+        int t0 = 0x10001 / x; // (2**16+1)/x; x is >= 2, so fits 16 bits.
+        int y = 0x10001 % x;
         if(y == 1)
-            return((1 - t1) & 0xFFFF);
+            return 1 - t0 & 0xFFFF;
         
-        t0 = 1;
+        int t1 = 1;
         do {
-            q = x / y;
+            int q0 = x / y;
             x = x % y;
-            t0 += q * t1;
+            t1 += q0 * t0;
             if(x == 1)
-                return(t0);
-            q = y / x;
+                return t1;
+            
+            int q1 = y / x;
             y = y % x;
-            t1 += q * t0;
+            t0 += q1 * t1;
         } while(y != 1);
         
-        return((1 - t1) & 0xFFFF);
+        return 1 - t0 & 0xFFFF;
     }
     
     public void validate() {
@@ -237,14 +225,14 @@ public class IdeaEncryption {
 class IdeaWorker implements Runnable {
     
     private final int id;
-    private final byte[] src, dest;
+    private final byte[] src, dst;
     private final int[] key;
     private final int threads;
     
-    public IdeaWorker(int id, byte[] src, byte[] dest, int[] key, int threads) {
+    public IdeaWorker(int id, byte[] src, byte[] dst, int[] key, int threads) {
         this.id = id;
         this.src = src;
-        this.dest = dest;
+        this.dst = dst;
         this.key = key;
         this.threads = threads;
     }
@@ -259,121 +247,113 @@ class IdeaWorker implements Runnable {
      * bits.
      */
     public void run() {
-        int ilow, iupper, slice, tslice, ttslice;
+        int slice = ((src.length / 8 + threads - 1) / threads) * 8;
         
-        tslice = src.length / 8;
-        ttslice = (tslice + threads - 1) / threads;
-        slice = ttslice * 8;
+        int begin = id * slice;
+        int end = (id + 1) * slice;
+        if(end > src.length)
+            end = src.length;
         
-        ilow = id * slice;
-        iupper = (id + 1) * slice;
-        if(iupper > src.length)
-            iupper = src.length;
-        
-        int i1 = ilow; // Index into first text array.
-        int i2 = ilow; // Index into second text array.
-        int ik; // Index into key array.
-        int x1, x2, x3, x4, t1, t2; // Four "16-bit" blocks, two temps.
-        int r; // Eight rounds of processing.
-        
-        for(int i = ilow; i < iupper; i += 8) {
-            ik = 0; // Restart key index.
-            r = 8; // Eight rounds of processing.
-            
+        int iSrc = begin;
+        int iDst = begin;
+        for(int i = begin; i < end; i += 8) {
             // Load eight plain1 bytes as four 16-bit "unsigned" integers.
             // Masking with 0xff prevents sign extension with cast to int.
             
-            x1 = src[i1++] & 0xff; // Build 16-bit x1 from 2 bytes,
-            x1 |= (src[i1++] & 0xff) << 8; // assuming low-order byte first.
-            x2 = src[i1++] & 0xff;
-            x2 |= (src[i1++] & 0xff) << 8;
-            x3 = src[i1++] & 0xff;
-            x3 |= (src[i1++] & 0xff) << 8;
-            x4 = src[i1++] & 0xff;
-            x4 |= (src[i1++] & 0xff) << 8;
+            int x1 = src[iSrc++] & 0xff; // Build 16-bit x1 from 2 bytes,
+            x1 |= (src[iSrc++] & 0xff) << 8; // assuming low-order byte first.
+            int x2 = src[iSrc++] & 0xff;
+            x2 |= (src[iSrc++] & 0xff) << 8;
+            int x3 = src[iSrc++] & 0xff;
+            x3 |= (src[iSrc++] & 0xff) << 8;
+            int x4 = src[iSrc++] & 0xff;
+            x4 |= (src[iSrc++] & 0xff) << 8;
             
+            int round = 8; // Eight rounds of processing.
+            int iKey = 0;
             do {
+                
                 // 1) Multiply (modulo 0x10001), 1st text sub-block
                 // with 1st key sub-block.
-                x1 = (int) ((long) x1 * key[ik++] % 0x10001L & 0xffff);
+                x1 = (int) ((long) x1 * key[iKey++] % 0x10001L & 0xffff);
                 
                 // 2) Add (modulo 0x10000), 2nd text sub-block
                 // with 2nd key sub-block.
-                x2 = x2 + key[ik++] & 0xffff;
+                x2 = x2 + key[iKey++] & 0xffff;
                 
                 // 3) Add (modulo 0x10000), 3rd text sub-block
                 // with 3rd key sub-block.
-                x3 = x3 + key[ik++] & 0xffff;
+                x3 = x3 + key[iKey++] & 0xffff;
                 
                 // 4) Multiply (modulo 0x10001), 4th text sub-block
                 // with 4th key sub-block.
-                x4 = (int) ((long) x4 * key[ik++] % 0x10001L & 0xffff);
+                x4 = (int) ((long) x4 * key[iKey++] % 0x10001L & 0xffff);
                 
                 // 5) XOR results from steps 1 and 3.
-                t2 = x1 ^ x3;
+                int t0 = x1 ^ x3;
                 
                 // 6) XOR results from steps 2 and 4.
                 // Included in step 8.
                 
                 // 7) Multiply (modulo 0x10001), result of step 5
                 // with 5th key sub-block.
-                t2 = (int) ((long) t2 * key[ik++] % 0x10001L & 0xffff);
+                t0 = (int) ((long) t0 * key[iKey++] % 0x10001L & 0xffff);
                 
                 // 8) Add (modulo 0x10000), results of steps 6 and 7.
-                t1 = t2 + (x2 ^ x4) & 0xffff;
+                int t1 = t0 + (x2 ^ x4) & 0xffff;
                 
                 // 9) Multiply (modulo 0x10001), result of step 8
                 // with 6th key sub-block.
-                t1 = (int) ((long) t1 * key[ik++] % 0x10001L & 0xffff);
+                t1 = (int) ((long) t1 * key[iKey++] % 0x10001L & 0xffff);
                 
                 // 10) Add (modulo 0x10000), results of steps 7 and 9.
-                t2 = t1 + t2 & 0xffff;
+                t0 = t1 + t0 & 0xffff;
                 
                 // 11) XOR results from steps 1 and 9.
                 x1 ^= t1;
                 
                 // 14) XOR results from steps 4 and 10. (Out of order).
-                x4 ^= t2;
+                x4 ^= t0;
                 
                 // 13) XOR results from steps 2 and 10. (Out of order).
-                t2 ^= x2;
+                t0 ^= x2;
                 
                 // 12) XOR results from steps 3 and 9. (Out of order).
                 x2 = x3 ^ t1;
                 
-                x3 = t2; // Results of x2 and x3 now swapped.
+                x3 = t0; // Results of x2 and x3 now swapped.
                 
-            } while(--r != 0); // Repeats seven more rounds.
+            } while(--round != 0); // Repeats seven more rounds.
             
             // Final output transform (4 steps).
             
             // 1) Multiply (modulo 0x10001), 1st text-block
             // with 1st key sub-block.
-            x1 = (int) ((long) x1 * key[ik++] % 0x10001L & 0xffff);
+            x1 = (int) ((long) x1 * key[iKey++] % 0x10001L & 0xffff);
             
             // 2) Add (modulo 0x10000), 2nd text sub-block
             // with 2nd key sub-block. It says x3, but that is to undo swap
             // of subblocks 2 and 3 in 8th processing round.
-            x3 = x3 + key[ik++] & 0xffff;
+            x3 = x3 + key[iKey++] & 0xffff;
             
             // 3) Add (modulo 0x10000), 3rd text sub-block
             // with 3rd key sub-block. It says x2, but that is to undo swap
             // of subblocks 2 and 3 in 8th processing round.
-            x2 = x2 + key[ik++] & 0xffff;
+            x2 = x2 + key[iKey++] & 0xffff;
             
             // 4) Multiply (modulo 0x10001), 4th text-block
             // with 4th key sub-block.
-            x4 = (int) ((long) x4 * key[ik++] % 0x10001L & 0xffff);
+            x4 = (int) ((long) x4 * key[iKey++] % 0x10001L & 0xffff);
             
             // Repackage from 16-bit sub-blocks to 8-bit byte array text2.
-            dest[i2++] = (byte) x1;
-            dest[i2++] = (byte) (x1 >>> 8);
-            dest[i2++] = (byte) x3; // x3 and x2 are switched
-            dest[i2++] = (byte) (x3 >>> 8); // only in name.
-            dest[i2++] = (byte) x2;
-            dest[i2++] = (byte) (x2 >>> 8);
-            dest[i2++] = (byte) x4;
-            dest[i2++] = (byte) (x4 >>> 8);
+            dst[iDst++] = (byte) x1;
+            dst[iDst++] = (byte) (x1 >>> 8);
+            dst[iDst++] = (byte) x3; // x3 and x2 are switched
+            dst[iDst++] = (byte) (x3 >>> 8); // only in name.
+            dst[iDst++] = (byte) x2;
+            dst[iDst++] = (byte) (x2 >>> 8);
+            dst[iDst++] = (byte) x4;
+            dst[iDst++] = (byte) (x4 >>> 8);
         }
     }
 }

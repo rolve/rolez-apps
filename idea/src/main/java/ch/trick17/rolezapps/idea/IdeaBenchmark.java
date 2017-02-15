@@ -4,6 +4,8 @@ import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
 
+import java.util.Random;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -36,7 +38,7 @@ public class IdeaBenchmark {
     @Setup(Level.Iteration)
     public void setup() {
         idea = instantiateBenchmark(IdeaEncryption.class, impl, n, tasks);
-        idea.buildTestData();
+        idea.buildTestData(new Random(136506717L));
     }
     
     @Benchmark
