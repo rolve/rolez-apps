@@ -1,6 +1,8 @@
 package ch.trick17.rolezapps.idea;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -160,40 +162,37 @@ public class IdeaEncyption {
     }
     
     public void run() {
-        Runnable thobjects[] = new Runnable[threads];
-        Thread th[] = new Thread[threads];
-        
         // Encrypt
+        List<Thread> ts = new ArrayList<>();
         for(int i = 1; i < threads; i++) {
-            thobjects[i] = new IDEARunner(i, plain, encrypted, encryptKey, threads);
-            th[i] = new Thread(thobjects[i]);
-            th[i].start();
+            Thread t = new Thread(new IdeaWorker(i, plain, encrypted, encryptKey, threads));
+            t.start();
+            ts.add(t);
         }
+        new IdeaWorker(0, plain, encrypted, encryptKey, threads).run();
         
-        thobjects[0] = new IDEARunner(0, plain, encrypted, encryptKey, threads);
-        thobjects[0].run();
-        
-        for(int i = 1; i < threads; i++) {
+        for(Thread t : ts)
             try {
-                th[i].join();
-            } catch(InterruptedException e) {}
-        }
+                t.join();
+            } catch(final InterruptedException e) {
+                throw new AssertionError(e);
+            }
         
         // Decrypt
+        ts.clear();
         for(int i = 1; i < threads; i++) {
-            thobjects[i] = new IDEARunner(i, encrypted, decrypted, decryptKey, threads);
-            th[i] = new Thread(thobjects[i]);
-            th[i].start();
+            Thread t = new Thread(new IdeaWorker(i, encrypted, decrypted, decryptKey, threads));
+            t.start();
+            ts.add(t);
         }
+        new IdeaWorker(0, encrypted, decrypted, decryptKey, threads).run();
         
-        thobjects[0] = new IDEARunner(0, encrypted, decrypted, decryptKey, threads);
-        thobjects[0].run();
-        
-        for(int i = 1; i < threads; i++) {
+        for(Thread t : ts)
             try {
-                th[i].join();
-            } catch(InterruptedException e) {}
-        }
+                t.join();
+            } catch(final InterruptedException e) {
+                throw new AssertionError(e);
+            }
     }
     
     /**
@@ -235,14 +234,14 @@ public class IdeaEncyption {
     }
 }
 
-class IDEARunner implements Runnable {
+class IdeaWorker implements Runnable {
     
     private final int id;
     private final byte[] src, dest;
     private final int[] key;
     private final int threads;
     
-    public IDEARunner(int id, byte[] src, byte[] dest, int[] key, int threads) {
+    public IdeaWorker(int id, byte[] src, byte[] dest, int[] key, int threads) {
         this.id = id;
         this.src = src;
         this.dest = dest;
