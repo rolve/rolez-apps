@@ -10,7 +10,7 @@ import java.util.Random;
  * Algorithm. The test is based on code presented in Applied Cryptography by Bruce Schnier, which
  * was based on code developed by Xuejia Lai and James L. Massey.
  */
-public class IdeaEncyption {
+public class IdeaEncryption {
     
     private final int size;
     private final int threads;
@@ -24,7 +24,7 @@ public class IdeaEncyption {
     private int[] decryptKey; // userkey derived
     
     
-    public IdeaEncyption(int size, int threads) {
+    public IdeaEncryption(int size, int threads) {
         this.size = size;
         this.threads = threads;
     }

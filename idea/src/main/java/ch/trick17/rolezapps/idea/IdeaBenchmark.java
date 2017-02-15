@@ -31,11 +31,11 @@ public class IdeaBenchmark {
     @Param({"1", "2", "4", "16", "64"})
     int tasks;
     
-    IdeaEncyption idea;
+    IdeaEncryption idea;
     
     @Setup(Level.Iteration)
     public void setup() {
-        idea = instantiateBenchmark(IdeaEncyption.class, impl, n, tasks);
+        idea = instantiateBenchmark(IdeaEncryption.class, impl, n, tasks);
         idea.buildTestData();
     }
     
