@@ -10,21 +10,16 @@ import java.util.Random;
  */
 public class IdeaEncyption {
     
-    // Declare class data. Byte buffer plain1 holds the original
-    // data for encryption, crypt1 holds the encrypted data, and
-    // plain2 holds the decrypted data, which should match plain1
-    // byte for byte.
-    
     private final int size;
     private final int threads;
     
-    private byte[] plain1; // Buffer for plaintext data.
-    private byte[] crypt1; // Buffer for encrypted data.
-    private byte[] plain2; // Buffer for decrypted data.
+    private byte[] plain;
+    private byte[] encrypted;
+    private byte[] decrypted;
     
-    private short[] userkey; // Key for encryption/decryption.
-    private int[] Z;         // Encryption subkey (userkey derived).
-    private int[] DK;        // Decryption subkey (userkey derived).
+    private short[] userKey;
+    private int[] encryptKey; // userkey derived
+    private int[] decryptKey; // userkey derived
     
     
     public IdeaEncyption(int size, int threads) {
@@ -36,19 +31,15 @@ public class IdeaEncyption {
      * Builds the data used for the test
      */
     public void buildTestData() {
-        
-        // Create three byte arrays that will be used (and reused) for
-        // encryption/decryption operations.
-        
-        plain1 = new byte[size];
-        crypt1 = new byte[size];
-        plain2 = new byte[size];
+        plain = new byte[size];
+        encrypted = new byte[size];
+        decrypted = new byte[size];
         
         Random random = new Random(136506717L); // Create random number generator.
         
         // Allocate three arrays to hold keys: userkey is the 128-bit key.
-        // Z is the set of 16-bit encryption subkeys derived from userkey,
-        // while DK is the set of 16-bit decryption subkeys also derived
+        // encryptKey is the set of 16-bit encryption subkeys derived from userkey,
+        // while decryptKey is the set of 16-bit decryption subkeys also derived
         // from userkey. NOTE: The 16-bit values are stored here in
         // 32-bit int arrays so that the values may be used in calculations
         // as if they are unsigned. Each 64-bit block of plaintext goes
@@ -56,48 +47,42 @@ public class IdeaEncyption {
         // then a final output transform with four of the keys; (8 * 6)
         // + 4 = 52 subkeys.
         
-        userkey = new short[8]; // User key has 8 16-bit shorts.
-        Z = new int[52]; // Encryption subkey (user key derived).
-        DK = new int[52]; // Decryption subkey (user key derived).
+        userKey = new short[8]; // User key has 8 16-bit shorts.
         
         // Generate user key randomly; eight 16-bit values in an array.
-        
         for(int i = 0; i < 8; i++) {
             // Again, the random number function returns int. Converting
             // to a short type preserves the bit pattern in the lower 16
             // bits of the int and discards the rest.
-            
-            userkey[i] = (short) random.nextInt();
+            userKey[i] = (short) random.nextInt();
         }
         
         // Compute encryption and decryption subkeys.
+        encryptKey = calcEncryptKey(userKey);
+        decryptKey = calcDecryptKey(encryptKey);
         
-        calcEncryptKey();
-        calcDecryptKey();
-        
-        // Fill plain1 with "text."
+        // Fill plain with "text."
         for(int i = 0; i < size; i++) {
-            plain1[i] = (byte) i;
-            
-            // Converting to a byte
-            // type preserves the bit pattern in the lower 8 bits of the
+            plain[i] = (byte) i;
+            // Converting to a byte type preserves the bit pattern in the lower 8 bits of the
             // int and discards the rest.
         }
     }
     
     /**
-     * Builds the 52 16-bit encryption subkeys Z[] from the user key and stores in 32-bit int array.
-     * The routing corrects an error in the source code in the Schnier book. Basically, the sense of
-     * the 7- and 9-bit shifts are reversed. It still works reversed, but would encrypted code would
-     * not decrypt with someone else's IDEA code.
+     * Builds the 52 16-bit encryption subkeys from the user key and stores in 32-bit int array. The
+     * routing corrects an error in the source code in the Schnier book. Basically, the sense of the
+     * 7- and 9-bit shifts are reversed. It still works reversed, but would encrypted code would not
+     * decrypt with someone else's IDEA code.
      */
-    private void calcEncryptKey() {
-        for(int i = 0; i < 52; i++) // Zero out the 52-int Z array.
-            Z[i] = 0;
+    private static int[] calcEncryptKey(short[] userKey) {
+        int[] key = new int[52];
+        for(int i = 0; i < 52; i++)
+            key[i] = 0;
         
         for(int i = 0; i < 8; i++) // First 8 subkeys are userkey itself.
-            Z[i] = userkey[i] & 0xffff; // Convert "unsigned"
-                                        // short to int.
+            key[i] = userKey[i] & 0xffff; // Convert "unsigned"
+                                          // short to int.
         
         // Each set of 8 subkeys thereafter is derived from left rotating
         // the whole 128-bit key 25 bits to left (once between each set of
@@ -113,76 +98,79 @@ public class IdeaEncyption {
         for(int i = 8; i < 52; i++) {
             int j = i % 8;
             if(j < 6) {
-                Z[i] = ((Z[i - 7] >>> 9) | (Z[i - 6] << 7)) & 0xFFFF; // Shift and combine. Just 16 bits.
+                key[i] = ((key[i - 7] >>> 9) | (key[i - 6] << 7)) & 0xFFFF; // Shift and combine. Just 16 bits.
                 continue; // Next iteration.
             }
             
             if(j == 6) { // Wrap to beginning for second chunk.
-                Z[i] = ((Z[i - 7] >>> 9) | (Z[i - 14] << 7)) & 0xFFFF;
+                key[i] = ((key[i - 7] >>> 9) | (key[i - 14] << 7)) & 0xFFFF;
                 continue;
             }
             
             // j == 7 so wrap to beginning for both chunks.
-            Z[i] = ((Z[i - 15] >>> 9) | (Z[i - 14] << 7)) & 0xFFFF;
+            key[i] = ((key[i - 15] >>> 9) | (key[i - 14] << 7)) & 0xFFFF;
         }
+        return key;
     }
     
     /**
-     * Builds the 52 16-bit encryption subkeys DK[] from the encryption- subkeys Z[]. DK[] is a
-     * 32-bit int array holding 16-bit values as unsigned.
+     * Builds the 52 16-bit encryption subkeys from the encryption subkeys.
      */
-    private void calcDecryptKey() {
+    private static int[] calcDecryptKey(int[] encryptKey) {
+        int[] decryptKey = new int[52];
         int j, k; // Index counters.
         int t1, t2, t3; // Temps to hold decrypt subkeys.
         
-        t1 = inv(Z[0]); // Multiplicative inverse (mod x10001).
-        t2 = -Z[1] & 0xffff; // Additive inverse, 2nd encrypt subkey.
-        t3 = -Z[2] & 0xffff; // Additive inverse, 3rd encrypt subkey.
+        t1 = inv(encryptKey[0]); // Multiplicative inverse (mod x10001).
+        t2 = -encryptKey[1] & 0xffff; // Additive inverse, 2nd encrypt subkey.
+        t3 = -encryptKey[2] & 0xffff; // Additive inverse, 3rd encrypt subkey.
         
-        DK[51] = inv(Z[3]); // Multiplicative inverse (mod x10001).
-        DK[50] = t3;
-        DK[49] = t2;
-        DK[48] = t1;
+        decryptKey[51] = inv(encryptKey[3]); // Multiplicative inverse (mod x10001).
+        decryptKey[50] = t3;
+        decryptKey[49] = t2;
+        decryptKey[48] = t1;
         
         j = 47; // Indices into temp and encrypt arrays.
         k = 4;
         for(int i = 0; i < 7; i++) {
-            t1 = Z[k++];
-            DK[j--] = Z[k++];
-            DK[j--] = t1;
-            t1 = inv(Z[k++]);
-            t2 = -Z[k++] & 0xffff;
-            t3 = -Z[k++] & 0xffff;
-            DK[j--] = inv(Z[k++]);
-            DK[j--] = t2;
-            DK[j--] = t3;
-            DK[j--] = t1;
+            t1 = encryptKey[k++];
+            decryptKey[j--] = encryptKey[k++];
+            decryptKey[j--] = t1;
+            t1 = inv(encryptKey[k++]);
+            t2 = -encryptKey[k++] & 0xffff;
+            t3 = -encryptKey[k++] & 0xffff;
+            decryptKey[j--] = inv(encryptKey[k++]);
+            decryptKey[j--] = t2;
+            decryptKey[j--] = t3;
+            decryptKey[j--] = t1;
         }
         
-        t1 = Z[k++];
-        DK[j--] = Z[k++];
-        DK[j--] = t1;
-        t1 = inv(Z[k++]);
-        t2 = -Z[k++] & 0xffff;
-        t3 = -Z[k++] & 0xffff;
-        DK[j--] = inv(Z[k++]);
-        DK[j--] = t3;
-        DK[j--] = t2;
-        DK[j--] = t1;
+        t1 = encryptKey[k++];
+        decryptKey[j--] = encryptKey[k++];
+        decryptKey[j--] = t1;
+        t1 = inv(encryptKey[k++]);
+        t2 = -encryptKey[k++] & 0xffff;
+        t3 = -encryptKey[k++] & 0xffff;
+        decryptKey[j--] = inv(encryptKey[k++]);
+        decryptKey[j--] = t3;
+        decryptKey[j--] = t2;
+        decryptKey[j--] = t1;
+        
+        return decryptKey;
     }
     
     public void run() {
         Runnable thobjects[] = new Runnable[threads];
         Thread th[] = new Thread[threads];
         
-        // Encrypt plain1.
+        // Encrypt
         for(int i = 1; i < threads; i++) {
-            thobjects[i] = new IDEARunner(i, plain1, crypt1, Z, threads);
+            thobjects[i] = new IDEARunner(i, plain, encrypted, encryptKey, threads);
             th[i] = new Thread(thobjects[i]);
             th[i].start();
         }
         
-        thobjects[0] = new IDEARunner(0, plain1, crypt1, Z, threads);
+        thobjects[0] = new IDEARunner(0, plain, encrypted, encryptKey, threads);
         thobjects[0].run();
         
         for(int i = 1; i < threads; i++) {
@@ -191,14 +179,14 @@ public class IdeaEncyption {
             } catch(InterruptedException e) {}
         }
         
-        // Decrypt.
+        // Decrypt
         for(int i = 1; i < threads; i++) {
-            thobjects[i] = new IDEARunner(i, crypt1, plain2, DK, threads);
+            thobjects[i] = new IDEARunner(i, encrypted, decrypted, decryptKey, threads);
             th[i] = new Thread(thobjects[i]);
             th[i].start();
         }
         
-        thobjects[0] = new IDEARunner(0, crypt1, plain2, DK, threads);
+        thobjects[0] = new IDEARunner(0, encrypted, decrypted, decryptKey, threads);
         thobjects[0].run();
         
         for(int i = 1; i < threads; i++) {
@@ -242,21 +230,22 @@ public class IdeaEncyption {
     }
     
     public void validate() {
-        if(!Arrays.equals(plain1, plain2))
+        if(!Arrays.equals(plain, decrypted))
             throw new AssertionError("Validation failed");
     }
 }
 
 class IDEARunner implements Runnable {
     
-    int id, key[];
-    byte text1[], text2[];
+    private final int id;
+    private final byte[] src, dest;
+    private final int[] key;
     private final int threads;
     
-    public IDEARunner(int id, byte[] text1, byte[] text2, int[] key, int threads) {
+    public IDEARunner(int id, byte[] src, byte[] dest, int[] key, int threads) {
         this.id = id;
-        this.text1 = text1;
-        this.text2 = text2;
+        this.src = src;
+        this.dest = dest;
         this.key = key;
         this.threads = threads;
     }
@@ -273,14 +262,14 @@ class IDEARunner implements Runnable {
     public void run() {
         int ilow, iupper, slice, tslice, ttslice;
         
-        tslice = text1.length / 8;
+        tslice = src.length / 8;
         ttslice = (tslice + threads - 1) / threads;
         slice = ttslice * 8;
         
         ilow = id * slice;
         iupper = (id + 1) * slice;
-        if(iupper > text1.length)
-            iupper = text1.length;
+        if(iupper > src.length)
+            iupper = src.length;
         
         int i1 = ilow; // Index into first text array.
         int i2 = ilow; // Index into second text array.
@@ -295,14 +284,14 @@ class IDEARunner implements Runnable {
             // Load eight plain1 bytes as four 16-bit "unsigned" integers.
             // Masking with 0xff prevents sign extension with cast to int.
             
-            x1 = text1[i1++] & 0xff; // Build 16-bit x1 from 2 bytes,
-            x1 |= (text1[i1++] & 0xff) << 8; // assuming low-order byte first.
-            x2 = text1[i1++] & 0xff;
-            x2 |= (text1[i1++] & 0xff) << 8;
-            x3 = text1[i1++] & 0xff;
-            x3 |= (text1[i1++] & 0xff) << 8;
-            x4 = text1[i1++] & 0xff;
-            x4 |= (text1[i1++] & 0xff) << 8;
+            x1 = src[i1++] & 0xff; // Build 16-bit x1 from 2 bytes,
+            x1 |= (src[i1++] & 0xff) << 8; // assuming low-order byte first.
+            x2 = src[i1++] & 0xff;
+            x2 |= (src[i1++] & 0xff) << 8;
+            x3 = src[i1++] & 0xff;
+            x3 |= (src[i1++] & 0xff) << 8;
+            x4 = src[i1++] & 0xff;
+            x4 |= (src[i1++] & 0xff) << 8;
             
             do {
                 // 1) Multiply (modulo 0x10001), 1st text sub-block
@@ -378,14 +367,14 @@ class IDEARunner implements Runnable {
             x4 = (int) ((long) x4 * key[ik++] % 0x10001L & 0xffff);
             
             // Repackage from 16-bit sub-blocks to 8-bit byte array text2.
-            text2[i2++] = (byte) x1;
-            text2[i2++] = (byte) (x1 >>> 8);
-            text2[i2++] = (byte) x3; // x3 and x2 are switched
-            text2[i2++] = (byte) (x3 >>> 8); // only in name.
-            text2[i2++] = (byte) x2;
-            text2[i2++] = (byte) (x2 >>> 8);
-            text2[i2++] = (byte) x4;
-            text2[i2++] = (byte) (x4 >>> 8);
+            dest[i2++] = (byte) x1;
+            dest[i2++] = (byte) (x1 >>> 8);
+            dest[i2++] = (byte) x3; // x3 and x2 are switched
+            dest[i2++] = (byte) (x3 >>> 8); // only in name.
+            dest[i2++] = (byte) x2;
+            dest[i2++] = (byte) (x2 >>> 8);
+            dest[i2++] = (byte) x4;
+            dest[i2++] = (byte) (x4 >>> 8);
         }
     }
 }
