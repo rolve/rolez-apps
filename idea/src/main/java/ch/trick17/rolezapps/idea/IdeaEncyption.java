@@ -1,92 +1,48 @@
 package ch.trick17.rolezapps.idea;
 
+import java.util.Arrays;
 import java.util.Random;
-
-import jgfutil.JGFInstrumentor;
 
 /**
  * This test performs IDEA encryption then decryption. IDEA stands for International Data Encryption
  * Algorithm. The test is based on code presented in Applied Cryptography by Bruce Schnier, which
  * was based on code developed by Xuejia Lai and James L. Massey.
  */
-class IDEATest {
+public class IdeaEncyption {
     
     // Declare class data. Byte buffer plain1 holds the original
     // data for encryption, crypt1 holds the encrypted data, and
     // plain2 holds the decrypted data, which should match plain1
     // byte for byte.
     
-    int arrayRows;
-    
-    byte[] plain1; // Buffer for plaintext data.
-    byte[] crypt1; // Buffer for encrypted data.
-    byte[] plain2; // Buffer for decrypted data.
-    
-    short[] userkey; // Key for encryption/decryption.
-    int[] Z;         // Encryption subkey (userkey derived).
-    int[] DK;        // Decryption subkey (userkey derived).
-    
+    private final int size;
     private final int threads;
     
-    public IDEATest(int threads) {
+    private byte[] plain1; // Buffer for plaintext data.
+    private byte[] crypt1; // Buffer for encrypted data.
+    private byte[] plain2; // Buffer for decrypted data.
+    
+    private short[] userkey; // Key for encryption/decryption.
+    private int[] Z;         // Encryption subkey (userkey derived).
+    private int[] DK;        // Decryption subkey (userkey derived).
+    
+    
+    public IdeaEncyption(int size, int threads) {
+        this.size = size;
         this.threads = threads;
     }
     
-    void run() {
-        Runnable thobjects[] = new Runnable[threads];
-        Thread th[] = new Thread[threads];
-        
-        // Start the stopwatch.       
-        JGFInstrumentor.startTimer("Section2:Crypt:Kernel");
-        
-        // Encrypt plain1.
-        for(int i = 1; i < threads; i++) {
-            thobjects[i] = new IDEARunner(i, plain1, crypt1, Z, threads);
-            th[i] = new Thread(thobjects[i]);
-            th[i].start();
-        }
-        
-        thobjects[0] = new IDEARunner(0, plain1, crypt1, Z, threads);
-        thobjects[0].run();
-        
-        for(int i = 1; i < threads; i++) {
-            try {
-                th[i].join();
-            } catch(InterruptedException e) {}
-        }
-        
-        // Decrypt.
-        for(int i = 1; i < threads; i++) {
-            thobjects[i] = new IDEARunner(i, crypt1, plain2, DK, threads);
-            th[i] = new Thread(thobjects[i]);
-            th[i].start();
-        }
-        
-        thobjects[0] = new IDEARunner(0, crypt1, plain2, DK, threads);
-        thobjects[0].run();
-        
-        for(int i = 1; i < threads; i++) {
-            try {
-                th[i].join();
-            } catch(InterruptedException e) {}
-        }
-        
-        // Stop the stopwatch.
-        JGFInstrumentor.stopTimer("Section2:Crypt:Kernel");
-        
-    }
-    
     /**
-     * Builds the data used for the test -- each time the test is run.
+     * Builds the data used for the test
      */
-    void buildTestData() {
+    public void buildTestData() {
         
         // Create three byte arrays that will be used (and reused) for
         // encryption/decryption operations.
         
-        plain1 = new byte[arrayRows];
-        crypt1 = new byte[arrayRows];
-        plain2 = new byte[arrayRows];
+        plain1 = new byte[size];
+        crypt1 = new byte[size];
+        plain2 = new byte[size];
         
         Random random = new Random(136506717L); // Create random number generator.
         
@@ -120,7 +76,7 @@ class IDEATest {
         calcDecryptKey();
         
         // Fill plain1 with "text."
-        for(int i = 0; i < arrayRows; i++) {
+        for(int i = 0; i < size; i++) {
             plain1[i] = (byte) i;
             
             // Converting to a byte
@@ -136,16 +92,12 @@ class IDEATest {
      * not decrypt with someone else's IDEA code.
      */
     private void calcEncryptKey() {
-        int j; // Utility variable.
-        
         for(int i = 0; i < 52; i++) // Zero out the 52-int Z array.
             Z[i] = 0;
         
         for(int i = 0; i < 8; i++) // First 8 subkeys are userkey itself.
-        {
             Z[i] = userkey[i] & 0xffff; // Convert "unsigned"
                                         // short to int.
-        }
         
         // Each set of 8 subkeys thereafter is derived from left rotating
         // the whole 128-bit key 25 bits to left (once between each set of
@@ -159,7 +111,7 @@ class IDEATest {
         // wrap around to the first two members of the previous eight.
         
         for(int i = 8; i < 52; i++) {
-            j = i % 8;
+            int j = i % 8;
             if(j < 6) {
                 Z[i] = ((Z[i - 7] >>> 9) | (Z[i - 6] << 7)) & 0xFFFF; // Shift and combine. Just 16 bits.
                 continue; // Next iteration.
@@ -219,6 +171,43 @@ class IDEATest {
         DK[j--] = t1;
     }
     
+    public void run() {
+        Runnable thobjects[] = new Runnable[threads];
+        Thread th[] = new Thread[threads];
+        
+        // Encrypt plain1.
+        for(int i = 1; i < threads; i++) {
+            thobjects[i] = new IDEARunner(i, plain1, crypt1, Z, threads);
+            th[i] = new Thread(thobjects[i]);
+            th[i].start();
+        }
+        
+        thobjects[0] = new IDEARunner(0, plain1, crypt1, Z, threads);
+        thobjects[0].run();
+        
+        for(int i = 1; i < threads; i++) {
+            try {
+                th[i].join();
+            } catch(InterruptedException e) {}
+        }
+        
+        // Decrypt.
+        for(int i = 1; i < threads; i++) {
+            thobjects[i] = new IDEARunner(i, crypt1, plain2, DK, threads);
+            th[i] = new Thread(thobjects[i]);
+            th[i].start();
+        }
+        
+        thobjects[0] = new IDEARunner(0, crypt1, plain2, DK, threads);
+        thobjects[0].run();
+        
+        for(int i = 1; i < threads; i++) {
+            try {
+                th[i].join();
+            } catch(InterruptedException e) {}
+        }
+    }
+    
     /**
      * Compute multiplicative inverse of x, modulo (2**16)+1 using extended Euclid's GCD (greatest
      * common divisor) algorithm. It is unrolled twice to avoid swapping the meaning of the
@@ -250,6 +239,11 @@ class IDEATest {
         } while(y != 1);
         
         return((1 - t1) & 0xFFFF);
+    }
+    
+    public void validate() {
+        if(!Arrays.equals(plain1, plain2))
+            throw new AssertionError("Validation failed");
     }
 }
 
