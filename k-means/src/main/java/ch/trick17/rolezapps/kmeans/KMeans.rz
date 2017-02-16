@@ -25,7 +25,7 @@ class KMeans {
     def pure createDataSet(n: int): readwrite Array[pure Vector[double]] {
         val random = new Random;
         val dataSet = new Array[pure Vector[double]](n);
-        for(var i = 0; i < n; i += 1)
+        for(var i = 0; i < n; i++)
             dataSet.set(i, this.newRandomVector(random));
         return dataSet;
     }
@@ -35,7 +35,7 @@ class KMeans {
         /* Initialization */
         val random = new Random;
         val centroids = new Array[pure Vector[double]](this.clusters);
-        for(var i = 0; i < this.clusters; i += 1)
+        for(var i = 0; i < this.clusters; i++)
             centroids.set(i, this.newRandomVector(random));
         
         val assignments = new Array[int](dataSet.length);

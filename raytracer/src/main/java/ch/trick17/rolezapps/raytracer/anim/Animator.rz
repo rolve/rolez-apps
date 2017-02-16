@@ -24,7 +24,7 @@ class Animator {
         this.raytracer.scene = this.scene;
         
         val image = new Array[readwrite Array[int]](this.writer.height);
-        for(var i = 0; i < image.length; i += 1)
+        for(var i = 0; i < image.length; i++)
             image.set(i, new Array[int](this.writer.width));
         
         while(this.scene.time < this.scene.length) {

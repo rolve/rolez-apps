@@ -12,7 +12,7 @@ class Scene {
     
     def readonly intersect(ray: pure Ray): readonly Intersection {
         var closest: readonly Intersection = null;
-        for(var i = 0; i < this.objects.size; i += 1) {
+        for(var i = 0; i < this.objects.size; i++) {
             val intersection = this.objects.get(i).intersect(ray);
             if(intersection != null && (closest == null || intersection.t < closest.t))
                 closest = intersection;

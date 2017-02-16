@@ -16,7 +16,7 @@ class AnimatedScene extends Scene {
     
     def readwrite animationStep(timeStep: double): {
         this.time += timeStep;
-        for(var i = 0; i < this.animations.size; i += 1) {
+        for(var i = 0; i < this.animations.size; i++) {
             val animation = this.animations.get(i);
             if(animation.begun(this.time) && !animation.finished(this.time))
                 animation.animationStep(this.time, timeStep);

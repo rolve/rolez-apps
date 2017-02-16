@@ -36,7 +36,7 @@ object RatePathReader {
         val pathValues = new Array[double](lines.size);
         val pathDates = new Array[int](lines.size);
         
-        for(var i = 0; i < lines.size; i += 1) {
+        for(var i = 0; i < lines.size; i++) {
             val fields = lines.get(i).split(",");
             val date = the Int.parseInt("19" + fields.get(0));
             

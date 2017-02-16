@@ -10,17 +10,17 @@ class Returns extends Path {
         
         val returnPathValues = new Array[double](ratePath.pathValues.length);
         returnPathValues.set(0, 0.0);
-        for(var i = 1; i < ratePath.pathValues.length; i += 1)
+        for(var i = 1; i < ratePath.pathValues.length; i++)
             returnPathValues.set(i,
                     the Math.log(ratePath.pathValues.get(i) / ratePath.pathValues.get(i - 1)));
         
         var mean = 0.0;
-        for(var i = 1; i < returnPathValues.length; i += 1)
+        for(var i = 1; i < returnPathValues.length; i++)
             mean += returnPathValues.get(i);
         mean /= returnPathValues.length - 1;
         
         var variance = 0.0;
-        for(var i = 1; i < returnPathValues.length; i += 1)
+        for(var i = 1; i < returnPathValues.length; i++)
             variance += (returnPathValues.get(i) - mean) * (returnPathValues.get(i) - mean);
         variance /= returnPathValues.length - 1;
         

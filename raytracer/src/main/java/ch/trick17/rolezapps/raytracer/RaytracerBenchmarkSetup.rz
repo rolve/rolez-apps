@@ -18,7 +18,7 @@ class RaytracerBenchmarkSetupRolez extends RaytracerBenchmarkSetup {
         val width = (height * scene.view.aspect) as int;
         
         this.image = new Array[readwrite Array[int]](height);
-        for(var i = 0; i < height; i += 1)
+        for(var i = 0; i < height; i++)
             this.image.set(i, new Array[int](width));
         
         this.raytracer.numTasks = numTasks;
@@ -29,7 +29,7 @@ class RaytracerBenchmarkSetupRolez extends RaytracerBenchmarkSetup {
     def pure createBenchmarkScene(random: readwrite Random): readwrite Scene {
         val scene = new AnimatedScene(30.0);
         the AnimatorApp.buildScene(scene, random);
-        for(var t = 1; t <= 8; t += 1)
+        for(var t = 1; t <= 8; t++)
             scene.animationStep(1.0);
         return scene;
     }

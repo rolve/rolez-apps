@@ -51,7 +51,7 @@ class AnimationGroup extends Animation {
     
     override readwrite begun(time: double): boolean {
         var oneBegun = false;
-        for(var i = 0; i < this.animations.length; i += 1) {
+        for(var i = 0; i < this.animations.length; i++) {
             if(this.animations.get(i).begun(time))
                 oneBegun = true;
         }
@@ -64,7 +64,7 @@ class AnimationGroup extends Animation {
     
     override readwrite finished(time: double): boolean {
         var allFinished = true;
-        for(var i = 0; i < this.animations.length; i += 1) {
+        for(var i = 0; i < this.animations.length; i++) {
             if(!this.animations.get(i).finished(time))
                 allFinished = false;
         }
@@ -76,7 +76,7 @@ class AnimationGroup extends Animation {
     }
     
     override readwrite animationStep(time: double, timeStep: double): {
-        for(var i = 0; i < this.animations.length; i += 1) {
+        for(var i = 0; i < this.animations.length; i++) {
             val animation = this.animations.get(i);
             if(animation.begun(time) && !animation.finished(time))
                 animation.animationStep(time, timeStep);

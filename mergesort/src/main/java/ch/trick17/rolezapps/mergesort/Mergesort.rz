@@ -22,12 +22,12 @@ class Mergesort {
         
         val arrays = new Array[readwrite Array[int]](iterations);
         
-        for(var i = 0; i < iterations; i += 1)
+        for(var i = 0; i < iterations; i++)
             arrays.set(i, this.shuffledInts(n));
         
         the System.out.println("Press Enter to start");
         new Scanner(the System.in).nextLine;
-        for(var i = 0; i < iterations; i += 1) {
+        for(var i = 0; i < iterations; i++) {
             watch.go;
             this.sort(arrays.get(i));
             the System.out.println(watch.get);
@@ -36,7 +36,7 @@ class Mergesort {
     
     def pure shuffledInts(n: int): readwrite Array[int] {
         val array = new Array[int](n);
-        for(var i = 0; i < n; i += 1)
+        for(var i = 0; i < n; i++)
             array.set(i, i);
         
         val random = new Random;
@@ -93,14 +93,14 @@ class Mergesort {
         var i = begin;
         var j = middle;
         
-        for(var k = begin; k < end; k += 1) {
+        for(var k = begin; k < end; k++) {
             if(i < middle && (j >= end || b.get(i) <= b.get(j))) {
                 a.set(k, b.get(i));
-                i += 1;
+                i++;
             }
             else {
                 a.set(k, b.get(j));
-                j += 1;
+                j++;
             }
         }
     }

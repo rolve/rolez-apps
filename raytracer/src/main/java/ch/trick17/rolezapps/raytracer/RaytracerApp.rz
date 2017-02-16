@@ -12,7 +12,7 @@ object RaytracerApp {
     task pure main(args: readonly Array[pure String]): {
         val scene = new AnimatedScene(30.0);
         the AnimatorApp.buildScene(scene, new Random(42L));
-        for(var i = 0; i < 8; i += 1)
+        for(var i = 0; i < 8; i++)
             scene.animationStep(1.0);
         
         val raytracer = new Raytracer;
@@ -23,13 +23,13 @@ object RaytracerApp {
         val height = 180;
         val width = (scene.view.aspect * height) as int;
         val image = new Array[readwrite Array[int]](height);
-        for(var i = 0; i < height; i += 1)
+        for(var i = 0; i < height; i++)
             image.set(i, new Array[int](width));
         
         the System.out.println("Press Enter to start");
         new Scanner(the System.in).nextLine;
         
-        for(var i = 0; i < 10; i += 1) {
+        for(var i = 0; i < 10; i++) {
             val watch = new StopWatch.go;
             raytracer.render(image);
             the System.out.println(watch.get);
