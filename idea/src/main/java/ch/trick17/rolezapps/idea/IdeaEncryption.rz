@@ -2,6 +2,8 @@ package ch.trick17.rolezapps.idea
 
 import rolez.util.Random
 import rolez.util.Arrays
+import rolez.util.Scanner
+import rolez.util.StopWatch
 
 class IdeaEncryption {
     
@@ -15,6 +17,11 @@ class IdeaEncryption {
     var userKey: readwrite Array[short]
     var encryptKey: readwrite Array[int]
     var decryptKey: readwrite Array[int]
+    
+    new {
+        this.size = 50000000;
+        this.tasks = 8;
+    }
     
     new(size: int, tasks: int) {
         this.size = size;
@@ -253,5 +260,19 @@ class IdeaEncryption {
     
     def readonly validate: {
         new Assertion(the Arrays.equals(this.plain, this.decrypted));
+    }
+    
+    task readwrite main: {
+        this.buildTestData(new Random(42L));
+        
+        the System.out.println("Press Enter to start");
+        new Scanner(the System.in).nextLine;
+        
+        val watch = new StopWatch;
+        for(var i = 0; i < 20; i++) {
+            watch.go;
+            this.run;
+            the System.out.println(watch.get);
+        }
     }
 }

@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 
 import rolez.lang.BlockPartitioner;
 import rolez.lang.SliceRange;
+import rolez.util.StopWatch;
 
 /**
  * This test performs IDEA encryption then decryption. IDEA stands for International Data Encryption
@@ -222,6 +224,21 @@ public class IdeaEncryptionJava extends IdeaEncryption {
         if(!Arrays.equals(plain, decrypted))
             throw new AssertionError("Validation failed");
     }
+    
+    public static void main(String[] args) {
+        IdeaEncryptionJava idea = new IdeaEncryptionJava(50000000, 8, 0L);
+        idea.buildTestData(new Random(42), 0L);
+        
+        System.out.println("Press Enter to start");
+        new Scanner(System.in).nextLine();
+        
+        StopWatch watch = new StopWatch();
+        for(int i = 0; i < 20; i++) {
+            watch.go();
+            idea.run(0L);
+            System.out.println(watch.get());
+        }
+    }
 }
 
 class IdeaWorker implements Runnable {
@@ -252,12 +269,10 @@ class IdeaWorker implements Runnable {
         // use partitioner to make sure partitioning is correct in cases JGF people did not consider
         BlockPartitioner partitioner = new BlockPartitioner(8, 0L);
         SliceRange range = partitioner.partition(new SliceRange(0, src.length, 1), threads, 0L)[id];
-        int begin = range.begin;
-        int end = range.end;
         
-        int iSrc = begin;
-        int iDst = begin;
-        for(int i = begin; i < end; i += 8) {
+        int iSrc = range.begin;
+        int iDst = range.begin;
+        for(int i = range.begin; i < range.end; i += 8) {
             // Load eight plain1 bytes as four 16-bit "unsigned" integers.
             // Masking with 0xff prevents sign extension with cast to int.
             
