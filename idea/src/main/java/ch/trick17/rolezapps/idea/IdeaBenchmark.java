@@ -19,6 +19,8 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import rolez.lang.Task;
+
 @BenchmarkMode(SingleShotTime)
 @Fork(1)
 @State(Thread)
@@ -27,33 +29,36 @@ public class IdeaBenchmark {
     @Param({"3000000", "20000000", "50000000"})
     int n;
     
-    @Param({""})
+    @Param({"", "Java"})
     String impl;
     
-    @Param({"1", "2", "4", "16", "64"})
+    @Param({"1", "2", "4", "16", "32"})
     int tasks;
     
     IdeaEncryption idea;
     
     @Setup(Level.Iteration)
     public void setup() {
-        idea = instantiateBenchmark(IdeaEncryption.class, impl, n, tasks);
-        idea.buildTestData(new Random(136506717L));
+        Task.registerNewRootTask();
+        idea = instantiateBenchmark(IdeaEncryption.class, impl, n, tasks,
+                Task.currentTask().idBits());
+        idea.buildTestData(new Random(136506717L), Task.currentTask().idBits());
     }
     
     @Benchmark
     public void idea() {
-        idea.run();
+        idea.run(Task.currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)
     public void tearDown() {
-        idea.validate();
+        idea.validate(Task.currentTask().idBits());
+        Task.unregisterRootTask();
     }
     
     public static void main(String[] args) throws RunnerException {
         Options options = new OptionsBuilder().include(IdeaBenchmark.class.getSimpleName())
-                .warmupIterations(10).measurementIterations(30).build();
+                .warmupIterations(10).measurementIterations(20).build();
         new Runner(options).run();
     }
 }

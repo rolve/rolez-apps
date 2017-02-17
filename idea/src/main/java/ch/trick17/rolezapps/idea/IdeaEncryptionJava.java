@@ -5,15 +5,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import rolez.lang.BlockPartitioner;
+import rolez.lang.SliceRange;
+
 /**
  * This test performs IDEA encryption then decryption. IDEA stands for International Data Encryption
  * Algorithm. The test is based on code presented in Applied Cryptography by Bruce Schnier, which
  * was based on code developed by Xuejia Lai and James L. Massey.
  */
-public class IdeaEncryption {
-    
-    private final int size;
-    private final int threads;
+public class IdeaEncryptionJava extends IdeaEncryption {
     
     private byte[] plain;
     private byte[] encrypted;
@@ -23,15 +23,15 @@ public class IdeaEncryption {
     private int[] encryptKey; // userkey derived
     private int[] decryptKey; // userkey derived
     
-    public IdeaEncryption(int size, int threads) {
-        this.size = size;
-        this.threads = threads;
+    public IdeaEncryptionJava(int size, int threads, long $task) {
+        super(size, threads, $task);
     }
     
     /**
      * Builds the data used for the test
      */
-    public void buildTestData(Random random) {
+    @Override
+    public void buildTestData(Random random, long $task) {
         plain     = new byte[size];
         encrypted = new byte[size];
         decrypted = new byte[size];
@@ -151,17 +151,18 @@ public class IdeaEncryption {
         return decryptKey;
     }
     
-    public void run() {
+    @Override
+    public void run(long $task) {
         // Encrypt
-        List<Thread> ts = new ArrayList<>();
-        for(int i = 1; i < threads; i++) {
-            Thread t = new Thread(new IdeaWorker(i, plain, encrypted, encryptKey, threads));
+        List<Thread> threads = new ArrayList<>();
+        for(int i = 1; i < tasks; i++) {
+            Thread t = new Thread(new IdeaWorker(i, plain, encrypted, encryptKey, tasks));
             t.start();
-            ts.add(t);
+            threads.add(t);
         }
-        new IdeaWorker(0, plain, encrypted, encryptKey, threads).run();
+        new IdeaWorker(0, plain, encrypted, encryptKey, tasks).run();
         
-        for(Thread t : ts)
+        for(Thread t : threads)
             try {
                 t.join();
             } catch(final InterruptedException e) {
@@ -169,15 +170,15 @@ public class IdeaEncryption {
             }
         
         // Decrypt
-        ts.clear();
-        for(int i = 1; i < threads; i++) {
-            Thread t = new Thread(new IdeaWorker(i, encrypted, decrypted, decryptKey, threads));
+        threads.clear();
+        for(int i = 1; i < tasks; i++) {
+            Thread t = new Thread(new IdeaWorker(i, encrypted, decrypted, decryptKey, tasks));
             t.start();
-            ts.add(t);
+            threads.add(t);
         }
-        new IdeaWorker(0, encrypted, decrypted, decryptKey, threads).run();
+        new IdeaWorker(0, encrypted, decrypted, decryptKey, tasks).run();
         
-        for(Thread t : ts)
+        for(Thread t : threads)
             try {
                 t.join();
             } catch(final InterruptedException e) {
@@ -216,7 +217,8 @@ public class IdeaEncryption {
         return 1 - t0 & 0xFFFF;
     }
     
-    public void validate() {
+    @Override
+    public void validate(long $task) {
         if(!Arrays.equals(plain, decrypted))
             throw new AssertionError("Validation failed");
     }
@@ -247,12 +249,11 @@ class IdeaWorker implements Runnable {
      * bits.
      */
     public void run() {
-        int slice = ((src.length / 8 + threads - 1) / threads) * 8;
-        
-        int begin = id * slice;
-        int end = (id + 1) * slice;
-        if(end > src.length)
-            end = src.length;
+        // use partitioner to make sure partitioning is correct in cases JGF people did not consider
+        BlockPartitioner partitioner = new BlockPartitioner(8, 0L);
+        SliceRange range = partitioner.partition(new SliceRange(0, src.length, 1), threads, 0L)[id];
+        int begin = range.begin;
+        int end = range.end;
         
         int iSrc = begin;
         int iDst = begin;
