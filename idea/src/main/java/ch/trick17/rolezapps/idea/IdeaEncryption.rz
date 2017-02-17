@@ -14,13 +14,13 @@ class IdeaEncryption {
     var encrypted: readwrite Array[byte]
     var decrypted: readwrite Array[byte]
     
-    var userKey: readwrite Array[short]
-    var encryptKey: readwrite Array[int]
-    var decryptKey: readwrite Array[int]
+    var userKey: pure Vector[short]
+    var encryptKey: pure Vector[int]
+    var decryptKey: pure Vector[int]
     
     new {
         this.size = 50000000;
-        this.tasks = 8;
+        this.tasks = 2;
     }
     
     new(size: int, tasks: int) {
@@ -29,9 +29,10 @@ class IdeaEncryption {
     }
     
     def readwrite buildTestData(random: readwrite Random): {
-        this.userKey = new Array[short](8);
+        val userKey = new VectorBuilder[short](8);
         for(var i = 0; i < 8; i++)
-            this.userKey.set(i, random.nextInt as short);
+            userKey.set(i, random.nextInt as short);
+        this.userKey = userKey.build;
         
         this.encryptKey = this.calcEncryptKey(this.userKey);
         this.decryptKey = this.calcDecryptKey(this.encryptKey);
@@ -44,10 +45,10 @@ class IdeaEncryption {
             this.plain.set(i, i as byte);
     }
     
-    def pure calcEncryptKey(userKey: readonly Array[short]): readwrite Array[int] {
+    def pure calcEncryptKey(userKey: pure Vector[short]): pure Vector[int] {
         val xFFFF = 65535; // :D
         
-        var key = new Array[int](52);
+        var key = new VectorBuilder[int](52);
         for(var i = 0; i < 52; i++)
             key.set(i, 0);
         
@@ -66,13 +67,13 @@ class IdeaEncryption {
                 // j == 7 so wrap to beginning for both chunks.
                 key.set(i, ((key.get(i - 15) >>> 9) | (key.get(i - 14) << 7)) & xFFFF);
         }
-        return key;
+        return key.build;
     }
     
-    def pure calcDecryptKey(encryptKey: readonly Array[int]): readwrite Array[int] {
+    def pure calcDecryptKey(encryptKey: pure Vector[int]): pure Vector[int] {
         val xFFFF = 65535;
         
-        var key = new Array[int](52);
+        var key = new VectorBuilder[int](52);
         key.set(51, this.inv(encryptKey.get(3)));
         key.set(50, -encryptKey.get(2) & xFFFF);
         key.set(49, -encryptKey.get(1) & xFFFF);
@@ -104,7 +105,7 @@ class IdeaEncryption {
         key.set(j--, t2);
         key.set(j--, t1);
         
-        return key;
+        return key.build;
     }
     
     def pure inv(theX: int): int {
@@ -153,7 +154,7 @@ class IdeaEncryption {
     }
     
     task pure encryptDecrypt(src: readonly Slice[byte], dst: readwrite Slice[byte],
-            key: readonly Array[int]): {
+            key: pure Vector[int]): {
         val xFF = 255;
         val xFFFF = 65535;
         val x10001L = 65537L;
