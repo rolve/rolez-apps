@@ -20,7 +20,7 @@ public class Raytracer {
     
     public void render(int[][] image) {
         SliceRange fullRange = new SliceRange(0, image.length, 1);
-        SliceRange[] ranges = StripedPartitioner.INSTANCE.partition(fullRange, numTasks).data;
+        SliceRange[] ranges = StripedPartitioner.INSTANCE.partition(fullRange, numTasks);
         
         List<FutureTask<Void>> tasks = new ArrayList<>();
         for(int i = 0; i < ranges.length - 1; i += 1) {

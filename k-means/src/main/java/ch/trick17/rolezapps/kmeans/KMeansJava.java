@@ -30,8 +30,7 @@ public class KMeansJava extends KMeans {
             centroids[i] = newRandomVectorJava(random);
         
         int[] assignments = new int[n];
-        SliceRange[] ranges = ContiguousPartitioner.INSTANCE.partition(dataSet.range,
-                numTasks).data;
+        SliceRange[] ranges = ContiguousPartitioner.INSTANCE.partition(dataSet.range, numTasks);
         
         int iterations = 0;
         boolean changed = true;

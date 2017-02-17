@@ -70,7 +70,7 @@ public class MonteCarloAppJava extends MonteCarloApp {
     @Override
     public void run(long $task) {
         SliceRange fullRange = new SliceRange(0, runs, 1);
-        SliceRange[] ranges = ContiguousPartitioner.INSTANCE.partition(fullRange, numTasks).data;
+        SliceRange[] ranges = ContiguousPartitioner.INSTANCE.partition(fullRange, numTasks);
         
         List<FutureTask<List<Double>>> tasks = new ArrayList<FutureTask<List<Double>>>();
         for(int i = 1; i < numTasks; i++) {
