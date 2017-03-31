@@ -17,5 +17,6 @@
         <module>montecarlo</module>
         <module>mergesort</module>
         <module>idea</module>
+        <module>histogram</module>
     </modules>
 </project>

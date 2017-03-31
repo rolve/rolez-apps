@@ -1,0 +1,13 @@
+package ch.trick17.rolezapps.histogram
+
+pure class Color {
+    val r: int
+    val g: int
+    val b: int
+    
+    new(rgb: int) {
+        this.r = (rgb >> 16) & 255;
+        this.g = (rgb >> 8) & 255;
+        this.b = rgb & 255;
+    }
+}

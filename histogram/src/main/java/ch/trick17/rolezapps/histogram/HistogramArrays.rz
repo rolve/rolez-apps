@@ -1,0 +1,69 @@
+package ch.trick17.rolezapps.histogram
+
+class HistogramArrays {
+    
+    val image: readonly Array[readwrite Array[int]]
+    
+    var rHist: readwrite Array[int]
+    var gHist: readwrite Array[int]
+    var bHist: readwrite Array[int]
+    
+    new(image: readonly Array[readwrite Array[int]]) {
+        this.image = image;
+    }
+    
+    def readwrite compute(numTasks: int): {
+        // partition
+        val ranges = the ContiguousPartitioner.partition(this.image.range, numTasks);
+        
+        // map
+        val tasks = new Array[pure Task[readwrite HistPartArrays]](numTasks);
+        for(var i = 0; i < numTasks - 1; i++)
+            tasks.set(i, this start computePart(ranges.get(i + 1)));
+        val part0 = this.computePart(ranges.get(0));
+        
+        // reduce
+        this.rHist = part0.r;
+        this.gHist = part0.g;
+        this.bHist = part0.b;
+        for(var i = 0; i < numTasks - 1; i++)
+            this.merge(tasks.get(i).get);
+    }
+    
+    task readonly computePart(range: pure SliceRange): readwrite HistPartArrays {
+        val r: readwrite Array[int] = new Array[int](256);
+        val g: readwrite Array[int] = new Array[int](256);
+        val b: readwrite Array[int] = new Array[int](256);
+        
+        for(var y = range.begin; y < range.end; y+= range.step) {
+            val row = this.image.get(y);
+            for(var x = 0; x < row.length; x++) {
+                val color = new Color(row.get(x));
+                r.set(color.r, r.get(color.r) + 1);
+                g.set(color.g, g.get(color.g) + 1);
+                b.set(color.b, b.get(color.b) + 1);
+            }
+        }
+        return new HistPartArrays(r, g, b);
+    }
+    
+    def readwrite merge(histPart: readonly HistPartArrays): {
+        for(var c = 0; c < 256; c++) {
+            this.rHist.set(c, this.rHist.get(c) + histPart.r.get(c));
+            this.gHist.set(c, this.gHist.get(c) + histPart.g.get(c));
+            this.bHist.set(c, this.bHist.get(c) + histPart.b.get(c));
+        }
+    }
+}
+
+class HistPartArrays {
+    val r: readwrite Array[int]
+    val g: readwrite Array[int]
+    val b: readwrite Array[int]
+    
+    new(r: readwrite Array[int], g: readwrite Array[int], b: readwrite Array[int]) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+}
