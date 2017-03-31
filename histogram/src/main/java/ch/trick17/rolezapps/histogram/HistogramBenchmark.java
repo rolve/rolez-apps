@@ -32,7 +32,7 @@ public class HistogramBenchmark {
     @Param({"6mpx", "24mpx", "50mpx"})
     String n;
     
-    @Param({"", "Java", "JavaAtomicInt", "JavaAtomicIntMerge"})
+    @Param({"", "Immutable", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16"})
