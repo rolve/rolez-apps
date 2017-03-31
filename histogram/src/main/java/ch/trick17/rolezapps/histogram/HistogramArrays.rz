@@ -1,36 +1,34 @@
 package ch.trick17.rolezapps.histogram
 
-class HistogramArrays {
+class HistogramArrays extends Histogram {
     
-    val image: readonly Array[readwrite Array[int]]
-    
-    var rHist: readwrite Array[int]
-    var gHist: readwrite Array[int]
-    var bHist: readwrite Array[int]
+    var rHistArrays: readwrite Array[int]
+    var gHistArrays: readwrite Array[int]
+    var bHistArrays: readwrite Array[int]
     
     new(image: readonly Array[readwrite Array[int]]) {
-        this.image = image;
+        super(image);
     }
     
-    def readwrite compute(numTasks: int): {
+    override readwrite compute(numTasks: int): {
         // partition
         val ranges = the ContiguousPartitioner.partition(this.image.range, numTasks);
         
         // map
         val tasks = new Array[pure Task[readwrite HistPartArrays]](numTasks);
         for(var i = 0; i < numTasks - 1; i++)
-            tasks.set(i, this start computePart(ranges.get(i + 1)));
-        val part0 = this.computePart(ranges.get(0));
+            tasks.set(i, this start computePartArrays(ranges.get(i + 1)));
+        val part0 = this.computePartArrays(ranges.get(0));
         
         // reduce
-        this.rHist = part0.r;
-        this.gHist = part0.g;
-        this.bHist = part0.b;
+        this.rHistArrays = part0.r;
+        this.gHistArrays = part0.g;
+        this.bHistArrays = part0.b;
         for(var i = 0; i < numTasks - 1; i++)
-            this.merge(tasks.get(i).get);
+            this.mergeArrays(tasks.get(i).get);
     }
     
-    task readonly computePart(range: pure SliceRange): readwrite HistPartArrays {
+    task readonly computePartArrays(range: pure SliceRange): readwrite HistPartArrays {
         val r: readwrite Array[int] = new Array[int](256);
         val g: readwrite Array[int] = new Array[int](256);
         val b: readwrite Array[int] = new Array[int](256);
@@ -47,11 +45,11 @@ class HistogramArrays {
         return new HistPartArrays(r, g, b);
     }
     
-    def readwrite merge(histPart: readonly HistPartArrays): {
+    def readwrite mergeArrays(histPart: readonly HistPartArrays): {
         for(var c = 0; c < 256; c++) {
-            this.rHist.set(c, this.rHist.get(c) + histPart.r.get(c));
-            this.gHist.set(c, this.gHist.get(c) + histPart.g.get(c));
-            this.bHist.set(c, this.bHist.get(c) + histPart.b.get(c));
+            this.rHistArrays.set(c, this.rHistArrays.get(c) + histPart.r.get(c));
+            this.gHistArrays.set(c, this.gHistArrays.get(c) + histPart.g.get(c));
+            this.bHistArrays.set(c, this.bHistArrays.get(c) + histPart.b.get(c));
         }
     }
 }
