@@ -64,8 +64,8 @@ public class HistogramJava extends Histogram {
             for(int element : row) {
                 Color color = new Color(element);
                 r[color.r]++;
-                r[color.g]++;
-                r[color.b]++;
+                g[color.g]++;
+                b[color.b]++;
             }
         }
         return new HistPart(r, g, b);
