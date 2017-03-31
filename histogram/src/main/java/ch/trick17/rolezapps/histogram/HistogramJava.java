@@ -15,9 +15,9 @@ public class HistogramJava extends Histogram {
     
     public int[][] image;
     
-    public final int[] rHist = new int[256];
-    public final int[] gHist = new int[256];
-    public final int[] bHist = new int[256];
+    public int[] rHist;
+    public int[] gHist;
+    public int[] bHist;
     
     public HistogramJava(GuardedArray<GuardedArray<int[]>[]> image, long $task) {
         super(image, $task);
@@ -28,7 +28,7 @@ public class HistogramJava extends Histogram {
     public void compute(int numTasks, long $task) {
         SliceRange[] ranges = ContiguousPartitioner.INSTANCE.partition(new SliceRange(0, image.length, 1), numTasks, 0);
         
-        List<Future<HistPart>> tasks = new ArrayList<Future<HistPart>>();
+        List<Future<HistPart>> tasks = new ArrayList<>();
         for(int i = 0; i < numTasks - 1; i++) {
             FutureTask<HistPart> task = computePartTask(ranges[i + 1]);
             tasks.add(task);
@@ -36,7 +36,9 @@ public class HistogramJava extends Histogram {
         }
         HistPart part0 = computePart(ranges[0]);
         
-        this.merge(part0);
+        rHist = part0.r;
+        gHist = part0.g;
+        bHist = part0.b;
         for(int i = 0; i < (numTasks - 1); i++)
             try {
                 this.merge(tasks.get(i).get());
@@ -77,7 +79,7 @@ public class HistogramJava extends Histogram {
         }
     }
     
-    private class HistPart {
+    public static class HistPart {
         public final int[] r;
         public final int[] g;
         public final int[] b;
@@ -89,7 +91,7 @@ public class HistogramJava extends Histogram {
         }
     }
     
-    private class Color {
+    public static class Color {
         public final int r;
         public final int g;
         public final int b;
