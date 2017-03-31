@@ -39,7 +39,7 @@ public class HistogramJava extends Histogram {
         rHist = part0.r;
         gHist = part0.g;
         bHist = part0.b;
-        for(int i = 0; i < (numTasks - 1); i++)
+        for(int i = 0; i < numTasks - 1; i++)
             try {
                 this.merge(tasks.get(i).get());
             } catch(InterruptedException | ExecutionException e) {
@@ -61,8 +61,8 @@ public class HistogramJava extends Histogram {
         int[] b = new int[256];
         for(int y = range.begin; y < range.end; y += range.step) {
             int[] row = image[y];
-            for(int element : row) {
-                Color color = new Color(element);
+            for(int c : row) {
+                Color color = new Color(c);
                 r[color.r]++;
                 g[color.g]++;
                 b[color.b]++;
