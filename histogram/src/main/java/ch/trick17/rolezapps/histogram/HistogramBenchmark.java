@@ -29,8 +29,8 @@ import rolez.lang.Task;
 @State(Thread)
 public class HistogramBenchmark {
     
-    @Param({"6mpx", "24mpx", "50mpx"})
-    String n;
+    @Param({"6000000", "24000000", "50000000"})
+    int n;
     
     @Param({"", "Immutable", "Java"})
     String impl;
