@@ -4,6 +4,10 @@ import rolez.io.PrintStream
 import ch.trick17.rolezapps.histogram.util.ImageReader
 
 class Histogram {
+    def readwrite compute(numTasks: int): {}
+}
+
+class HistogramRolez extends Histogram {
     
     val image: readonly Array[readwrite Array[int]]
     
@@ -15,7 +19,7 @@ class Histogram {
         this.image = image;
     }
     
-    def readwrite compute(numTasks: int): {
+    override readwrite compute(numTasks: int): {
         // partition
         val ranges = the ContiguousPartitioner.partition(this.image.range, numTasks);
         
@@ -112,7 +116,7 @@ class HistPart {
 object HistogramApp {
     task pure main: {
         val image = the ImageReader.read("6mpx.jpg");
-        val histogram = new Histogram(image);
+        val histogram = new HistogramRolez(image);
         
         histogram.compute(8);
         histogram.print(80, 8, the System.out);

@@ -16,7 +16,7 @@ public class HistogramJavaAtomicIntMerge extends Histogram {
     public final AtomicInteger[] bHist = new AtomicInteger[256];
     
     public HistogramJavaAtomicIntMerge(GuardedArray<GuardedArray<int[]>[]> image, long $task) {
-        super(image, $task);
+        super($task);
         this.image = GuardedArray.unwrap(image, int[][].class);
         
         for(int c = 0; c < 256; c++) {

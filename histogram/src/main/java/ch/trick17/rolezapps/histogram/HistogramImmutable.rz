@@ -1,6 +1,6 @@
 package ch.trick17.rolezapps.histogram
 
-class HistogramImmutable extends Histogram {
+class HistogramRolezImmutable extends HistogramRolez {
     
     val image: pure Vector[pure Vector[int]]
     

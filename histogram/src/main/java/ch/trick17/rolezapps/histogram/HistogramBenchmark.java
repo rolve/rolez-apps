@@ -1,6 +1,7 @@
 package ch.trick17.rolezapps.histogram;
 
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
+import static ch.trick17.rolezapps.BenchmarkUtils.runAndPlot;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
 import static rolez.lang.Task.currentTask;
@@ -15,8 +16,6 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
-import org.openjdk.jmh.runner.Runner;
-import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
@@ -32,7 +31,7 @@ public class HistogramBenchmark {
     @Param({"6000000", "24000000", "50000000"})
     int n;
     
-    @Param({"", "Immutable", "Java"})
+    @Param({"Rolez", "RolezImmutable", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16"})
@@ -62,9 +61,9 @@ public class HistogramBenchmark {
         Task.unregisterRootTask();
     }
     
-    public static void main(String[] args) throws RunnerException {
+    public static void main(String[] args) {
         Options options = new OptionsBuilder().include(HistogramBenchmark.class.getSimpleName())
                 .warmupIterations(10).measurementIterations(30).build();
-        new Runner(options).run();
+        runAndPlot(options);
     }
 }

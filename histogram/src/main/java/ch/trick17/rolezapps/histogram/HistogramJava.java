@@ -20,7 +20,7 @@ public class HistogramJava extends Histogram {
     public int[] bHist;
     
     public HistogramJava(GuardedArray<GuardedArray<int[]>[]> image, long $task) {
-        super(image, $task);
+        super($task);
         this.image = GuardedArray.unwrap(image, int[][].class);
     }
     
