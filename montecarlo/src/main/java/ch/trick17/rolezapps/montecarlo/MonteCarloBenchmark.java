@@ -1,6 +1,7 @@
 package ch.trick17.rolezapps.montecarlo;
 
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
+import static ch.trick17.rolezapps.BenchmarkUtils.runAndPlot;
 import static java.lang.Math.abs;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
@@ -17,8 +18,6 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
-import org.openjdk.jmh.runner.Runner;
-import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
@@ -69,9 +68,9 @@ public class MonteCarloBenchmark {
         Task.unregisterRootTask();
     }
 
-    public static void main(String[] args) throws RunnerException {
+    public static void main(String[] args) {
         Options options = new OptionsBuilder().include(MonteCarloBenchmark.class.getSimpleName())
                 .warmupIterations(5).measurementIterations(5).build();
-        new Runner(options).run();
+        runAndPlot(options);
     }
 }
