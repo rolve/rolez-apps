@@ -28,7 +28,7 @@ public class IdeaBenchmark {
     @Param({"3000000", "20000000", "50000000"})
     int n;
     
-    @Param({"", "ArrayOpt", "Java"})
+    @Param({"Rolez", "ArrayOpt", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "16", "32"})

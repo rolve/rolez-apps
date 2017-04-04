@@ -225,6 +225,7 @@ public class IdeaEncryptionJava extends IdeaEncryption {
             throw new AssertionError("Validation failed");
     }
     
+    @SuppressWarnings("resource")
     public static void main(String[] args) {
         IdeaEncryptionJava idea = new IdeaEncryptionJava(50000000, 8, 0L);
         idea.buildTestData(new Random(42), 0L);

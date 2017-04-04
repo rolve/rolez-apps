@@ -10,14 +10,6 @@ class IdeaEncryption {
     val size: int
     val tasks: int
     
-    var plain: readwrite Array[byte]
-    var encrypted: readwrite Array[byte]
-    var decrypted: readwrite Array[byte]
-    
-    var userKey: pure Vector[short]
-    var encryptKey: pure Vector[int]
-    var decryptKey: pure Vector[int]
-    
     new {
         this.size = 50000000;
         this.tasks = 2;
@@ -28,7 +20,28 @@ class IdeaEncryption {
         this.tasks = tasks;
     }
     
-    def readwrite buildTestData(random: readwrite Random): {
+    def readwrite buildTestData(random: readwrite Random): {}
+    def readwrite run: {}
+    def readonly validate: {}
+}
+
+class IdeaEncryptionRolez extends IdeaEncryption {
+    
+    new {}
+    
+    new(size: int, tasks: int) {
+        super(size, tasks);
+    }
+    
+    var plain: readwrite Array[byte]
+    var encrypted: readwrite Array[byte]
+    var decrypted: readwrite Array[byte]
+    
+    var userKey: pure Vector[short]
+    var encryptKey: pure Vector[int]
+    var decryptKey: pure Vector[int]
+    
+    override readwrite buildTestData(random: readwrite Random): {
         val userKey = new VectorBuilder[short](8);
         for(var i = 0; i < 8; i++)
             userKey.set(i, random.nextInt as short);
@@ -136,7 +149,7 @@ class IdeaEncryption {
         return 1 - t0 & xFFFF;
     }
     
-    def readwrite run: {
+    override readwrite run: {
         val partitioner = new BlockPartitioner(8);
         val plainSlices = this.plain.partition(partitioner, this.tasks);
         val encryptedSlices = this.encrypted.partition(partitioner, this.tasks);
@@ -259,7 +272,7 @@ class IdeaEncryption {
         }
     }
     
-    def readonly validate: {
+    override readonly validate: {
         new Assertion(the Arrays.equals(this.plain, this.decrypted));
     }
     

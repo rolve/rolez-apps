@@ -6,7 +6,7 @@ import rolez.lang.GuardedSlice;
 import rolez.lang.Task;
 import rolez.util.StopWatch;
 
-public class IdeaEncryptionArrayOpt extends IdeaEncryption {
+public class IdeaEncryptionArrayOpt extends IdeaEncryptionRolez {
     
     public IdeaEncryptionArrayOpt(long $task) {
         super($task);
@@ -133,6 +133,7 @@ public class IdeaEncryptionArrayOpt extends IdeaEncryption {
     @Override
     public Task<Void> $mainTask() {
         return new rolez.lang.Task<Void>(new Object[]{this}, new Object[]{}) {
+            @SuppressWarnings("resource")
             @Override
             protected java.lang.Void runRolez() {
                 long $task = idBits();
