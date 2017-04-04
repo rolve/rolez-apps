@@ -4,14 +4,18 @@ import rolez.lang.GuardedArray;
 import rolez.lang.GuardedSlice;
 import rolez.lang.TaskSystem;
 
-public class MergesortLocalOpt extends Mergesort {
+public class MergesortRolezLocalOpt extends MergesortRolez {
     
-    public MergesortLocalOpt(int maxLevel, long $task) {
+    public MergesortRolezLocalOpt(long $task) {
+        super($task);
+    }
+    
+    public MergesortRolezLocalOpt(int maxLevel, long $task) {
         super(maxLevel, $task);
     }
     
     public static void main(String[] args) {
-        TaskSystem.getDefault().run(new Mergesort(0L).$mainTask(GuardedArray.<String[]> wrap(args)));
+        TaskSystem.getDefault().run(new MergesortRolezLocalOpt(0L).$mainTask(GuardedArray.<String[]> wrap(args)));
     }
     
     @Override

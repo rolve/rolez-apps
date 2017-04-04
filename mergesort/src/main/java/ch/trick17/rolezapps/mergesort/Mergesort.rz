@@ -15,25 +15,6 @@ class Mergesort {
         this.maxLevel = maxLevel;
     }
     
-    task pure main(args: readonly Array[pure String]): {
-        val n = the Int.parseInt(args.get(0));
-        val iterations = 20;
-        val watch = new StopWatch;
-        
-        val arrays = new Array[readwrite Array[int]](iterations);
-        
-        for(var i = 0; i < iterations; i++)
-            arrays.set(i, this.shuffledInts(n));
-        
-        the System.out.println("Press Enter to start");
-        new Scanner(the System.in).nextLine;
-        for(var i = 0; i < iterations; i++) {
-            watch.go;
-            this.sort(arrays.get(i));
-            the System.out.println(watch.get);
-        }
-    }
-    
     def pure shuffledInts(n: int): readwrite Array[int] {
         val array = new Array[int](n);
         for(var i = 0; i < n; i++)
@@ -50,7 +31,18 @@ class Mergesort {
         return array;
     }
     
-    def pure sort(a: readwrite Array[int]): {
+    def pure sort(a: readwrite Array[int]): {}
+}
+
+class MergesortRolez extends Mergesort {
+    
+    new {}
+    
+    new(maxLevel: int) {
+        super(maxLevel);
+    }
+    
+    override pure sort(a: readwrite Array[int]): {
         val b = a.clone;
         this.doSort(b, a, 0, a.length, 0);
     }
@@ -102,6 +94,25 @@ class Mergesort {
                 a.set(k, b.get(j));
                 j++;
             }
+        }
+    }
+    
+    task pure main(args: readonly Array[pure String]): {
+        val n = the Int.parseInt(args.get(0));
+        val iterations = 20;
+        val watch = new StopWatch;
+        
+        val arrays = new Array[readwrite Array[int]](iterations);
+        
+        for(var i = 0; i < iterations; i++)
+            arrays.set(i, this.shuffledInts(n));
+        
+        the System.out.println("Press Enter to start");
+        new Scanner(the System.in).nextLine;
+        for(var i = 0; i < iterations; i++) {
+            watch.go;
+            this.sort(arrays.get(i));
+            the System.out.println(watch.get);
         }
     }
 }
