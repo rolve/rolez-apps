@@ -61,23 +61,47 @@ class HistogramRolez extends Histogram {
             this.bHist.set(c, this.bHist.get(c) + histPart.b.get(c));
         }
     }
+}
+
+class HistPart {
+    val r: readwrite Array[int]
+    val g: readwrite Array[int]
+    val b: readwrite Array[int]
     
-    def readonly print(width: int, binSize: int, out: readonly PrintStream): {
+    new(r: readwrite Array[int], g: readwrite Array[int], b: readwrite Array[int]) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+    }
+}
+
+object HistogramApp {
+    
+    task pure main: {
+        val image = the ImageReader.read("6mpx.jpg");
+        val histogram = new HistogramRolez(image);
+        
+        histogram.compute(8);
+        this.print(histogram, 80, 8, the System.out);
+    }
+    
+    def pure print(hist: readonly HistogramRolez, width: int, binSize: int,
+            out: readonly PrintStream): {
         var max = 0;
         for(var c = 0; c < 256; c++) {
-           max = the Math.max(max, this.rHist.get(c));
-           max = the Math.max(max, this.gHist.get(c));
-           max = the Math.max(max, this.bHist.get(c));
+           max = the Math.max(max, hist.rHist.get(c));
+           max = the Math.max(max, hist.gHist.get(c));
+           max = the Math.max(max, hist.bHist.get(c));
         }
         
         val scaleWidth = width as double / max;
         
         out.println("Red:");
-        this.printChannel(this.rHist, scaleWidth, binSize, out);
+        this.printChannel(hist.rHist, scaleWidth, binSize, out);
         the System.out.println("Green:");
-        this.printChannel(this.gHist, scaleWidth, binSize, out);
+        this.printChannel(hist.gHist, scaleWidth, binSize, out);
         the System.out.println("Blue:");
-        this.printChannel(this.bHist, scaleWidth, binSize, out);
+        this.printChannel(hist.bHist, scaleWidth, binSize, out);
     }
     
     def pure printChannel(hist: readonly Array[int], scaleWidth: double, binSize: int,
@@ -98,27 +122,5 @@ class HistogramRolez extends Histogram {
     def pure printBar(size: int, out: readonly PrintStream): {
         for(var i = 0; i < size; i++)
             out.print("▄");
-    }
-}
-
-class HistPart {
-    val r: readwrite Array[int]
-    val g: readwrite Array[int]
-    val b: readwrite Array[int]
-    
-    new(r: readwrite Array[int], g: readwrite Array[int], b: readwrite Array[int]) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-    }
-}
-
-object HistogramApp {
-    task pure main: {
-        val image = the ImageReader.read("6mpx.jpg");
-        val histogram = new HistogramRolez(image);
-        
-        histogram.compute(8);
-        histogram.print(80, 8, the System.out);
     }
 }
