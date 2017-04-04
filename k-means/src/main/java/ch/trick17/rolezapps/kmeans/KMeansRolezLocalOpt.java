@@ -16,9 +16,9 @@ import rolez.lang.TaskSystem;
  * if a method-local analysis could deduce that guarding is not necessary, under the assumption that
  * the analysis knows which methods can start tasks.
  */
-public class KMeansLocalOpt extends KMeansRolez {
+public class KMeansRolezLocalOpt extends KMeansRolez {
     
-    public KMeansLocalOpt(int dim, int clusters, int numTasks, long $task) {
+    public KMeansRolezLocalOpt(int dim, int clusters, int numTasks, long $task) {
         super(dim, clusters, numTasks, $task);
     }
     
@@ -121,6 +121,6 @@ public class KMeansLocalOpt extends KMeansRolez {
     public static void main(final String[] args) {
         int numTasks = 1;
         GuardedArray<String[]> wrapped = wrap(args);
-        TaskSystem.getDefault().run(new KMeansLocalOpt(10, 10, numTasks, 0L).$mainTask(wrapped));
+        TaskSystem.getDefault().run(new KMeansRolezLocalOpt(10, 10, numTasks, 0L).$mainTask(wrapped));
     }
 }

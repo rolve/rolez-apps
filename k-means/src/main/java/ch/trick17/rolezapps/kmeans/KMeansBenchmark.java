@@ -33,7 +33,7 @@ public class KMeansBenchmark {
     @Param({"50"})
     int maxIters;
     
-    @Param({"Rolez", "LocalOpt", "Java"})
+    @Param({"Rolez", "RolezLocalOpt", "Java"})
     String impl;
     
     int clusters;

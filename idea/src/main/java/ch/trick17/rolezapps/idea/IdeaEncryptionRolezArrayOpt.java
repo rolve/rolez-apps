@@ -6,13 +6,13 @@ import rolez.lang.GuardedSlice;
 import rolez.lang.Task;
 import rolez.util.StopWatch;
 
-public class IdeaEncryptionArrayOpt extends IdeaEncryptionRolez {
+public class IdeaEncryptionRolezArrayOpt extends IdeaEncryptionRolez {
     
-    public IdeaEncryptionArrayOpt(long $task) {
+    public IdeaEncryptionRolezArrayOpt(long $task) {
         super($task);
     }
     
-    public IdeaEncryptionArrayOpt(int size, int tasks, long $task) {
+    public IdeaEncryptionRolezArrayOpt(int size, int tasks, long $task) {
         super(size, tasks, $task);
     }
 
@@ -133,7 +133,6 @@ public class IdeaEncryptionArrayOpt extends IdeaEncryptionRolez {
     @Override
     public Task<Void> $mainTask() {
         return new rolez.lang.Task<Void>(new Object[]{this}, new Object[]{}) {
-            @SuppressWarnings("resource")
             @Override
             protected java.lang.Void runRolez() {
                 long $task = idBits();
@@ -145,7 +144,7 @@ public class IdeaEncryptionArrayOpt extends IdeaEncryptionRolez {
                 StopWatch watch = new StopWatch();
                 for(int i = 0; i < 20; i++) {
                     watch.go();
-                    IdeaEncryptionArrayOpt.this.run($task);
+                    IdeaEncryptionRolezArrayOpt.this.run($task);
                     System.out.println(watch.get());
                 }
                 return null;
@@ -154,6 +153,6 @@ public class IdeaEncryptionArrayOpt extends IdeaEncryptionRolez {
     }
     
     public static void main(final java.lang.String[] args) {
-        rolez.lang.TaskSystem.getDefault().run(new IdeaEncryptionArrayOpt(0L).$mainTask());
+        rolez.lang.TaskSystem.getDefault().run(new IdeaEncryptionRolezArrayOpt(0L).$mainTask());
     }
 }
