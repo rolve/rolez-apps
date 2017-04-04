@@ -8,19 +8,29 @@ class MonteCarloApp {
     
     val pathStartValue: double = 100.0
     
+    val steps: int
     val runs: int
     val numTasks: int
+
+    new(steps: int, runs: int, numTasks: int) {
+        this.steps = steps;
+        this.runs = runs;
+        this.numTasks = numTasks;
+    }
+    
+    def readwrite run: {}
+    def readonly avgExpectedReturnRate: double { return 0.0; }
+}
+
+class MonteCarloAppRolez extends MonteCarloApp {
     
     val returns: pure Returns
-    val steps: int
     
     val seeds: readwrite Array[long]
     val results: readwrite ArrayList[double] = new ArrayList[double]
     
-    new(ratesFile: pure String, steps: int, runs: int, numTasks: int) {
-        this.steps = steps;
-        this.runs = runs;
-        this.numTasks = numTasks;
+    new(steps: int, runs: int, numTasks: int, ratesFile: pure String) {
+        super(steps, runs, numTasks);
         
         this.returns = new Returns(the RatePathReader.readRatesFile(ratesFile));
         
@@ -29,7 +39,7 @@ class MonteCarloApp {
             this.seeds.set(i, i * 11 as long);
     }
     
-    def readwrite run: {
+    override readwrite run: {
         val partitions = this.seeds.partition(the ContiguousPartitioner, this.numTasks);
         
         val tasks = new ArrayList[pure Task[readwrite ArrayList[double]]];
@@ -53,7 +63,7 @@ class MonteCarloApp {
         return results;
     }
     
-    def readonly avgExpectedReturnRate: double {
+    override readonly avgExpectedReturnRate: double {
         var result = 0.0;
         for(var i = 0; i < this.runs; i++)
             result += this.results.get(i);
@@ -62,13 +72,13 @@ class MonteCarloApp {
     }
 }
 
-object MonteCarloAppRunner {
+object MonteCarloAppRolezRunner {
     
     val file: pure String = "Data/hitData"
     val steps: int = 1000
     
     task pure main: {
-        val app = new MonteCarloApp(this.file, this.steps, 100000, 8);
+        val app = new MonteCarloAppRolez(this.steps, 100000, 8, this.file);
         
         the System.out.println("Press Enter to start");
         new Scanner(the System.in).nextLine;

@@ -28,20 +28,20 @@ import rolez.lang.Task;
 @State(Thread)
 public class MonteCarloBenchmark {
     
-    private static final String FILE = MonteCarloAppRunner.INSTANCE.file;
-    private static final int TIME_STEPS = MonteCarloAppRunner.INSTANCE.steps;
+    private static final String FILE = MonteCarloAppRolezRunner.INSTANCE.file;
+    private static final int TIME_STEPS = MonteCarloAppRolezRunner.INSTANCE.steps;
     private static final Map<Integer, Double> REF_VALS = new HashMap<Integer, Double>() {{
         put(10000, -0.0333976656762814);
         put(60000, -0.03215796752868655);
     }};
     
-    @Param({"10000", /* "60000" */})
-    int runs;
+    @Param({"10000", "60000"})
+    int n;
     
     @Param({"1", "2", "4", "8", "32", "64"})
     int tasks;
     
-    @Param({"", "Java"})
+    @Param({"Rolez", "Java"})
     String impl;
     
     MonteCarloApp app;
@@ -49,8 +49,8 @@ public class MonteCarloBenchmark {
     @Setup(Level.Iteration)
     public void setup() {
         Task.registerNewRootTask();
-        app = instantiateBenchmark(MonteCarloApp.class, impl, FILE, TIME_STEPS, runs,
-                tasks, currentTask().idBits());
+        app = instantiateBenchmark(MonteCarloApp.class, impl, TIME_STEPS, n, tasks, FILE,
+                currentTask().idBits());
     }
     
     @Benchmark
@@ -61,7 +61,7 @@ public class MonteCarloBenchmark {
     @TearDown(Level.Iteration)
     public void tearDown() {
         double expectedReturnRate = app.avgExpectedReturnRate(currentTask().idBits());
-        double dev = abs(expectedReturnRate - REF_VALS.get(runs));
+        double dev = abs(expectedReturnRate - REF_VALS.get(n));
         if(dev > 1.0e-12)
             throw new AssertionError("Validation failed");
         
@@ -70,7 +70,7 @@ public class MonteCarloBenchmark {
 
     public static void main(String[] args) {
         Options options = new OptionsBuilder().include(MonteCarloBenchmark.class.getSimpleName())
-                .warmupIterations(5).measurementIterations(5).build();
+                .warmupIterations(5).measurementIterations(30).build();
         runAndPlot(options);
     }
 }

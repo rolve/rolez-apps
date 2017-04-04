@@ -56,9 +56,8 @@ public class MonteCarloAppJava extends MonteCarloApp {
     private final long[] seeds;
     private final List<Double> results = new ArrayList<>();
 
-    public MonteCarloAppJava(String ratesFile, int steps, int runs, int numTasks, long $task) {
-        // super constr will duplicate the work below, but doesn't matter in initialization
-        super(ratesFile, steps, runs, numTasks, $task);
+    public MonteCarloAppJava(int steps, int runs, int numTasks, String ratesFile, long $task) {
+        super(steps, runs, numTasks, $task);
         
         returns = new Returns(RatePath.readRatesFile(ratesFile));
         
