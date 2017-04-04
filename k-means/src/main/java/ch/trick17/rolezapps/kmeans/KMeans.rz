@@ -30,7 +30,28 @@ class KMeans {
         return dataSet;
     }
     
+    def pure newRandomVector(random: readwrite Random): pure Vector[double] {
+        val vec = new VectorBuilder[double](this.dim);
+        for(var d = 0; d < this.dim; d += 1)
+            vec.set(d, random.nextDouble);
+        return vec.build;
+    }
+    
     def pure kMeans(dataSet: readonly Array[pure Vector[double]], maxIterations: int):
+            readwrite Array[pure Vector[double]] {
+        return null;
+    }
+}
+
+class KMeansRolez extends KMeans {
+    
+    new {}
+    
+    new(dim: int, clusters: int, numTasks: int) {
+        super(dim, clusters, numTasks);
+    }
+    
+    override pure kMeans(dataSet: readonly Array[pure Vector[double]], maxIterations: int):
             readwrite Array[pure Vector[double]] {
         /* Initialization */
         val random = new Random;
@@ -113,13 +134,6 @@ class KMeans {
             sum += diff * diff;
         }
         return sum;
-    }
-    
-    def pure newRandomVector(random: readwrite Random): pure Vector[double] {
-        val vec = new VectorBuilder[double](this.dim);
-        for(var d = 0; d < this.dim; d += 1)
-            vec.set(d, random.nextDouble);
-        return vec.build;
     }
     
     task pure main(args: readonly Array[pure String]): {

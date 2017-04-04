@@ -14,7 +14,7 @@ import rolez.lang.GuardedArray;
 import rolez.lang.SliceRange;
 import rolez.lang.TaskSystem;
 
-public class KMeansJava extends KMeans {
+public class KMeansJava extends KMeansRolez {
     
     public KMeansJava(int dim, int clusters, int numTasks, long $task) {
         super(dim, clusters, numTasks, $task);

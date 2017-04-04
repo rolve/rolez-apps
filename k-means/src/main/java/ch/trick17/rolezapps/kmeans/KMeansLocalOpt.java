@@ -16,7 +16,7 @@ import rolez.lang.TaskSystem;
  * if a method-local analysis could deduce that guarding is not necessary, under the assumption that
  * the analysis knows which methods can start tasks.
  */
-public class KMeansLocalOpt extends KMeans {
+public class KMeansLocalOpt extends KMeansRolez {
     
     public KMeansLocalOpt(int dim, int clusters, int numTasks, long $task) {
         super(dim, clusters, numTasks, $task);

@@ -27,18 +27,18 @@ public class KMeansBenchmark {
     
     int dim = 10;
     
-    @Param({"10000"})
+    @Param({"2000", "10000", "20000"})
     int n;
     
     @Param({"50"})
     int maxIters;
     
-    @Param({"", "LocalOpt", "Java"})
+    @Param({"Rolez", "LocalOpt", "Java"})
     String impl;
     
     int clusters;
     
-    @Param({"1", "2", "4", "8"})
+    @Param({"1", "2", "4", "8", "16"})
     int tasks;
     
     KMeans kMeans;
