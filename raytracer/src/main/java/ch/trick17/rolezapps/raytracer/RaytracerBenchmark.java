@@ -29,10 +29,10 @@ public class RaytracerBenchmark {
     @Param({"90", "180"})
     int height;
     
-    @Param({"1", "2", "8", "32"})
+    @Param({"1", "2", "4", "8", "32"})
     int tasks;
     
-    @Param({"Rolez", "IntersectOpt", "Java"})
+    @Param({"Rolez", "RolezIntersectOpt", "Java"})
     String impl;
     
     RaytracerBenchmarkSetup setup;

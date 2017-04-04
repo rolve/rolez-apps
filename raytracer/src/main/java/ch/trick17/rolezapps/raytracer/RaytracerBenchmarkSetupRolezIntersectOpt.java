@@ -5,9 +5,9 @@ import java.util.Random;
 import ch.trick17.rolezapps.raytracer.anim.AnimatorApp;
 import ch.trick17.rolezapps.raytracerintersectopt.anim.AnimatedScene;
 
-public class RaytracerBenchmarkSetupIntersectOpt extends RaytracerBenchmarkSetupRolez {
+public class RaytracerBenchmarkSetupRolezIntersectOpt extends RaytracerBenchmarkSetupRolez {
     
-    public RaytracerBenchmarkSetupIntersectOpt(int height, int numTasks, Random random,
+    public RaytracerBenchmarkSetupRolezIntersectOpt(int height, int numTasks, Random random,
             long $task) {
         super(height, numTasks, random, $task);
     }
