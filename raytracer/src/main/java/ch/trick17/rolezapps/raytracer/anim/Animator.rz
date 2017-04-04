@@ -7,7 +7,7 @@ import ch.trick17.rolezapps.raytracer.util.VideoWriter
 import ch.trick17.rolezapps.raytracer.util.ImageWriter
 
 class Animator {
-        
+    
     val raytracer: readwrite Raytracer
     val scene: readwrite AnimatedScene
     val writer: readwrite VideoWriter

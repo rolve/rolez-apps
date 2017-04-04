@@ -6,9 +6,6 @@ import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
 import static rolez.lang.Task.currentTask;
 
-import java.io.IOException;
-import java.util.Random;
-
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -20,47 +17,34 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import ch.trick17.rolezapps.raytracer.Raytracer;
-import ch.trick17.rolezapps.raytracer.util.VideoWriterJava;
 import rolez.lang.Task;
 
 @BenchmarkMode(SingleShotTime)
 @Fork(1)
 @State(Thread)
 public class AnimatorBenchmark {
-    
-    private static final String MOVIE_FILE = "movie.mp4";
 
-    @Param({"90"})
-    int height;
+    @Param({"45"})
+    int n; //height
     
-    @Param({""})
+    @Param({"Rolez", "RolezIntersectOpt", "Java"})
     String impl;
     
     @Param({"1", "8"})
     int tasks;
     
-    Animator animator;
+    AnimatorBenchmarkSetup setup;
     
     @Setup(Level.Iteration)
-    public void setup() throws IOException {
+    public void setup() {
         Task.registerNewRootTask();
-        AnimatedScene scene = new AnimatedScene(3.0, currentTask().idBits());
-        AnimatorApp.INSTANCE.buildScene(scene, new Random(42), currentTask().idBits());
-        int width = (int) (height * scene.view.aspect);
-        
-        Raytracer raytracer = instantiateBenchmark(Raytracer.class, impl, currentTask().idBits());
-        raytracer.numTasks = tasks;
-        raytracer.maxRecursions = 3;
-        
-        VideoWriterJava writer = new VideoWriterJava(MOVIE_FILE, width, height, 25, 12);
-        
-        animator = instantiateBenchmark(Animator.class, impl, raytracer, scene, writer);
+        setup = instantiateBenchmark(AnimatorBenchmarkSetup.class, impl, n, tasks,
+                currentTask().idBits());
     }
     
     @Benchmark
     public void animator() {
-        animator.render(currentTask().idBits());
+        setup.runAnimator(currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)
@@ -70,7 +54,7 @@ public class AnimatorBenchmark {
 
     public static void main(String[] args) {
         Options options = new OptionsBuilder().include(AnimatorBenchmark.class.getSimpleName())
-                .warmupIterations(5).measurementIterations(30).build();
+                .warmupIterations(5).measurementIterations(5).build();
         runAndPlot(options);
     }
 }
