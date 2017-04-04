@@ -27,7 +27,7 @@ import rolez.lang.Task;
 public class RaytracerBenchmark {
     
     @Param({"90", "180"})
-    int height;
+    int n; // height
     
     @Param({"1", "2", "4", "8", "32"})
     int tasks;
@@ -41,7 +41,7 @@ public class RaytracerBenchmark {
     public void setup() {
         Task.registerNewRootTask();
         Random random = new Random(42);
-        setup = instantiateBenchmark(RaytracerBenchmarkSetup.class, impl, height, tasks, random,
+        setup = instantiateBenchmark(RaytracerBenchmarkSetup.class, impl, n, tasks, random,
                 currentTask().idBits());
     }
     
