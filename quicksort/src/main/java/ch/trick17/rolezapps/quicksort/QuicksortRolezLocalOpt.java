@@ -4,9 +4,9 @@ import rolez.lang.GuardedSlice;
 import rolez.lang.Task;
 import rolez.lang.TaskSystem;
 
-public class QuicksortLocalOpt extends Quicksort {
+public class QuicksortRolezLocalOpt extends QuicksortRolez {
     
-    public QuicksortLocalOpt(final int maxLevel, long $task) {
+    public QuicksortRolezLocalOpt(final int maxLevel, long $task) {
         super(maxLevel, $task);
     }
     

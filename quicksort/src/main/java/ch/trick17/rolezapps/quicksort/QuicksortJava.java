@@ -1,30 +1,11 @@
 package ch.trick17.rolezapps.quicksort;
 
-import static rolez.lang.GuardedArray.wrap;
-
-import java.util.Random;
-
 import rolez.lang.GuardedArray;
 
 public class QuicksortJava extends Quicksort {
     
     public QuicksortJava(final int maxLevel, long $task) {
         super(maxLevel, $task);
-    }
-    
-    @Override
-    public GuardedArray<int[]> shuffledInts(int n, long $task) {
-        int[] array = new int[n];
-        for(int i = 0; i < n; i += 1)
-            array[i] = i;
-        Random random = new Random();
-        for(int i = n - 1; i > 0; i -= 1) {
-            int index = random.nextInt(i + 1);
-            int t = array[index];
-            array[index] = array[i];
-            array[i] = t;
-        }
-        return wrap(array);
     }
     
     @Override
