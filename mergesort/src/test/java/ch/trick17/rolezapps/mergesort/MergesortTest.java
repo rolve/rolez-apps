@@ -12,7 +12,7 @@ public class MergesortTest {
     public void testSort() {
         // Only tests the single-threaded sort implementation. Since nothing is ever passed around,
         // guarding is never initialized, and the $task parameter is never really used
-        Mergesort mergesort = new Mergesort(0, 0L);
+        Mergesort mergesort = new MergesortRolez(0, 0L);
         
         int n = 1000;
         GuardedArray<int[]> ints = mergesort.shuffledInts(n, 0L);
