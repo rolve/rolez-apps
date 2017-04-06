@@ -81,10 +81,11 @@ public final class BenchmarkUtils {
                 
                 for(RunResult run : runs) {
                     BenchmarkResult result = run.getAggregatedResult();
-                    String benchmark = result.getParams().getBenchmark();
+                    String[] benchmarkName = result.getParams().getBenchmark().split("\\.");
+                    String shortName = benchmarkName[benchmarkName.length - 1];
                     
                     for(IterationResult iteration : result.getIterationResults()) {
-                        out.print(benchmark + "\t");
+                        out.print(shortName + "\t");
                         for(String key : keys)
                             out.print(result.getParams().getParam(key) + "\t");
                         out.println(iteration.getPrimaryResult().getScore());
