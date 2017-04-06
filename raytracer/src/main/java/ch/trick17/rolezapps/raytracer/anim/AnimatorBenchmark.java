@@ -27,7 +27,7 @@ public class AnimatorBenchmark {
     @Param({"45", "90"})
     int n; //height
     
-    @Param({"Rolez", "RolezIntersectOpt", "Java"})
+    @Param({"Rolez", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16", "32"})

@@ -32,7 +32,7 @@ public class RaytracerBenchmark {
     @Param({"1", "2", "4", "8", "16", "32"})
     int tasks;
     
-    @Param({"Rolez", "RolezIntersectOpt", "Java"})
+    @Param({"Rolez", "Java"})
     String impl;
     
     RaytracerBenchmarkSetup setup;
