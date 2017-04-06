@@ -7,6 +7,8 @@ data <- read_tsv("results.tsv") %>%
     tasks = factor(tasks)
   )
 
+benchmark <- data %>% select(benchmark) %>% unique() %>% .[[1]]
+
 # Execution time bar plots
 plot <- ggplot(data, aes(tasks, time, fill = impl)) +
   geom_bar(
@@ -25,17 +27,24 @@ plot <- ggplot(data, aes(tasks, time, fill = impl)) +
     labeller = as_labeller(function(labels) {
       return(paste0("n = ", labels))
     })) +
+  labs(title = benchmark) +
   scale_x_discrete("Tasks") + 
   scale_y_continuous("Execution time [s]") +
   scale_fill_discrete(NULL) +
   theme(
+    plot.title = element_text(
+      hjust = 0.5,
+      size=18,
+      face="bold", 
+      margin = margin(5, 0, 10, 0)
+    ),
     panel.grid.major.x = element_blank(),
     axis.ticks.x = element_blank(),
     legend.position = "bottom"
   )
 
 ns <- data %>% select(n) %>% distinct() %>% count %>% unlist(use.names = FALSE)
-ggsave("execution_time.pdf", plot, width = 3 * ns, height = 4)
+ggsave(paste(benchmark, "_execution_time.pdf", sep = ""), plot, width = 3 * ns, height = 4)
 
 
 # Self-relative speedup plots
@@ -60,13 +69,21 @@ plot <- ggplot(speedups, aes(tasks, speedup, color = impl)) +
     labeller = as_labeller(function(labels) {
       return(paste0("n = ", labels))
     })) +
+  labs(title = benchmark) +
   scale_x_discrete("Tasks") + 
-  scale_y_continuous("Speedup") +
+  scale_y_continuous("Speedup", breaks = pretty_breaks(n = 5)) +
   scale_color_discrete(NULL) +
   theme(
+    plot.title = element_text(
+      hjust = 0.5,
+      size=18,
+      face="bold", 
+      margin = margin(5, 0, 10, 0)
+    ),
     panel.grid.major.x = element_blank(),
     axis.ticks.x = element_blank(),
     legend.position = "bottom"
   )
 
-ggsave("speedup.pdf", plot, width = 3 * ns, height = 4)
+ggsave(paste(benchmark, "_speedup.pdf", sep = ""), plot, width = 3 * ns, height = 4)
+
