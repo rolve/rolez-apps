@@ -3,7 +3,7 @@ library(scales)
 
 data <- read_tsv("results.tsv") %>%
   mutate(
-    impl  = factor(impl, levels = unique(data$impl)),
+    impl  = factor(impl, levels = unique(impl)),
     tasks = factor(tasks)
   )
 
