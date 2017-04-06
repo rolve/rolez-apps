@@ -38,7 +38,7 @@ public class KMeansBenchmark {
     
     int clusters;
     
-    @Param({"1", "2", "4", "8", "16"})
+    @Param({"1", "2", "4", "8", "16", "32"})
     int tasks;
     
     KMeans kMeans;

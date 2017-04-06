@@ -34,7 +34,7 @@ public class HistogramBenchmark {
     @Param({"Rolez", "RolezImmutable", "Java"})
     String impl;
     
-    @Param({"1", "2", "4", "8", "16"})
+    @Param({"1", "2", "4", "8", "16", "32"})
     int tasks;
     
     GuardedArray<GuardedArray<int[]>[]> image;

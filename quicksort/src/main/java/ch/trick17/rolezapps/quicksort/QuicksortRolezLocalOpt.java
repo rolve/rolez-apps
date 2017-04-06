@@ -12,7 +12,7 @@ public class QuicksortRolezLocalOpt extends QuicksortRolez {
     
     @Override
     public void doSort(GuardedSlice<int[]> s, int begin, int end, int level, long $task) {
-        final int pivot = this.pivot(s, begin, end, $task);
+        int pivot = this.pivot(s, begin, end, $task);
         int left = begin;
         int right = end - 1;
         guardReadWrite(s, $task);
@@ -22,7 +22,7 @@ public class QuicksortRolezLocalOpt extends QuicksortRolez {
             while(s.getInt(right) > pivot)
                 right -= 1;
             if(left <= right) {
-                final int temp = s.getInt(left);
+                int temp = s.getInt(left);
                 s.setInt(left, s.getInt(right));
                 s.setInt(right, temp);
                 left += 1;

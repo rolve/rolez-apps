@@ -31,7 +31,7 @@ public class IdeaBenchmark {
     @Param({"Rolez", "RolezArrayOpt", "Java"})
     String impl;
     
-    @Param({"1", "2", "4", "16", "32"})
+    @Param({"1", "2", "4", "8", "16", "32"})
     int tasks;
     
     IdeaEncryption idea;

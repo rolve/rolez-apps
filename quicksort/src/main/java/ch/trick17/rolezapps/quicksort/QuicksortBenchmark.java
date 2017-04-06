@@ -32,7 +32,7 @@ public class QuicksortBenchmark {
     @Param({"Rolez", "RolezLocalOpt", "Java"})
     String impl;
     
-    @Param({"1", "2", "4", "16", "64"})
+    @Param({"1", "2", "4", "8", "16", "32"})
     int tasks;
     
     Quicksort quicksort;
