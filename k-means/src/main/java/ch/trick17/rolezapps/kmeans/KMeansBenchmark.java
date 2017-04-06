@@ -27,13 +27,13 @@ public class KMeansBenchmark {
     
     int dim = 10;
     
-    @Param({"2000", "10000", "20000"})
+    @Param({"10000", "50000", "200000"})
     int n;
     
     @Param({"50"})
     int maxIters;
     
-    @Param({"Rolez", "RolezLocalOpt", "Java"})
+    @Param({"Rolez", "Java"})
     String impl;
     
     int clusters;
