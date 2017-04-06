@@ -57,7 +57,7 @@ public class RaytracerBenchmark {
 
     public static void main(String[] args) {
         Options options = new OptionsBuilder().include(RaytracerBenchmark.class.getSimpleName())
-                .warmupIterations(10).measurementIterations(20).build();
+                .warmupIterations(10).measurementIterations(30).build();
         runAndPlot(options);
     }
 }

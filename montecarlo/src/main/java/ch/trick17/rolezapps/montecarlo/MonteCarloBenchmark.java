@@ -70,7 +70,7 @@ public class MonteCarloBenchmark {
 
     public static void main(String[] args) {
         Options options = new OptionsBuilder().include(MonteCarloBenchmark.class.getSimpleName())
-                .warmupIterations(5).measurementIterations(30).build();
+                .warmupIterations(10).measurementIterations(30).build();
         runAndPlot(options);
     }
 }

@@ -65,7 +65,7 @@ public class KMeansBenchmark {
     
     public static void main(String[] args) {
         Options options = new OptionsBuilder().include(KMeansBenchmark.class.getSimpleName())
-                .warmupIterations(20).measurementIterations(30).build();
+                .warmupIterations(10).measurementIterations(30).build();
         runAndPlot(options);
     }
 }

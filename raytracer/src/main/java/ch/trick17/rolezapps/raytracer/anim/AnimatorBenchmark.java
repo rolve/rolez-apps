@@ -24,13 +24,13 @@ import rolez.lang.Task;
 @State(Thread)
 public class AnimatorBenchmark {
 
-    @Param({"45"})
+    @Param({"45", "90"})
     int n; //height
     
     @Param({"Rolez", "RolezIntersectOpt", "Java"})
     String impl;
     
-    @Param({"1", "8"})
+    @Param({"1", "2", "4", "8", "16", "32"})
     int tasks;
     
     AnimatorBenchmarkSetup setup;
@@ -54,7 +54,7 @@ public class AnimatorBenchmark {
 
     public static void main(String[] args) {
         Options options = new OptionsBuilder().include(AnimatorBenchmark.class.getSimpleName())
-                .warmupIterations(5).measurementIterations(5).build();
+                .warmupIterations(10).measurementIterations(30).build();
         runAndPlot(options);
     }
 }
