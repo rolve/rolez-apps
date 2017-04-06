@@ -13,6 +13,17 @@
         <benchmarkClass>ch.trick17.rolezapps.raytracer.RaytracerBenchmark</benchmarkClass>
     </properties>
     
+    <build>
+        <resources>
+            <resource>
+                <directory>src</directory>
+                <includes>
+                    <include>**/*.rz</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+    
     <dependencies>
         <dependency>
             <groupId>org.jcodec</groupId>

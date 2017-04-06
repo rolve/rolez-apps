@@ -18,5 +18,6 @@
         <module>mergesort</module>
         <module>idea</module>
         <module>histogram</module>
+        <module>animator</module>
     </modules>
 </project>
