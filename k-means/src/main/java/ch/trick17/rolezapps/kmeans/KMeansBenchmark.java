@@ -27,7 +27,7 @@ public class KMeansBenchmark {
     
     int dim = 10;
     
-    @Param({"10000", "50000", "200000"})
+    @Param({"10000", "20000", "50000"})
     int n;
     
     @Param({"50"})
