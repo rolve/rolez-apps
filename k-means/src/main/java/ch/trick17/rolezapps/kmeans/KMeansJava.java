@@ -26,7 +26,7 @@ public class KMeansJava extends KMeansRolez {
         int n = dataSet.data.length;
         Random random = new Random();
         double[][] centroids = new double[clusters][];
-        for(int i = 0; i < clusters; i += 1)
+        for(int i = 0; i < clusters; i++)
             centroids[i] = newRandomVectorJava(random);
         
         int[] assignments = new int[n];
@@ -36,7 +36,7 @@ public class KMeansJava extends KMeansRolez {
         boolean changed = true;
         while(changed && iterations < maxIterations) {
             List<FutureTask<Boolean>> tasks = new ArrayList<FutureTask<Boolean>>(numTasks);
-            for(int i = 0; i < numTasks; i += 1) {
+            for(int i = 0; i < numTasks; i++) {
                 FutureTask<Boolean> task = $assignTask(dataSet.data, centroids, assignments,
                         ranges[i]);
                 tasks.add(task);
@@ -52,23 +52,23 @@ public class KMeansJava extends KMeansRolez {
                 }
             
             double[][] newCentroids = new double[clusters][];
-            for(int i = 0; i < clusters; i += 1)
+            for(int i = 0; i < clusters; i++)
                 newCentroids[i] = new double[dim];
             
             int[] counts = new int[clusters];
-            for(int i = 0; i < n; i += 1) {
+            for(int i = 0; i < n; i++) {
                 double[] vector = dataSet.data[i];
                 int centroidIndex = assignments[i];
                 double[] centroid = newCentroids[centroidIndex];
-                for(int d = 0; d < dim; d += 1)
+                for(int d = 0; d < dim; d++)
                     centroid[d] += vector[d];
                 counts[centroidIndex]++;
             }
             
-            for(int i = 0; i < clusters; i += 1) {
+            for(int i = 0; i < clusters; i++) {
                 double[] centroid = newCentroids[i];
                 int count = counts[i];
-                for(int d = 0; d < dim; d += 1)
+                for(int d = 0; d < dim; d++)
                     centroid[d] /= count;
                 centroids[i] = centroid;
             }
@@ -89,7 +89,7 @@ public class KMeansJava extends KMeansRolez {
                 for(int i = range.begin; i < range.end; i += range.step) {
                     double min = Double.POSITIVE_INFINITY;
                     int minIndex = -1;
-                    for(int c = 0; c < clusters; c += 1) {
+                    for(int c = 0; c < clusters; c++) {
                         double distance2 = distance2(dataSet[i], centroids[c]);
                         if(distance2 < min) {
                             min = distance2;
@@ -108,7 +108,7 @@ public class KMeansJava extends KMeansRolez {
     
     public double distance2(double[] data, final double[] centroids) {
         double sum = 0.0;
-        for(int d = 0; d < dim; d += 1) {
+        for(int d = 0; d < dim; d++) {
             final double diff = data[d] - centroids[d];
             sum += diff * diff;
         }
@@ -117,7 +117,7 @@ public class KMeansJava extends KMeansRolez {
     
     public double[] newRandomVectorJava(Random random) {
         double[] vec = new double[dim];
-        for(int d = 0; d < dim; d += 1)
+        for(int d = 0; d < dim; d++)
             vec[d] = random.nextDouble();
         return vec;
     }

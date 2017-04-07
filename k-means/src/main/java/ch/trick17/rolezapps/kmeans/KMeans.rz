@@ -32,7 +32,7 @@ class KMeans {
     
     def pure newRandomVector(random: readwrite Random): pure Vector[double] {
         val vec = new VectorBuilder[double](this.dim);
-        for(var d = 0; d < this.dim; d += 1)
+        for(var d = 0; d < this.dim; d++)
             vec.set(d, random.nextDouble);
         return vec.build;
     }
@@ -70,36 +70,36 @@ class KMeansRolez extends KMeans {
             val assignParts = assignments.partition(the ContiguousPartitioner, this.numTasks);
             val tasks = new Array[pure Task[boolean]](this.numTasks);
             
-            for(var i = 0; i < tasks.length; i+= 1)
+            for(var i = 0; i < tasks.length; i++)
                 tasks.set(i, this start assign(dataParts.get(i), centroids, assignParts.get(i)));
             
             changed = false;
-            for(var i = 0; i < tasks.length; i += 1)
+            for(var i = 0; i < tasks.length; i++)
                 changed |= tasks.get(i).get;
             
             /* Update step */
             val newCentroids = new Array[readwrite VectorBuilder[double]](this.clusters);
-            for(var i = 0; i < newCentroids.length; i += 1)
+            for(var i = 0; i < newCentroids.length; i++)
                 newCentroids.set(i, new VectorBuilder[double](this.dim));
             val counts = new Array[int](this.clusters);
             
-            for(var i = 0; i < dataSet.length; i += 1) {
+            for(var i = 0; i < dataSet.length; i++) {
                 val vector = dataSet.get(i);
                 val centroidIndex = assignments.get(i);
                 val centroid = newCentroids.get(centroidIndex);
-                for(var d = 0; d < this.dim; d += 1)
+                for(var d = 0; d < this.dim; d++)
                     centroid.set(d, centroid.get(d) + vector.get(d));
                 counts.set(centroidIndex, counts.get(centroidIndex) + 1);
             }
             
-            for(var i = 0; i < centroids.length; i += 1) {
+            for(var i = 0; i < centroids.length; i++) {
                 val centroid = newCentroids.get(i);
                 val count = counts.get(i);
-                for(var d = 0; d < this.dim; d += 1)
+                for(var d = 0; d < this.dim; d++)
                     centroid.set(d, centroid.get(d) / count);
                 centroids.set(i, centroid.build);
             }
-            iterations += 1;
+            iterations++;
         }
         return centroids;
     }
@@ -111,7 +111,7 @@ class KMeansRolez extends KMeans {
         for(var i = dataSet.range.begin; i < dataSet.range.end; i += dataSet.range.step) {
             var min = the Double.POSITIVE_INFINITY;
             var minIndex = -1;
-            for(var c = 0; c < centroids.length; c += 1) {
+            for(var c = 0; c < centroids.length; c++) {
                 val distance2 = this.distance2(dataSet.get(i), centroids.get(c));
                 if(distance2 < min) {
                     min = distance2;
@@ -128,7 +128,7 @@ class KMeansRolez extends KMeans {
     
     def pure distance2(v1: pure Vector[double], v2: pure Vector[double]): double {
         var sum = 0.0;
-        for(var d = 0; d < this.dim; d += 1) {
+        for(var d = 0; d < this.dim; d++) {
             val diff = v1.get(d) - v2.get(d);
             sum += diff * diff;
         }
@@ -142,12 +142,12 @@ class KMeansRolez extends KMeans {
         val watch = new StopWatch;
         
         val dataSets = new Array[readwrite Array[pure Vector[double]]](repetitions);
-        for(var i = 0; i < repetitions; i += 1)
+        for(var i = 0; i < repetitions; i++)
             dataSets.set(i, this.createDataSet(n));
         
         the System.out.println("Press Enter to start");
         new Scanner(the System.in).nextLine;
-        for(var i = 0; i < repetitions; i += 1) {
+        for(var i = 0; i < repetitions; i++) {
             watch.go;
             this.kMeans(dataSets.get(i), maxIterations);
             the System.out.println(watch.get);
