@@ -66,9 +66,8 @@ class KMeansRolez extends KMeans {
         var changed = true;
         while(changed && iterations < maxIterations) {
             /* Assignment step */
-            // TODO: Why are type declarations required?
-            val dataParts: readonly Array[readonly Slice[pure Vector[double]]] = dataSet.partition(the ContiguousPartitioner, this.numTasks);
-            val assignParts: readwrite Array[readwrite Slice[int]] = assignments.partition(the ContiguousPartitioner, this.numTasks);
+            val dataParts = dataSet.partition(the ContiguousPartitioner, this.numTasks);
+            val assignParts = assignments.partition(the ContiguousPartitioner, this.numTasks);
             val tasks = new Array[pure Task[boolean]](this.numTasks);
             
             for(var i = 0; i < tasks.length; i+= 1)

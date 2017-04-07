@@ -31,6 +31,7 @@ public class MonteCarloBenchmark {
     private static final String FILE = MonteCarloAppRolezRunner.INSTANCE.file;
     private static final int TIME_STEPS = MonteCarloAppRolezRunner.INSTANCE.steps;
     private static final Map<Integer, Double> REF_VALS = new HashMap<Integer, Double>() {{
+        put( 2000, -0.034247972816469394);
         put(10000, -0.0333976656762814);
         put(60000, -0.03215796752868655);
     }};
