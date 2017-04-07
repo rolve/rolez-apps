@@ -26,7 +26,7 @@ import rolez.lang.Task;
 @State(Thread)
 public class RaytracerBenchmark {
     
-    @Param({"90", "180"})
+    @Param({"45", "90", "180"})
     int n; // height
     
     @Param({"1", "2", "4", "8", "16", "32"})

@@ -21,7 +21,7 @@ public class AnimatorBenchmarkSetupJava extends AnimatorBenchmarkSetup {
         int width = (int) (height * scene.view.aspect);
         VideoWriterJava writer;
         try {
-            writer = new VideoWriterJava(movieFile, width, height, 25, 12);
+            writer = new VideoWriterJava(movieFile, width, height, 12, 12);
         } catch(IOException e) {
             throw new RuntimeException(e);
         }

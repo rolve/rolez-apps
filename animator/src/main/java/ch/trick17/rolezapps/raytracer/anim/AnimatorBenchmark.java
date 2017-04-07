@@ -24,7 +24,7 @@ import rolez.lang.Task;
 @State(Thread)
 public class AnimatorBenchmark {
 
-    @Param({"45", "90"})
+    @Param({"45", "90", "180"})
     int n; //height
     
     @Param({"Rolez", "Java"})
@@ -51,10 +51,10 @@ public class AnimatorBenchmark {
     public void tearDown() {
         Task.unregisterRootTask();
     }
-
+    
     public static void main(String[] args) {
         Options options = new OptionsBuilder().include(AnimatorBenchmark.class.getSimpleName())
-                .warmupIterations(10).measurementIterations(30).build();
+                .warmupIterations(5).measurementIterations(30).build();
         runAndPlot(options);
     }
 }
