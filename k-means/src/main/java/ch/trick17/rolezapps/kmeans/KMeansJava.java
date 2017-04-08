@@ -1,5 +1,6 @@
 package ch.trick17.rolezapps.kmeans;
 
+import static java.lang.Double.POSITIVE_INFINITY;
 import static rolez.lang.GuardedArray.wrap;
 
 import java.util.ArrayList;
@@ -35,42 +36,39 @@ public class KMeansJava extends KMeansRolez {
         int iterations = 0;
         boolean changed = true;
         while(changed && iterations < maxIterations) {
-            List<FutureTask<Boolean>> tasks = new ArrayList<FutureTask<Boolean>>(numTasks);
+            List<FutureTask<Result>> tasks = new ArrayList<FutureTask<Result>>(numTasks);
             for(int i = 0; i < numTasks; i++) {
-                FutureTask<Boolean> task = $assignTask(dataSet.data, centroids, assignments,
-                        ranges[i]);
+                FutureTask<Result> task = $assignAndUpdateTask(dataSet.data, centroids,
+                        assignments, ranges[i]);
                 tasks.add(task);
                 new Thread(task).start();
             }
             
             changed = false;
-            for(FutureTask<Boolean> task : tasks)
+            double[][] newCentroids = new double[clusters][];
+            for(int c = 0; c < clusters; c++)
+                newCentroids[c] = new double[dim];
+            int[] counts = new int[clusters];
+            
+            for(FutureTask<Result> task : tasks)
                 try {
-                    changed |= task.get();
+                    Result result = task.get();
+                    changed |= result.changed;
+                    for(int c = 0; c < clusters; c++) {
+                        for(int d = 0; d < dim; d++)
+                            newCentroids[c][d] += result.centroids[c][d];
+                        counts[c] += result.counts[c];
+                    }
                 } catch(InterruptedException | ExecutionException e) {
                     throw new RuntimeException(e);
                 }
             
-            double[][] newCentroids = new double[clusters][];
-            for(int i = 0; i < clusters; i++)
-                newCentroids[i] = new double[dim];
-            
-            int[] counts = new int[clusters];
-            for(int i = 0; i < n; i++) {
-                double[] vector = dataSet.data[i];
-                int centroidIndex = assignments[i];
-                double[] centroid = newCentroids[centroidIndex];
-                for(int d = 0; d < dim; d++)
-                    centroid[d] += vector[d];
-                counts[centroidIndex]++;
-            }
-            
-            for(int i = 0; i < clusters; i++) {
-                double[] centroid = newCentroids[i];
-                int count = counts[i];
+            for(int c = 0; c < clusters; c++) {
+                double[] centroid = newCentroids[c];
+                int count = counts[c];
                 for(int d = 0; d < dim; d++)
                     centroid[d] /= count;
-                centroids[i] = centroid;
+                centroids[c] = centroid;
             }
             iterations++;
         }
@@ -81,29 +79,51 @@ public class KMeansJava extends KMeansRolez {
         return wrap(wrappedCentroids);
     }
     
-    public FutureTask<Boolean> $assignTask(final double[][] dataSet,
+    public FutureTask<Result> $assignAndUpdateTask(final double[][] dataSet,
             final double[][] centroids, final int[] assignments, final SliceRange range) {
-        return new FutureTask<>(new Callable<Boolean>() {
-            public Boolean call() {
+        return new FutureTask<>(new Callable<Result>() {
+            public Result call() {
                 boolean changed = false;
+                double[][] newCentroids = new double[clusters][];
+                for(int i = 0; i < clusters; i++)
+                    newCentroids[i] = new double[dim];
+                int[] counts = new int[clusters];
+                
                 for(int i = range.begin; i < range.end; i += range.step) {
-                    double min = Double.POSITIVE_INFINITY;
-                    int minIndex = -1;
+                    double[] vector = dataSet[i];
+                    double min = POSITIVE_INFINITY;
+                    int cluster = -1;
                     for(int c = 0; c < clusters; c++) {
-                        double distance2 = distance2(dataSet[i], centroids[c]);
+                        double distance2 = distance2(vector, centroids[c]);
                         if(distance2 < min) {
                             min = distance2;
-                            minIndex = c;
+                            cluster = c;
                         }
                     }
-                    if(minIndex != assignments[i]) {
+                    if(cluster != assignments[i]) {
                         changed = true;
-                        assignments[i] = minIndex;
+                        assignments[i] = cluster;
                     }
+                    double[] newCentroid = newCentroids[cluster];
+                    for(int d = 0; d < dim; d++)
+                        newCentroid[d] += vector[d];
+                    counts[cluster]++;
                 }
-                return changed;
+                return new Result(changed, newCentroids, counts);
             }
         });
+    }
+    
+    private static class Result {
+        final boolean changed;
+        final double[][] centroids;
+        final int[] counts;
+        
+        public Result(boolean changed, double[][] centroids, int[] counts) {
+            this.changed = changed;
+            this.centroids = centroids;
+            this.counts = counts;
+        }
     }
     
     public double distance2(double[] data, final double[] centroids) {

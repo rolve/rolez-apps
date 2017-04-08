@@ -65,65 +65,73 @@ class KMeansRolez extends KMeans {
         var iterations = 0;
         var changed = true;
         while(changed && iterations < maxIterations) {
-            /* Assignment step */
             val dataParts = dataSet.partition(the ContiguousPartitioner, this.numTasks);
             val assignParts = assignments.partition(the ContiguousPartitioner, this.numTasks);
-            val tasks = new Array[pure Task[boolean]](this.numTasks);
+            val tasks = new Array[pure Task[pure Result]](this.numTasks);
             
             for(var i = 0; i < tasks.length; i++)
-                tasks.set(i, this start assign(dataParts.get(i), centroids, assignParts.get(i)));
+                tasks.set(i, this start assignAndUpdate(dataParts.get(i), centroids, assignParts.get(i)));
             
             changed = false;
-            for(var i = 0; i < tasks.length; i++)
-                changed |= tasks.get(i).get;
-            
-            /* Update step */
             val newCentroids = new Array[readwrite VectorBuilder[double]](this.clusters);
             for(var i = 0; i < newCentroids.length; i++)
                 newCentroids.set(i, new VectorBuilder[double](this.dim));
             val counts = new Array[int](this.clusters);
-            
-            for(var i = 0; i < dataSet.length; i++) {
-                val vector = dataSet.get(i);
-                val centroidIndex = assignments.get(i);
-                val centroid = newCentroids.get(centroidIndex);
-                for(var d = 0; d < this.dim; d++)
-                    centroid.set(d, centroid.get(d) + vector.get(d));
-                counts.set(centroidIndex, counts.get(centroidIndex) + 1);
+
+            for(var i = 0; i < tasks.length; i++) {
+                val result = tasks.get(i).get;
+                changed |= result.changed;
+                for(var c = 0; c < this.clusters; c++) {
+                    val newCentroid = newCentroids.get(c);
+                    val resultCentroid = result.centroids.get(c);
+                    for(var d = 0; d < this.dim; d++)
+                        newCentroid.set(d, newCentroid.get(d) + resultCentroid.get(d));
+                    counts.set(c, counts.get(c) + result.counts.get(c));
+                }
             }
             
-            for(var i = 0; i < centroids.length; i++) {
-                val centroid = newCentroids.get(i);
-                val count = counts.get(i);
+            for(var c = 0; c < this.clusters; c++) {
+                val centroid = newCentroids.get(c);
+                val count = counts.get(c);
                 for(var d = 0; d < this.dim; d++)
                     centroid.set(d, centroid.get(d) / count);
-                centroids.set(i, centroid.build);
+                centroids.set(c, centroid.build);
             }
             iterations++;
         }
         return centroids;
     }
     
-    task pure assign(dataSet: readonly Slice[pure Vector[double]],
+    task pure assignAndUpdate(dataSet: readonly Slice[pure Vector[double]],
             centroids: readonly Array[pure Vector[double]],
-            assignments: readwrite Slice[int]): boolean {
+            assignments: readwrite Slice[int]): pure Result {
         var changed = false;
+        val newCentroids = new Array[readwrite VectorBuilder[double]](this.clusters);
+        for(var i = 0; i < this.clusters; i++)
+            newCentroids.set(i, new VectorBuilder[double](this.dim));
+        val counts = new VectorBuilder[int](centroids.length);
+        
         for(var i = dataSet.range.begin; i < dataSet.range.end; i += dataSet.range.step) {
+            val vector = dataSet.get(i);
             var min = the Double.POSITIVE_INFINITY;
-            var minIndex = -1;
+            var cluster = -1;
             for(var c = 0; c < centroids.length; c++) {
-                val distance2 = this.distance2(dataSet.get(i), centroids.get(c));
+                val distance2 = this.distance2(vector, centroids.get(c));
                 if(distance2 < min) {
                     min = distance2;
-                    minIndex = c;
+                    cluster = c;
                 }
             }
-            if(minIndex != assignments.get(i)) {
+            if(cluster != assignments.get(i)) {
                 changed = true;
-                assignments.set(i, minIndex);
+                assignments.set(i, cluster);
             }
+            val newCentroid = newCentroids.get(cluster);
+            for(var d = 0; d < vector.length; d++)
+                newCentroid.set(d, newCentroid.get(d) + vector.get(d));
+            counts.set(cluster, counts.get(cluster) + 1);
         }
-        return changed;
+        return new Result(changed, newCentroids, counts.build);
     }
     
     def pure distance2(v1: pure Vector[double], v2: pure Vector[double]): double {
@@ -152,5 +160,20 @@ class KMeansRolez extends KMeans {
             this.kMeans(dataSets.get(i), maxIterations);
             the System.out.println(watch.get);
         }
+    }
+}
+
+pure class Result {
+    val changed: boolean
+    val centroids: pure Vector[pure Vector[double]]
+    val counts: pure Vector[int]
+    
+    new(changed: boolean, centroids: readwrite Array[readwrite VectorBuilder[double]], counts: pure Vector[int]) {
+        this.changed = changed;
+        val centroidsBuilder = new VectorBuilder[pure Vector[double]](centroids.length);
+        for(var c = 0; c < centroids.length; c++)
+            centroidsBuilder.set(c, centroids.get(c).build);
+        this.centroids = centroidsBuilder.build;
+        this.counts = counts;
     }
 }
