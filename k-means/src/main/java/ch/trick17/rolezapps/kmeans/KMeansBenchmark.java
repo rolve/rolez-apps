@@ -25,13 +25,12 @@ import rolez.lang.Task;
 @State(Thread)
 public class KMeansBenchmark {
     
+    private static final int maxIters = 50;
+    
     int dim = 10;
     
     @Param({"10000", "20000", "50000"})
     int n;
-    
-    @Param({"50"})
-    int maxIters;
     
     @Param({"Rolez", "Java"})
     String impl;
