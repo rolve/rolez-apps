@@ -23,17 +23,14 @@ class HistogramRolez extends Histogram {
         // partition
         val ranges = the ContiguousPartitioner.partition(this.image.range, numTasks);
         
-        // map
         val tasks = new Array[pure Task[readwrite HistPart]](numTasks);
-        for(var i = 0; i < numTasks - 1; i++)
-            tasks.set(i, this start computePart(ranges.get(i + 1)));
-        val part0 = this.computePart(ranges.get(0));
+        for(var i = 0; i < numTasks; i++)
+            tasks.set(i, this start computePart(ranges.get(i)));
         
-        // reduce
-        this.rHist = part0.r;
-        this.gHist = part0.g;
-        this.bHist = part0.b;
-        for(var i = 0; i < numTasks - 1; i++)
+        this.rHist = tasks.get(0).get.r;
+        this.gHist = tasks.get(0).get.g;
+        this.bHist = tasks.get(0).get.b;
+        for(var i = 1; i < numTasks; i++)
             this.merge(tasks.get(i).get);
     }
     
