@@ -2,9 +2,9 @@ package ch.trick17.rolezapps.histogram;
 
 import rolez.lang.GuardedArray;
 
-public class HistogramRolezLocalOpt extends HistogramRolez {
+public class HistogramRolezL extends HistogramRolez {
     
-    public HistogramRolezLocalOpt(GuardedArray<GuardedArray<int[]>[]> image, long $task) {
+    public HistogramRolezL(GuardedArray<GuardedArray<int[]>[]> image, long $task) {
         super(image, $task);
     }
     
