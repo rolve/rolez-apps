@@ -58,7 +58,7 @@ base_times <- mean_times %>%
   rename(base_time = time)
 
 speedups <- mean_times %>%
-  left_join(base_times, suffix = c("", "_base")) %>%
+  left_join(base_times, suffix = c("", "_")) %>%
   mutate(speedup = base_time / time)
 
 plot <- ggplot(speedups, aes(tasks, speedup, color = impl)) +
