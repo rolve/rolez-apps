@@ -26,7 +26,7 @@ import rolez.lang.Task;
 @State(Thread)
 public class QuicksortBenchmark {
     
-    @Param({"100000", "1000000", "10000000"})
+    @Param({"1000000", "5000000", "20000000"})
     int n;
     
     @Param({"RolezL", "Java"})

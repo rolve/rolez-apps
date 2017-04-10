@@ -26,7 +26,7 @@ import rolez.lang.Task;
 @State(Thread)
 public class MergesortBenchmark {
     
-    @Param({"100000", "500000", "2000000"})
+    @Param({"1000000", "5000000", "20000000"})
     int n;
     
     @Param({"RolezL", "Java"})

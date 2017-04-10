@@ -29,7 +29,7 @@ public class KMeansBenchmark {
     
     int dim = 10;
     
-    @Param({"10000", "20000", "50000"})
+    @Param({"20000", "50000", "100000"})
     int n;
     
     @Param({"Rolez", "Java"})
