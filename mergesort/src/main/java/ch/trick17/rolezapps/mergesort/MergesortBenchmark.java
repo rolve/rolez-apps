@@ -29,7 +29,7 @@ public class MergesortBenchmark {
     @Param({"1000000", "5000000", "20000000"})
     int n;
     
-    @Param({"RolezL", "Java"})
+    @Param({"Rolez", "RolezL", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16", "32"})
