@@ -22,8 +22,7 @@ class KMeans {
         this.numTasks = numTasks;
     }
     
-    def pure createDataSet(n: int): readwrite Array[pure Vector[double]] {
-        val random = new Random;
+    def pure createDataSet(n: int, random: readwrite Random): readwrite Array[pure Vector[double]] {
         val dataSet = new Array[pure Vector[double]](n);
         for(var i = 0; i < n; i++)
             dataSet.set(i, this.newRandomVector(random));
@@ -151,7 +150,7 @@ class KMeansRolez extends KMeans {
         
         val dataSets = new Array[readwrite Array[pure Vector[double]]](repetitions);
         for(var i = 0; i < repetitions; i++)
-            dataSets.set(i, this.createDataSet(n));
+            dataSets.set(i, this.createDataSet(n, new Random));
         
         the System.out.println("Press Enter to start");
         new Scanner(the System.in).nextLine;

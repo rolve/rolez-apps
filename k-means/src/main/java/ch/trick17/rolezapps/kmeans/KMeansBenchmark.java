@@ -6,6 +6,8 @@ import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
 import static rolez.lang.Task.currentTask;
 
+import java.util.Random;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -49,7 +51,7 @@ public class KMeansBenchmark {
         clusters = n / 100;
         kMeans = instantiateBenchmark(KMeans.class, impl, dim, clusters, tasks,
                 currentTask().idBits());
-        data = kMeans.createDataSet(n, currentTask().idBits());
+        data = kMeans.createDataSet(n, new Random(42), currentTask().idBits());
     }
     
     @Benchmark
