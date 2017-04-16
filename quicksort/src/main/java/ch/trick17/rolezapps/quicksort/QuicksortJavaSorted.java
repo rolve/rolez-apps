@@ -2,6 +2,8 @@ package ch.trick17.rolezapps.quicksort;
 
 import static rolez.lang.GuardedArray.wrap;
 
+import java.util.Random;
+
 import rolez.lang.GuardedArray;
 
 public class QuicksortJavaSorted extends QuicksortJavaPerfectPivot {
@@ -11,7 +13,7 @@ public class QuicksortJavaSorted extends QuicksortJavaPerfectPivot {
     }
     
     @Override
-    public GuardedArray<int[]> shuffledInts(int n, long $task) {
+    public GuardedArray<int[]> shuffledInts(int n, Random random, long $task) {
         int[] array = new int[n];
         for(int i = 0; i < n; i += 1)
             array[i] = i;

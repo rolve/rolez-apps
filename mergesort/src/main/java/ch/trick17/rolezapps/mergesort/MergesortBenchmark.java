@@ -6,6 +6,8 @@ import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
 import static rolez.lang.Task.currentTask;
 
+import java.util.Random;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -26,7 +28,7 @@ import rolez.lang.Task;
 @State(Thread)
 public class MergesortBenchmark {
     
-    @Param({"1000000", "5000000", "20000000"})
+    @Param({"300000", "1500000", "6000000"})
     int n;
     
     @Param({"Rolez", "RolezL", "Java"})
@@ -36,19 +38,26 @@ public class MergesortBenchmark {
     int tasks;
     
     Mergesort mergesort;
-    GuardedArray<int[]> data;
+    GuardedArray<int[]> data1;
+    GuardedArray<int[]> data2;
+    GuardedArray<int[]> data3;
     
     @Setup(Level.Iteration)
     public void setup() {
         Task.registerNewRootTask();
+        Random random = new Random(42);
         int maxLevel = MathExtra.INSTANCE.log2(tasks, currentTask().idBits());
         mergesort = instantiateBenchmark(Mergesort.class, impl, maxLevel, currentTask().idBits());
-        data = mergesort.shuffledInts(n, currentTask().idBits());
+        data1 = mergesort.shuffledInts(n, random, currentTask().idBits());
+        data2 = mergesort.shuffledInts(n, random, currentTask().idBits());
+        data3 = mergesort.shuffledInts(n, random, currentTask().idBits());
     }
     
     @Benchmark
     public void mergesort() {
-        mergesort.sort(data, currentTask().idBits());
+        mergesort.sort(data1, currentTask().idBits());
+        mergesort.sort(data2, currentTask().idBits());
+        mergesort.sort(data3, currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)

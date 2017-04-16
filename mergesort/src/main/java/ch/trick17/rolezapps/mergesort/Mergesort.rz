@@ -15,12 +15,11 @@ class Mergesort {
         this.maxLevel = maxLevel;
     }
     
-    def pure shuffledInts(n: int): readwrite Array[int] {
+    def pure shuffledInts(n: int, random: readwrite Random): readwrite Array[int] {
         val array = new Array[int](n);
         for(var i = 0; i < n; i++)
             array.set(i, i);
         
-        val random = new Random;
         for(var i = n - 1; i > 0; i--) {
             val index: int = random.nextInt(i + 1);
             
@@ -104,8 +103,9 @@ class MergesortRolez extends Mergesort {
         
         val arrays = new Array[readwrite Array[int]](iterations);
         
+        val random = new Random;
         for(var i = 0; i < iterations; i++)
-            arrays.set(i, this.shuffledInts(n));
+            arrays.set(i, this.shuffledInts(n, random));
         
         the System.out.println("Press Enter to start");
         new Scanner(the System.in).nextLine;

@@ -1,5 +1,6 @@
 package ch.trick17.rolezapps.quicksort;
 
+import java.util.Random;
 import java.util.Scanner;
 
 import rolez.lang.GuardedArray;
@@ -17,12 +18,13 @@ public class QuicksortJavaPerfectPivotBranchOpt extends QuicksortJava {
         int n = 50000000;
         GuardedArray<int[]> ints;
         
+        Random random = new Random();
         System.out.println("Warming up...");
         for(int i = 0; i < 2; i++) {
-            ints = quicksort.shuffledInts(n, 0L);
+            ints = quicksort.shuffledInts(n, random, 0L);
             quicksort.sort(ints, 0L);
         }
-        ints = quicksort.shuffledInts(n, 0L);
+        ints = quicksort.shuffledInts(n, random, 0L);
         
         System.out.println("Enter to start");
         new Scanner(System.in).nextLine();

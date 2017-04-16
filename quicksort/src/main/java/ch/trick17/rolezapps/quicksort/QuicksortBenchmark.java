@@ -6,6 +6,8 @@ import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
 import static rolez.lang.Task.currentTask;
 
+import java.util.Random;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -26,7 +28,7 @@ import rolez.lang.Task;
 @State(Thread)
 public class QuicksortBenchmark {
     
-    @Param({"1000000", "5000000", "20000000"})
+    @Param({"300000", "1500000", "6000000"})
     int n;
     
     @Param({"Rolez", "RolezL", "Java"})
@@ -36,19 +38,26 @@ public class QuicksortBenchmark {
     int tasks;
     
     Quicksort quicksort;
-    GuardedArray<int[]> data;
+    GuardedArray<int[]> data1;
+    GuardedArray<int[]> data2;
+    GuardedArray<int[]> data3;
     
     @Setup(Level.Iteration)
     public void setup() {
+        Random random = new Random(42);
         Task.registerNewRootTask();
         int maxLevel = MathExtra.INSTANCE.log2(tasks, currentTask().idBits());
         quicksort = instantiateBenchmark(Quicksort.class, impl, maxLevel, currentTask().idBits());
-        data = quicksort.shuffledInts(n, currentTask().idBits());
+        data1 = quicksort.shuffledInts(n, random, currentTask().idBits());
+        data2 = quicksort.shuffledInts(n, random, currentTask().idBits());
+        data3 = quicksort.shuffledInts(n, random, currentTask().idBits());
     }
     
     @Benchmark
     public void quicksort() {
-        quicksort.sort(data, currentTask().idBits());
+        quicksort.sort(data1, currentTask().idBits());
+        quicksort.sort(data2, currentTask().idBits());
+        quicksort.sort(data3, currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)
