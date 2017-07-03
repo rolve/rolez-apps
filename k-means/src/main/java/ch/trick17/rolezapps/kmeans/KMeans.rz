@@ -58,18 +58,19 @@ class KMeansRolez extends KMeans {
         for(var i = 0; i < this.clusters; i++)
             centroids.set(i, this.newRandomVector(random));
         
-        val assignments = new Array[int](dataSet.length);
+        val ranges = the ContiguousPartitioner.partition(new SliceRange(0, dataSet.length, 1), this.numTasks);
+        val assignments = new Array[readwrite Array[int]](this.numTasks);
+        for(var i = 0; i < this.numTasks; i++)
+            assignments.set(i, new Array[int](dataSet.length));
         
         /* Computation */
         var iterations = 0;
         var changed = true;
         while(changed && iterations < maxIterations) {
-            val dataParts = dataSet.partition(the ContiguousPartitioner, this.numTasks);
-            val assignParts = assignments.partition(the ContiguousPartitioner, this.numTasks);
             val tasks = new Array[pure Task[pure Result]](this.numTasks);
-            
             for(var i = 0; i < tasks.length; i++)
-                tasks.set(i, this start assignAndUpdate(dataParts.get(i), centroids, assignParts.get(i)));
+                tasks.set(i, this start assignAndUpdate(dataSet, centroids,
+                    assignments.get(i), ranges.get(i)));
             
             changed = false;
             val newCentroids = new Array[readwrite VectorBuilder[double]](this.clusters);
@@ -101,16 +102,16 @@ class KMeansRolez extends KMeans {
         return centroids;
     }
     
-    task pure assignAndUpdate(dataSet: readonly Slice[pure Vector[double]],
+    task pure assignAndUpdate(dataSet: readonly Array[pure Vector[double]],
             centroids: readonly Array[pure Vector[double]],
-            assignments: readwrite Slice[int]): pure Result {
+            assignments: readwrite Array[int], range: pure SliceRange): pure Result {
         var changed = false;
         val newCentroids = new Array[readwrite VectorBuilder[double]](this.clusters);
         for(var i = 0; i < this.clusters; i++)
             newCentroids.set(i, new VectorBuilder[double](this.dim));
         val counts = new VectorBuilder[int](centroids.length);
         
-        for(var i = dataSet.range.begin; i < dataSet.range.end; i += dataSet.range.step) {
+        for(var i = range.begin; i < range.end; i += range.step) {
             val vector = dataSet.get(i);
             var min = the Double.POSITIVE_INFINITY;
             var cluster = -1;
