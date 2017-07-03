@@ -58,7 +58,7 @@ class KMeansRolez extends KMeans {
         for(var i = 0; i < this.clusters; i++)
             centroids.set(i, this.newRandomVector(random));
         
-        val ranges = the ContiguousPartitioner.partition(new SliceRange(0, dataSet.length, 1), this.numTasks);
+        val ranges = the ContiguousPartitioner.partition(dataSet.range, this.numTasks);
         val assignments = new Array[readwrite Array[int]](this.numTasks);
         for(var i = 0; i < this.numTasks; i++)
             assignments.set(i, new Array[int](dataSet.length));
