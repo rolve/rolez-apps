@@ -28,7 +28,7 @@ public class IdeaBenchmark {
     @Param({"3000000", "20000000", "50000000"})
     int n;
     
-    @Param({"Rolez", "Java"})
+    @Param({"RolezNoSlices", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16", "32"})

@@ -1,0 +1,288 @@
+package ch.trick17.rolezapps.idea
+
+import rolez.util.Random
+import rolez.util.Arrays
+import rolez.util.Scanner
+import rolez.util.StopWatch
+
+class IdeaEncryptionRolezNoSlices extends IdeaEncryption {
+    
+    new {}
+    
+    new(size: int, tasks: int) {
+        super(size, tasks);
+    }
+    
+    var plain: readwrite Array[byte]
+    var encrypted: readwrite Array[byte]
+    var decrypted: readwrite Array[byte]
+    
+    var userKey: pure Vector[short]
+    var encryptKey: pure Vector[int]
+    var decryptKey: pure Vector[int]
+    
+    override readwrite buildTestData(random: readwrite Random): {
+        val userKey = new VectorBuilder[short](8);
+        for(var i = 0; i < 8; i++)
+            userKey.set(i, random.nextInt as short);
+        this.userKey = userKey.build;
+        
+        this.encryptKey = this.calcEncryptKey(this.userKey);
+        this.decryptKey = this.calcDecryptKey(this.encryptKey);
+        
+        this.plain     = new Array[byte](this.size);
+        this.encrypted = new Array[byte](this.size);
+        this.decrypted = new Array[byte](this.size);
+        
+        for(var i = 0; i < this.size; i++)
+            this.plain.set(i, i as byte);
+    }
+    
+    def pure calcEncryptKey(userKey: pure Vector[short]): pure Vector[int] {
+        val xFFFF = 65535; // :D
+        
+        var key = new VectorBuilder[int](52);
+        for(var i = 0; i < 52; i++)
+            key.set(i, 0);
+        
+        for(var i = 0; i < 8; i++)
+            key.set(i, userKey.get(i) & xFFFF);
+        
+        for(var i = 8; i < 52; i++) {
+            var j = i % 8;
+            if(j < 6)
+                // Shift and combine. Just 16 bits.
+                key.set(i, ((key.get(i - 7) >>> 9) | (key.get(i - 6) << 7)) & xFFFF);
+            else if(j == 6)
+                // Wrap to beginning for second chunk.
+                key.set(i, ((key.get(i - 7) >>> 9) | (key.get(i - 14) << 7)) & xFFFF);
+            else
+                // j == 7 so wrap to beginning for both chunks.
+                key.set(i, ((key.get(i - 15) >>> 9) | (key.get(i - 14) << 7)) & xFFFF);
+        }
+        return key.build;
+    }
+    
+    def pure calcDecryptKey(encryptKey: pure Vector[int]): pure Vector[int] {
+        val xFFFF = 65535;
+        
+        var key = new VectorBuilder[int](52);
+        key.set(51, this.inv(encryptKey.get(3)));
+        key.set(50, -encryptKey.get(2) & xFFFF);
+        key.set(49, -encryptKey.get(1) & xFFFF);
+        key.set(48, this.inv(encryptKey.get(0)));
+        
+        var j = 47; // Indices into temp and encrypt arrays.
+        var k = 4;
+        for(var i = 0; i < 7; i++) {
+            var t0 = encryptKey.get(k++);
+            key.set(j--, encryptKey.get(k++));
+            key.set(j--, t0);
+            var t1 = this.inv(encryptKey.get(k++));
+            var t2 = -encryptKey.get(k++) & xFFFF;
+            var t3 = -encryptKey.get(k++) & xFFFF;
+            key.set(j--, this.inv(encryptKey.get(k++)));
+            key.set(j--, t2);
+            key.set(j--, t3);
+            key.set(j--, t1);
+        }
+        
+        var t0 = encryptKey.get(k++);
+        key.set(j--, encryptKey.get(k++));
+        key.set(j--, t0);
+        var t1 = this.inv(encryptKey.get(k++));
+        var t2 = -encryptKey.get(k++) & xFFFF;
+        var t3 = -encryptKey.get(k++) & xFFFF;
+        key.set(j--, this.inv(encryptKey.get(k++)));
+        key.set(j--, t3);
+        key.set(j--, t2);
+        key.set(j--, t1);
+        
+        return key.build;
+    }
+    
+    def pure inv(theX: int): int {
+        if(theX <= 1) // Assumes positive x.
+            return theX; // 0 and 1 are self-inverse.
+        
+        val xFFFF = 65535;
+        val x10001 = 65537;
+        
+        var x = theX;
+        var t0 = x10001 / x; // (2**16+1)/x; x is >= 2, so fits 16 bits.
+        var y = x10001 % x;
+        if(y == 1)
+            return 1 - t0 & xFFFF;
+        
+        var t1 = 1;
+        while(y != 1) {
+            val q0 = x / y;
+            x = x % y;
+            t1 += q0 * t0;
+            if(x == 1)
+                return t1;
+            
+            val q1 = y / x;
+            y = y % x;
+            t0 += q1 * t1;
+        }
+        return 1 - t0 & xFFFF;
+    }
+    
+    override readwrite run: {
+        val ranges = new BlockPartitioner(8).partition(this.plain.range, this.tasks);
+        
+        val privEncrypted = new Array[readwrite Array[byte]](this.tasks);
+        val privDecrypted = new Array[readwrite Array[byte]](this.tasks);
+        for(var i = 0; i < this.tasks; i++) {
+            privEncrypted.set(i, new Array[byte](this.size));
+            privDecrypted.set(i, new Array[byte](this.size));
+        }
+        
+        // encrypt
+        for(var i = 0; i < this.tasks; i++)
+            this start encryptDecrypt(this.plain, privEncrypted.get(i), ranges.get(i), this.encryptKey);
+        this.encrypted = this.merge(privEncrypted, ranges);
+        
+        // decrypt
+        for(var i = 0; i < this.tasks; i++)
+            this start encryptDecrypt(privEncrypted.get(i), privDecrypted.get(i), ranges.get(i), this.decryptKey);
+        this.decrypted = this.merge(privDecrypted, ranges);
+    }
+    
+    task pure encryptDecrypt(src: readonly Array[byte], dst: readwrite Array[byte],
+            range: pure SliceRange, key: pure Vector[int]): {
+        val xFF = 255;
+        val xFFFF = 65535;
+        val x10001L = 65537L;
+
+        var iSrc = range.begin;        
+        var iDst = range.begin;
+        for(var i = range.begin; i < range.end; i += 8) {
+            // Load eight plain1 bytes as four 16-bit "unsigned" integers.
+            // Masking with 0xFF prevents sign extension with cast to int.
+            
+            var x1 = src.get(iSrc++) & xFF; // Build 16-bit x1 from 2 bytes,
+            x1 = x1 | (src.get(iSrc++) & xFF) << 8; // assuming low-order byte first.
+            var x2 = src.get(iSrc++) & xFF;
+            x2 = x2 | (src.get(iSrc++) & xFF) << 8;
+            var x3 = src.get(iSrc++) & xFF;
+            x3 = x3 | (src.get(iSrc++) & xFF) << 8;
+            var x4 = src.get(iSrc++) & xFF;
+            x4 = x4 | (src.get(iSrc++) & xFF) << 8;
+            
+            var iKey = 0;
+            for(var round = 0; round < 8; round++) {
+                // 1) Multiply (modulo 0x10001), 1st text sub-block
+                // with 1st key sub-block.
+                x1 = (x1 as long * key.get(iKey++) % x10001L & xFFFF) as int;
+                
+                // 2) Add (modulo 0x10000), 2nd text sub-block
+                // with 2nd key sub-block.
+                x2 = x2 + key.get(iKey++) & xFFFF;
+                
+                // 3) Add (modulo 0x10000), 3rd text sub-block
+                // with 3rd key sub-block.
+                x3 = x3 + key.get(iKey++) & xFFFF;
+                
+                // 4) Multiply (modulo 0x10001), 4th text sub-block
+                // with 4th key sub-block.
+                x4 = (x4 as long * key.get(iKey++) % x10001L & xFFFF) as int;
+                
+                // 5) XOR results from steps 1 and 3.
+                var t0 = x1 ^ x3;
+                
+                // 6) XOR results from steps 2 and 4.
+                // Included in step 8.
+                
+                // 7) Multiply (modulo 0x10001), result of step 5
+                // with 5th key sub-block.
+                t0 = (t0 as long * key.get(iKey++) % x10001L & xFFFF) as int;
+                
+                // 8) Add (modulo 0x10000), results of steps 6 and 7.
+                var t1 = t0 + (x2 ^ x4) & xFFFF;
+                
+                // 9) Multiply (modulo 0x10001), result of step 8
+                // with 6th key sub-block.
+                t1 = (t1 as long * key.get(iKey++) % x10001L & xFFFF) as int;
+                
+                // 10) Add (modulo 0x10000), results of steps 7 and 9.
+                t0 = t1 + t0 & xFFFF;
+                
+                // 11) XOR results from steps 1 and 9.
+                x1 = x1 ^ t1;
+                
+                // 14) XOR results from steps 4 and 10. (Out of order).
+                x4 = x4 ^ t0;
+                
+                // 13) XOR results from steps 2 and 10. (Out of order).
+                t0 = t0 ^ x2;
+                
+                // 12) XOR results from steps 3 and 9. (Out of order).
+                x2 = x3 ^ t1;
+                
+                x3 = t0; // Results of x2 and x3 now swapped.
+            }
+        
+            // Final output transform (4 steps).
+            
+            // 1) Multiply (modulo 0x10001), 1st text-block
+            // with 1st key sub-block.
+            x1 = (x1 as long * key.get(iKey++) % x10001L & xFFFF) as int;
+            
+            // 2) Add (modulo 0x10000), 2nd text sub-block
+            // with 2nd key sub-block. It says x3, but that is to undo swap
+            // of subblocks 2 and 3 in 8th processing round.
+            x3 = x3 + key.get(iKey++) & xFFFF;
+            
+            // 3) Add (modulo 0x10000), 3rd text sub-block
+            // with 3rd key sub-block. It says x2, but that is to undo swap
+            // of subblocks 2 and 3 in 8th processing round.
+            x2 = x2 + key.get(iKey++) & xFFFF;
+            
+            // 4) Multiply (modulo 0x10001), 4th text-block
+            // with 4th key sub-block.
+            x4 = (x4 as long * key.get(iKey++) % x10001L & xFFFF) as int;
+            
+            // Repackage from 16-bit sub-blocks to 8-bit byte array text2.
+            dst.set(iDst++, x1 as byte);
+            dst.set(iDst++, (x1 >>> 8) as byte);
+            dst.set(iDst++, x3 as byte); // x3 and x2 are switched
+            dst.set(iDst++, (x3 >>> 8) as byte); // only in name.
+            dst.set(iDst++, x2 as byte);
+            dst.set(iDst++, (x2 >>> 8) as byte);
+            dst.set(iDst++, x4 as byte);
+            dst.set(iDst++, (x4 >>> 8) as byte);
+        }
+    }
+    
+    def pure merge(arrays: readwrite Array[readwrite Array[byte]],
+            ranges: pure Vector[pure SliceRange]): readwrite Array[byte] {
+        val result = new Array[byte](arrays.get(0).length);
+        for(var r = 0; r < ranges.length; r++) {
+            val range = ranges.get(r);
+            val array = arrays.get(r);
+            for(var i = range.begin; i < range.end; i += range.step)
+                result.set(i, array.get(i));
+        }
+        return result;
+    }
+    
+    override readonly validate: {
+        new Assertion(the Arrays.equals(this.plain, this.decrypted));
+    }
+    
+    task readwrite main: {
+        this.buildTestData(new Random(42L));
+        
+        the System.out.println("Press Enter to start");
+        new Scanner(the System.in).nextLine;
+        
+        val watch = new StopWatch;
+        for(var i = 0; i < 20; i++) {
+            watch.go;
+            this.run;
+            the System.out.println(watch.get);
+        }
+    }
+}
