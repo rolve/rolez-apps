@@ -1,0 +1,51 @@
+package ch.trick17.rolezapps.raytracer
+
+class RaytracerNoSlices extends Raytracer {
+    
+    override readonly render(image: readwrite Array[readwrite Array[int]]): {
+        val width = image.get(0).length;
+        val ranges = the StripedPartitioner.partition(image.range, this.numTasks);
+        val imageCopies = new Array[readwrite Array[readwrite Array[int]]](this.numTasks);
+        for(var i = 0; i < this.numTasks; i++) {
+            val copy = new Array[readwrite Array[int]](image.length);
+            for(var y = 0; y < image.length; y++)
+                copy.set(y, new Array[int](width));
+            imageCopies.set(i, copy);
+        }
+        
+        for(var i = 0; i < this.numTasks - 1; i++)
+            this start renderPart(imageCopies.get(i), ranges.get(i));
+        this.renderPart(imageCopies.get(this.numTasks - 1), ranges.get(this.numTasks - 1));
+        
+        this.merge(imageCopies, image, ranges);
+    }
+    
+    task readonly renderPart(image: readwrite Array[readwrite Array[int]], range: pure SliceRange): {
+        val view = this.scene.view;
+        val width = image.get(range.begin).length;
+        val height = image.arrayLength;
+        
+        val frustrumHeight = view.distance * the Math.tan(view.angle);
+
+        val viewDir = view.at.minus(view.from).normalize;
+        val viewLeft = view.up.cross(viewDir).normalize.scale(view.aspect * frustrumHeight);
+        val viewDown = view.up.minus(viewDir.scale(view.up.dot(viewDir))).normalize.scale(-frustrumHeight);
+        
+        for(var y = range.begin; y < range.end; y += range.step) {
+            for(var x = 0; x < width; x++) {
+                val color = this.renderPixel(x, y, width, height, viewDir, viewLeft, viewDown);
+                image.get(y).set(x, color.toRgbInt);
+            }
+        }
+    }
+    
+    def pure merge(srcs: readwrite Array[readwrite Array[readwrite Array[int]]],
+            dst: readwrite Array[readwrite Array[int]], ranges: pure Vector[pure SliceRange]): {
+        for(var r = 0; r < ranges.length; r++) {
+            val range = ranges.get(r);
+            val src = srcs.get(r);
+            for(var i = range.begin; i < range.end; i += range.step)
+                dst.set(i, src.get(i));
+        }
+    }
+}

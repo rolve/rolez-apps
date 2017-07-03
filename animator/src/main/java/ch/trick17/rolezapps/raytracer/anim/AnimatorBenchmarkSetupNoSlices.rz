@@ -1,0 +1,32 @@
+package ch.trick17.rolezapps.raytracer.anim
+
+import rolez.util.Random
+import ch.trick17.rolezapps.raytracer.Scene
+import ch.trick17.rolezapps.raytracer.RaytracerNoSlices
+import ch.trick17.rolezapps.raytracer.util.VideoWriter
+
+class AnimatorBenchmarkSetupRolezNoSlices extends AnimatorBenchmarkSetup {
+    
+    val animator: readwrite Animator
+    
+    new(height: int, numTasks: int) {
+        val scene = this.instantiateScene;
+        the AnimatorApp.buildScene(scene, new Random(42L));
+        val width = (height * scene.view.aspect) as int;
+        val writer = new VideoWriter(this.movieFile, width, height, 12, 12);
+        
+        val raytracer = new RaytracerNoSlices;
+        raytracer.numTasks = numTasks;
+        raytracer.maxRecursions = 3;
+        
+        this.animator = new Animator(raytracer, scene, writer);
+    }
+    
+    def pure instantiateScene: readwrite AnimatedScene {
+        return new AnimatedScene(3.0);
+    }
+    
+    override readwrite runAnimator: {
+        this.animator.render;
+    }
+}
