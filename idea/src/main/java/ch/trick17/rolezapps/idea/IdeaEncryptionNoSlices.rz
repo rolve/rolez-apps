@@ -146,7 +146,9 @@ class IdeaEncryptionRolezNoSlices extends IdeaEncryptionRolez {
             val array = arrays.get(r);
             // access array once to prevent guarding in loop:
             val dummy = array.get(0);
-            for(var i = range.begin; i < range.end; i += range.step)
+            // apparently, explicitly using a step of 1 helps...
+            new Assertion(range.step == 1);
+            for(var i = range.begin; i < range.end; i++)
                 result.set(i, array.get(i));
         }
         return result;
