@@ -21,8 +21,8 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import rolez.lang.Guarded;
 import rolez.lang.GuardedArray;
+import rolez.lang.SliceRange;
 import rolez.lang.Task;
 
 @BenchmarkMode(SingleShotTime)
@@ -34,6 +34,8 @@ public class ArrayCopyBenchmark {
 	
 	@Param({"1000000", "10000000", "100000000"})
 	int n;
+	
+	SliceRange range;
 
 	byte[] src;
 	byte[] dst;
@@ -52,6 +54,8 @@ public class ArrayCopyBenchmark {
 			src[i] = (byte) i;
 			guardedSrc.data[i] = (byte) i;
 		}
+		
+		range = new SliceRange(0, n, 1);
 	}
 	
 	@Benchmark
@@ -65,6 +69,23 @@ public class ArrayCopyBenchmark {
 		byte[] dst = this.dst;
 		for(int i = 0; i < src.length; i++)
 			dst[i] = src[i];
+	}
+	
+	@Benchmark
+	public void forLoopWithRange() {
+		byte[] src = this.src;
+		byte[] dst = this.dst;
+		SliceRange range = this.range;
+		for(int i = range.begin; i < range.end; i += range.step)
+			dst[i] = src[i];
+	}
+	
+	@Benchmark
+	public void forLoopWithGuardedArrays() {
+		GuardedArray<byte[]> src = this.guardedSrc;
+		GuardedArray<byte[]> dst = this.guardedDst;
+		for(int i = 0; i < src.data.length; i++)
+			dst.data[i] = src.data[i];
 	}
 	
 	@Benchmark
