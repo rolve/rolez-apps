@@ -41,9 +41,13 @@ class RaytracerNoSlices extends Raytracer {
     
     def pure merge(srcs: readwrite Array[readwrite Array[readwrite Array[int]]],
             dst: readwrite Array[readwrite Array[int]], ranges: pure Vector[pure SliceRange]): {
+        // dummy access to prevent guarding in loop:
+        dst.set(0, dst.get(0));
         for(var r = 0; r < ranges.length; r++) {
             val range = ranges.get(r);
             val src = srcs.get(r);
+            // again dummy access:
+            val dummy = src.get(0);
             for(var i = range.begin; i < range.end; i += range.step)
                 dst.set(i, src.get(i));
         }
