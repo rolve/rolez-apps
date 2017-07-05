@@ -17,8 +17,8 @@ class IdeaEncryptionRolezNoSlices extends IdeaEncryptionRolez {
         val privEncrypted = new Array[readwrite Array[byte]](this.tasks);
         val privDecrypted = new Array[readwrite Array[byte]](this.tasks);
         for(var i = 0; i < this.tasks; i++) {
-            privEncrypted.set(i, new Array[byte](this.size));
-            privDecrypted.set(i, new Array[byte](this.size));
+            privEncrypted.set(i, new Array[byte](ranges.get(i).size));
+            privDecrypted.set(i, new Array[byte](ranges.get(i).size));
         }
         
         // encrypt
@@ -28,7 +28,7 @@ class IdeaEncryptionRolezNoSlices extends IdeaEncryptionRolez {
         
         // decrypt
         for(var i = 0; i < this.tasks; i++)
-            this start encryptDecrypt(privEncrypted.get(i), privDecrypted.get(i), ranges.get(i), this.decryptKey);
+            this start encryptDecrypt(this.encrypted, privDecrypted.get(i), ranges.get(i), this.decryptKey);
         this.decrypted = this.merge(privDecrypted, ranges);
     }
     
@@ -39,7 +39,7 @@ class IdeaEncryptionRolezNoSlices extends IdeaEncryptionRolez {
         val x10001L = 65537L;
 
         var iSrc = range.begin;        
-        var iDst = range.begin;
+        var iDst = 0;
         for(var i = range.begin; i < range.end; i += 8) {
             // Load eight plain1 bytes as four 16-bit "unsigned" integers.
             // Masking with 0xFF prevents sign extension with cast to int.
@@ -140,7 +140,7 @@ class IdeaEncryptionRolezNoSlices extends IdeaEncryptionRolez {
     
     def pure merge(arrays: readwrite Array[readwrite Array[byte]],
             ranges: pure Vector[pure SliceRange]): readwrite Array[byte] {
-        val result = new Array[byte](arrays.get(0).length);
+        val result = new Array[byte](ranges.get(arrays.length - 1).end);
         for(var r = 0; r < ranges.length; r++) {
             val range = ranges.get(r);
             val array = arrays.get(r);
@@ -148,8 +148,11 @@ class IdeaEncryptionRolezNoSlices extends IdeaEncryptionRolez {
             val dummy = array.get(0);
             // apparently, explicitly using a step of 1 helps...
             new Assertion(range.step == 1);
-            for(var i = range.begin; i < range.end; i++)
-                result.set(i, array.get(i));
+            var j = 0;
+            for(var i = range.begin; i < range.end; i++) {
+                result.set(i, array.get(j));
+                j++;
+            }
         }
         return result;
     }
