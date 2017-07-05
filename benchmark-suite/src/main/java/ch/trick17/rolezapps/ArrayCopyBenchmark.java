@@ -32,7 +32,7 @@ import rolez.lang.Task;
 @Measurement(iterations = 30)
 public class ArrayCopyBenchmark {
 	
-	@Param({"1000000", "10000000", "100000000"})
+	@Param({"10000000", "100000000"})
 	int n;
 	
 	SliceRange range;
@@ -77,6 +77,15 @@ public class ArrayCopyBenchmark {
 		byte[] dst = this.dst;
 		SliceRange range = this.range;
 		for(int i = range.begin; i < range.end; i += range.step)
+			dst[i] = src[i];
+	}
+	
+	@Benchmark
+	public void forLoopWithContiguousRange() {
+		byte[] src = this.src;
+		byte[] dst = this.dst;
+		SliceRange range = this.range;
+		for(int i = range.begin; i < range.end; i++)
 			dst[i] = src[i];
 	}
 	
