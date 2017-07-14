@@ -30,7 +30,7 @@ public class NBodyBenchmark {
     
     int iterations = 30;
     
-    @Param({""})
+    @Param({"Rolez", "Java"})
     String impl;
     
     @Param({"1", "2", "4"})

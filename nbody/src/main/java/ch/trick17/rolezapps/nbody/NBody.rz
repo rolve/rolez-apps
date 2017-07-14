@@ -9,15 +9,6 @@ class NBody {
     val iterations: int
     val tasks: int
     
-    var system: readwrite Array[readwrite Body]
-    var out: readonly PrintStream
-    
-    new {
-        this.bodies = 100;
-        this.iterations = 5000;
-        this.tasks = 2;
-    }
-    
     new(bodies: int, iterations: int, tasks: int) {
         this.bodies = bodies;
         this.iterations = iterations;
@@ -25,6 +16,28 @@ class NBody {
     }
     
     def readwrite createSystem(random: readwrite Random): {
+        new Assertion(false);
+    }    
+    
+    def readwrite simulate: {
+        new Assertion(false);
+    }
+}
+
+class NBodyRolez extends NBody {
+    
+    var system: readwrite Array[readwrite Body]
+    var out: readonly PrintStream
+    
+    new {
+        super(100, 5000, 2);
+    }
+    
+    new(bodies: int, iterations: int, tasks: int) {
+        super(bodies, iterations, tasks);
+    }
+    
+    override readwrite createSystem(random: readwrite Random): {
         val system = new Array[readwrite Body](this.bodies);
         
         var px = 0.0;
@@ -45,13 +58,9 @@ class NBody {
         this.system = system;
     }
     
-    def readwrite simulate: {
-        val body = this.system.get(1);
-        for(var i = 0; i < this.iterations; i++) {
+    override readwrite simulate: {
+        for(var i = 0; i < this.iterations; i++)
             this.simulationStep;
-            if(this.out != null)
-                this.out.println(body.x + "\t" + body.y + "\t" + body.z);
-        }
     }
     
     def readwrite simulationStep: {
