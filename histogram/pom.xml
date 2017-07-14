@@ -12,12 +12,4 @@
     <properties>
         <benchmarkClass>ch.trick17.rolezapps.histogram.HistogramBenchmark</benchmarkClass>
     </properties>
-    
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-        </dependency>
-    </dependencies>
 </project>
