@@ -1,0 +1,172 @@
+package ch.trick17.rolezapps.nbody
+
+import rolez.util.Random
+import rolez.io.PrintStream
+
+class NBody {
+    
+    val bodies: int
+    val iterations: int
+    val tasks: int
+    
+    var system: readwrite Array[readwrite Body]
+    var out: readonly PrintStream
+    
+    new {
+        this.bodies = 100;
+        this.iterations = 5000;
+        this.tasks = 2;
+    }
+    
+    new(bodies: int, iterations: int, tasks: int) {
+        this.bodies = bodies;
+        this.iterations = iterations;
+        this.tasks = tasks;
+    }
+    
+    def readwrite createSystem(random: readwrite Random): {
+        val system = new Array[readwrite Body](this.bodies);
+        
+        var px = 0.0;
+        var py = 0.0;
+        var pz = 0.0;
+        for(var i = 1; i < system.length; i++) {
+            val body = new Body(random);
+            system.set(i, body);
+            px += body.vx * body.mass;
+            py += body.vy * body.mass;
+            pz += body.vz * body.mass;
+        }
+        
+        // Offset momentum
+        val s = the Constants.solarMass;
+        system.set(0, new Body(0.0, 0.0, 0.0, -px/s, -py/s, -pz/s, s));
+        
+        this.system = system;
+    }
+    
+    def readwrite simulate: {
+        val body = this.system.get(1);
+        for(var i = 0; i < this.iterations; i++) {
+            this.simulationStep;
+            if(this.out != null)
+                this.out.println(body.x + "\t" + body.y + "\t" + body.z);
+        }
+    }
+    
+    def readwrite simulationStep: {
+        val positions  = new Array[readwrite Body\position](this.bodies);
+        val velocities = new Array[readwrite Body\velocity](this.bodies);
+        for(var i = 0; i < this.bodies; i++) {
+            positions .set(i, this.system.get(i) slice position);
+            velocities.set(i, this.system.get(i) slice velocity);
+        }
+        
+        val vSlices = velocities.partition(the ContiguousPartitioner, this.tasks);
+        for(var t = 0; t < this.tasks; t++)
+            this start updateVelocity(vSlices.get(t), positions);
+        
+        val bodiesSlices = this.system.partition(the ContiguousPartitioner, this.tasks);
+        for(var t = 0; t < this.tasks; t++)
+            this start updatePosition(bodiesSlices.get(t));
+    }
+    
+    task pure updateVelocity(velocities: readwrite Slice[readwrite Body\velocity],
+            positions: readonly Array[readwrite Body\position]): {
+        for(var i = velocities.range.begin; i < velocities.range.end; i += velocities.range.step) {
+            val v1 = velocities.get(i);
+            val p1 = positions.get(i);
+            for(var j = 0; j < positions.length; j++) {
+                if(i != j) {
+                    val p2 = positions.get(j);
+                    val dx = p1.x - p2.x;
+                    val dy = p1.y - p2.y;
+                    val dz = p1.z - p2.z;
+                    
+                    val d2 = dx*dx + dy*dy + dz*dz;
+                    val mag = the Constants.dt / d2;
+                    
+                    v1.vx -= dx * p2.mass * mag;
+                    v1.vy -= dy * p2.mass * mag;
+                    v1.vz -= dz * p2.mass * mag;
+                }
+            }
+        }
+    }
+    
+    task pure updatePosition(bodies: readwrite Slice[readwrite Body]): {
+        for(var i = bodies.range.begin; i < bodies.range.end; i += bodies.range.step) {
+            val body = bodies.get(i);
+            body.x += the Constants.dt * body.vx;
+            body.y += the Constants.dt * body.vy;
+            body.z += the Constants.dt * body.vz;
+        }
+    }
+    
+    task readwrite main: {
+        this.out = the System.out;
+        this.createSystem(new Random);
+        this.simulate;
+    }
+}
+
+class Body {
+    
+    slice position {
+        var x: double
+        var y: double
+        var z: double
+    
+        val mass: double
+    }
+    
+    slice velocity {
+        var vx: double
+        var vy: double
+        var vz: double
+    }
+    
+    new(random: readwrite Random) {
+        this.x  = this.randomPos(random);
+        this.y  = this.randomPos(random);
+        this.z  = this.randomPos(random);
+        this.vx = this.randomVelocity(random);
+        this.vy = this.randomVelocity(random);
+        this.vz = this.randomVelocity(random);
+        this.mass = this.randomMass(random);
+    }
+    
+    new(x: double, y: double, z: double, vx: double, vy: double, vz: double, mass: double) {
+        this.x  = x;
+        this.y  = y;
+        this.z  = z;
+        this.vx = vx;
+        this.vy = vy;
+        this.vz = vz;
+        this.mass = mass;
+    }
+    
+    def pure randomPos(random: readwrite Random): double {
+        return (2 * random.nextDouble - 1) * 20;
+    }
+    
+    def pure randomVelocity(random: readwrite Random): double {
+        return (2 * random.nextDouble - 1) * 0.01 * the Constants.daysPerYear;
+    }
+    
+    def pure randomMass(random: readwrite Random): double {
+        return random.nextDouble * 0.001 * the Constants.solarMass;
+    }
+    
+    override readonly toString: readonly String {
+        return "Body[p=(" + this.x + ", " + this.y + ", " + this.z +
+                "), v=(" + this.vx + ", " + this.vy + ", " + this.vz +
+                "), mass=" + this.mass + "]"; 
+    }
+}
+
+object Constants {
+    val solarMass: double = 4 * the Math.PI * the Math.PI
+    val daysPerYear: double = 365.24
+    val dt: double = 0.01
+}
