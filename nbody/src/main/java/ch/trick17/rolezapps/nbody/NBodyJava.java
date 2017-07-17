@@ -39,23 +39,39 @@ public class NBodyJava extends NBody {
     public void simulationStep() {
         Thread[] threads = new Thread[tasks];
         SliceRange[] ranges = ContiguousPartitioner.INSTANCE.partition(new SliceRange(0, bodies, 1), tasks);
-        for (int t = 0; t < tasks; t++) {
+        for(int t = 0; t < tasks; t++) {
             Thread thread = new Thread(this.$updateVelocityTask(ranges[t]));
             threads[t] = thread;
             thread.start();
         }
-        for (int t = 0; t < tasks; t++) {
+        for(Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                throw new AssertionError(e);
+            }
+        }
+        
+        for(int t = 0; t < tasks; t++) {
             Thread thread = new Thread(this.$updatePositionTask(ranges[t]));
             threads[t] = thread;
-            thread.start();        }
+            thread.start();
+        }
+        for(Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                throw new AssertionError(e);
+            }
+        }
     }
     
     public Runnable $updateVelocityTask(final SliceRange range) {
         return new Runnable() {
             public void run() {
-                for (int i = range.begin; i < range.end; i += range.step) {
+                for(int i = range.begin; i < range.end; i += range.step) {
                     BodyJava body1 = system[i];
-                    for (int j = 0; j < system.length; j++) {
+                    for(int j = 0; j < system.length; j++) {
                         if (i != j) {
                             BodyJava body2 = system[j];
                             double dx = body1.x - body2.x;
@@ -76,7 +92,7 @@ public class NBodyJava extends NBody {
     public Runnable $updatePositionTask(final SliceRange range) {
         return new Runnable() {
             public void run() {
-                for (int i = range.begin; i < range.end; i += range.step) {
+                for(int i = range.begin; i < range.end; i += range.step) {
                     final BodyJava body = system[i];
                     body.x += Constants.INSTANCE.dt * body.vx;
                     body.y += Constants.INSTANCE.dt * body.vy;
