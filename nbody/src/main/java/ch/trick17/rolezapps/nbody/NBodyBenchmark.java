@@ -25,10 +25,10 @@ import rolez.lang.Task;
 @State(Thread)
 public class NBodyBenchmark {
     
-    @Param({"500", "1000", "2000"})
+    @Param({"2000", "5000", "8000"})
     int n;
     
-    int iterations = 30;
+    int iterations = 3;
     
     @Param({"Rolez", "Java"})
     String impl;
@@ -46,7 +46,7 @@ public class NBodyBenchmark {
     }
     
     @Benchmark
-    public void idea() {
+    public void nbody() {
         nbody.simulate(Task.currentTask().idBits());
     }
     
