@@ -22,7 +22,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import rolez.lang.Task;
 
 @BenchmarkMode(SingleShotTime)
-@Fork(1)
+@Fork(value = 1, jvmArgsAppend = {"-XX:+UnlockExperimentalVMOptions", "-XX:+TrustFinalNonStaticFields"})
 @State(Thread)
 public class RaytracerBenchmark {
     
