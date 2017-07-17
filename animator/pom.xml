@@ -12,4 +12,12 @@
     <properties>
         <benchmarkClass>ch.trick17.rolezapps.raytracer.anim.AnimatorBenchmark</benchmarkClass>
     </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>ch.trick17.rolez-apps</groupId>
+            <artifactId>raytracer</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 </project>
