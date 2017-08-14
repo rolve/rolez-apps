@@ -28,9 +28,9 @@ public class NBodyBenchmark {
     @Param({"2000", "5000", "8000"})
     int n;
     
-    int iterations = 3;
+    int iterations = 1;
     
-    @Param({"Rolez", "Java"})
+    @Param({"Rolez", "RolezLazySlicing", "Java"})
     String impl;
     
     @Param({"1", "2", "4"})
