@@ -145,6 +145,6 @@ public class KMeansJava extends KMeansRolez {
     public static void main(final String[] args) {
         int numTasks = 1;
         GuardedArray<String[]> wrapped = wrap(args);
-        TaskSystem.getDefault().run(new KMeansJava(10, 10, numTasks, 0L).$mainTask(wrapped));
+        TaskSystem.getDefault().run(new KMeansJava(10, 10, numTasks, 0L).main$Task(wrapped));
     }
 }

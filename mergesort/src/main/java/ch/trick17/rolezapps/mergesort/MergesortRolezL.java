@@ -15,7 +15,7 @@ public class MergesortRolezL extends MergesortRolez {
     }
     
     public static void main(String[] args) {
-        TaskSystem.getDefault().run(new MergesortRolezL(0L).$mainTask(GuardedArray.<String[]> wrap(args)));
+        TaskSystem.getDefault().run(new MergesortRolezL(0L).main$Task(GuardedArray.<String[]> wrap(args)));
     }
     
     @Override

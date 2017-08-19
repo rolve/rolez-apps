@@ -33,7 +33,7 @@ public class QuicksortRolezL extends QuicksortRolez {
         final boolean sortRight = left < (end - 1);
         if(level < this.maxLevel) {
             if(sortLeft)
-                TaskSystem.getDefault().start($doSortTask(s.slice(begin, right + 1, 1), begin, right
+                TaskSystem.getDefault().start(doSort$Task(s.slice(begin, right + 1, 1), begin, right
                         + 1, level + 1));
             
             if(sortRight)
@@ -49,7 +49,7 @@ public class QuicksortRolezL extends QuicksortRolez {
     }
     
     @Override
-    public Task<Void> $doSortTask(final GuardedSlice<int[]> s, final int begin, final int end,
+    public Task<Void> doSort$Task(final GuardedSlice<int[]> s, final int begin, final int end,
             final int level) {
         return new Task<Void>(new Object[]{s}, new Object[]{}) {
             @Override
@@ -75,7 +75,7 @@ public class QuicksortRolezL extends QuicksortRolez {
                 boolean sortRight = left < (end - 1);
                 if(level < maxLevel) {
                     if(sortLeft)
-                        TaskSystem.getDefault().start($doSortTask(s.slice(begin, right + 1, 1),
+                        TaskSystem.getDefault().start(doSort$Task(s.slice(begin, right + 1, 1),
                                 begin, right + 1, level + 1));
                     
                     if(sortRight)

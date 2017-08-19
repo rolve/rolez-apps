@@ -72,7 +72,7 @@ public class IdeaEncryptionRolezArrayOpt extends IdeaEncryptionRolez {
     }
     
     @Override
-    public Task<Void> $encryptDecryptTask(final GuardedSlice<byte[]> src,
+    public Task<Void> encryptDecrypt$Task(final GuardedSlice<byte[]> src,
             final GuardedSlice<byte[]> dst, final int[] key) {
         return new Task<Void>(new Object[]{dst}, new Object[]{src}) {
             @Override
@@ -131,7 +131,7 @@ public class IdeaEncryptionRolezArrayOpt extends IdeaEncryptionRolez {
     }
     
     @Override
-    public Task<Void> $mainTask() {
+    public Task<Void> main$Task() {
         return new rolez.lang.Task<Void>(new Object[]{this}, new Object[]{}) {
             @Override
             protected java.lang.Void runRolez() {
@@ -153,6 +153,6 @@ public class IdeaEncryptionRolezArrayOpt extends IdeaEncryptionRolez {
     }
     
     public static void main(final java.lang.String[] args) {
-        rolez.lang.TaskSystem.getDefault().run(new IdeaEncryptionRolezArrayOpt(0L).$mainTask());
+        rolez.lang.TaskSystem.getDefault().run(new IdeaEncryptionRolezArrayOpt(0L).main$Task());
     }
 }
