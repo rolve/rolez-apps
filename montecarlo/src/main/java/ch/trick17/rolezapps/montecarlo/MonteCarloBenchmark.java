@@ -56,12 +56,12 @@ public class MonteCarloBenchmark {
     
     @Benchmark
     public void monteCarlo() {
-        app.run(currentTask().idBits());
+        app.run$Unguarded(currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)
     public void tearDown() {
-        double expectedReturnRate = app.avgExpectedReturnRate(currentTask().idBits());
+        double expectedReturnRate = app.avgExpectedReturnRate$Unguarded(currentTask().idBits());
         double dev = abs(expectedReturnRate - REF_VALS.get(n));
         if(dev > 1.0e-12)
             throw new AssertionError("Validation failed");

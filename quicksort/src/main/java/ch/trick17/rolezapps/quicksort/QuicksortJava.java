@@ -9,11 +9,11 @@ public class QuicksortJava extends Quicksort {
     }
     
     @Override
-    public void sort(final GuardedArray<int[]> s, long $task) {
+    public void sort$Unguarded(final GuardedArray<int[]> s, long $task) {
         doSort(s.data, 0, s.data.length, 0);
     }
     
-    public void doSort(int[] s, int begin, int end, int level) {
+    private void doSort(int[] s, int begin, int end, int level) {
         int pivot = pivot(s, begin, end);
         int left = begin;
         int right = end - 1;
@@ -56,7 +56,7 @@ public class QuicksortJava extends Quicksort {
             } catch(InterruptedException e) {}
     }
     
-    public Runnable $doSortTask(final int[] s, final int begin, final int end, final int level) {
+    private Runnable $doSortTask(final int[] s, final int begin, final int end, final int level) {
         return new Runnable() {
             public void run() {
                 doSort(s, begin, end, level);
@@ -64,7 +64,7 @@ public class QuicksortJava extends Quicksort {
         };
     }
     
-    public int pivot(int[] s, int begin, int end) {
+    private int pivot(int[] s, int begin, int end) {
         int l = s[begin];
         int m = s[begin + ((end - begin) / 2)];
         int r = s[end - 1];

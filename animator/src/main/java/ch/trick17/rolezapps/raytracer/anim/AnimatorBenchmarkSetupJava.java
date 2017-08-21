@@ -33,7 +33,7 @@ public class AnimatorBenchmarkSetupJava extends AnimatorBenchmarkSetup {
     }
     
     @Override
-    public void runAnimator(long $task) {
+    public void runAnimator$Unguarded(long $task) {
         try {
             animator.render();
         } catch(IOException e) {

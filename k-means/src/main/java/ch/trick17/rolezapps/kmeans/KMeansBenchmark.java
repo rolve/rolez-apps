@@ -51,12 +51,12 @@ public class KMeansBenchmark {
         clusters = n / 100;
         kMeans = instantiateBenchmark(KMeans.class, impl, dim, clusters, tasks,
                 currentTask().idBits());
-        data = kMeans.createDataSet(n, new Random(42), currentTask().idBits());
+        data = kMeans.createDataSet$Unguarded(n, new Random(42), currentTask().idBits());
     }
     
     @Benchmark
     public Object kMeans() {
-        return kMeans.kMeans(data, maxIters, currentTask().idBits());
+        return kMeans.kMeans$Unguarded(data, maxIters, currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)

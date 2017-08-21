@@ -47,7 +47,7 @@ public class RaytracerBenchmark {
     
     @Benchmark
     public int raytracer() {
-        return setup.runRaytracer(currentTask().idBits());
+        return setup.runRaytracer$Unguarded(currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)

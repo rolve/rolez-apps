@@ -67,7 +67,7 @@ public class MonteCarloAppJava extends MonteCarloApp {
     }
     
     @Override
-    public void run(long $task) {
+    public void run$Unguarded(long $task) {
         SliceRange fullRange = new SliceRange(0, runs, 1);
         SliceRange[] ranges = ContiguousPartitioner.INSTANCE.partition(fullRange, numTasks);
         
@@ -93,7 +93,7 @@ public class MonteCarloAppJava extends MonteCarloApp {
      * correct, but shall take an average over all the simulated rate paths.
      */
     @Override
-    public double avgExpectedReturnRate(long $task) {
+    public double avgExpectedReturnRate$Unguarded(long $task) {
         double result = 0.0;
         for(int i = 0; i < runs; i++)
             result += results.get(i);

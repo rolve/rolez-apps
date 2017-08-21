@@ -14,7 +14,7 @@ public class NBodyJava extends NBody {
     }
     
     @Override
-    public void createSystem(Random random, long $task) {
+    public void createSystem$Unguarded(Random random, long $task) {
         system = new BodyJava[bodies];
         double px = 0.0;
         double py = 0.0;
@@ -31,16 +31,16 @@ public class NBodyJava extends NBody {
     }
     
     @Override
-    public void simulate(long $task) {
+    public void simulate$Unguarded(long $task) {
         for(int i = 0; i < iterations; i++)
             simulationStep();
     }
     
-    public void simulationStep() {
+    private void simulationStep() {
         Thread[] threads = new Thread[tasks];
         SliceRange[] ranges = ContiguousPartitioner.INSTANCE.partition(new SliceRange(0, bodies, 1), tasks);
         for(int t = 0; t < tasks; t++) {
-            Thread thread = new Thread(this.$updateVelocityTask(ranges[t]));
+            Thread thread = new Thread(this.updateVelocity(ranges[t]));
             threads[t] = thread;
             thread.start();
         }
@@ -53,7 +53,7 @@ public class NBodyJava extends NBody {
         }
         
         for(int t = 0; t < tasks; t++) {
-            Thread thread = new Thread(this.$updatePositionTask(ranges[t]));
+            Thread thread = new Thread(this.updatePosition(ranges[t]));
             threads[t] = thread;
             thread.start();
         }
@@ -66,7 +66,7 @@ public class NBodyJava extends NBody {
         }
     }
     
-    public Runnable $updateVelocityTask(final SliceRange range) {
+    private Runnable updateVelocity(final SliceRange range) {
         return new Runnable() {
             public void run() {
                 for(int i = range.begin; i < range.end; i += range.step) {
@@ -89,7 +89,7 @@ public class NBodyJava extends NBody {
         };
     }
     
-    public Runnable $updatePositionTask(final SliceRange range) {
+    private Runnable updatePosition(final SliceRange range) {
         return new Runnable() {
             public void run() {
                 for(int i = range.begin; i < range.end; i += range.step) {

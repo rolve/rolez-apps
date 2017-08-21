@@ -30,7 +30,7 @@ public class NBodyRolezLazySlicing extends ch.trick17.rolezapps.nbody.NBody {
     }
     
     @Override
-    public void createSystem(final Random random, final long $task) {
+    public void createSystem$Unguarded(final Random random, final long $task) {
         final GuardedArray<BodyWithFields[]> system = new GuardedArray<BodyWithFields[]>(new BodyWithFields[this.bodies]);
         double px = 0.0;
         double py = 0.0;
@@ -44,25 +44,25 @@ public class NBodyRolezLazySlicing extends ch.trick17.rolezapps.nbody.NBody {
         }
         final double s = Constants.INSTANCE.solarMass;
         system.data[0] = new BodyWithFields(0.0, 0.0, 0.0, (-px) / s, (-py) / s, (-pz) / s, s, $task);
-        guardReadWrite(this, $task).system = system;
+        this.system = system;
     }
     
     @Override
-    public void simulate(final long $task) {
+    public void simulate$Unguarded(final long $task) {
         for(int i = 0; i < this.iterations; i++)
             this.simulationStep($task);
     }
     
-    public void simulationStep(final long $task) {
+    private void simulationStep(final long $task) {
         final Tasks $tasks = new Tasks();
         try {
             GuardedArray<GuardedSlice<BodyWithFields[]>[]> veloSlices = this.system.partition(ContiguousPartitioner.INSTANCE, this.tasks);
             for(int t = 0; t < this.tasks; t++)
-                $tasks.addInline(TaskSystem.getDefault().start(this.$updateVelocityTask(velocityView(guardReadOnly(veloSlices, $task).data[t]), positionsView(system))));
+                $tasks.addInline(TaskSystem.getDefault().start(this.updateVelocity$Task(velocityView(guardReadOnly(veloSlices, $task).data[t]), positionsView(system))));
             
             GuardedArray<GuardedSlice<BodyWithFields[]>[]> bodiesSlices = guardReadOnly(this, $task).system.partition(ContiguousPartitioner.INSTANCE, this.tasks);
             for(int t = 0; t < this.tasks; t++)
-                $tasks.addInline(TaskSystem.getDefault().start(this.$updatePositionTask(guardReadOnly(bodiesSlices, $task).data[t])));
+                $tasks.addInline(TaskSystem.getDefault().start(this.updatePosition$Task(guardReadOnly(bodiesSlices, $task).data[t])));
         }
         finally {
             $tasks.joinAll();
@@ -105,7 +105,7 @@ public class NBodyRolezLazySlicing extends ch.trick17.rolezapps.nbody.NBody {
         R apply(A arg);
     }
     
-    public Task<Void> $updateVelocityTask(final GuardedSliceViewWithMap<?, BodyWithFields£velocity> velocities, final GuardedSliceViewWithMap<?, BodyWithFields£position> positions) {
+    private Task<Void> updateVelocity$Task(final GuardedSliceViewWithMap<?, BodyWithFields£velocity> velocities, final GuardedSliceViewWithMap<?, BodyWithFields£position> positions) {
         return new Task<Void>(new Object[]{velocities}, new Object[]{positions}) {
             @Override
             protected Void runRolez() {
@@ -131,7 +131,7 @@ public class NBodyRolezLazySlicing extends ch.trick17.rolezapps.nbody.NBody {
         };
     }
     
-    public Task<Void> $updatePositionTask(final GuardedSlice<BodyWithFields[]> bodies) {
+    private Task<Void> updatePosition$Task(final GuardedSlice<BodyWithFields[]> bodies) {
         return new Task<Void>(new Object[]{bodies}, new Object[]{}) {
             @Override
             protected Void runRolez() {
@@ -147,7 +147,7 @@ public class NBodyRolezLazySlicing extends ch.trick17.rolezapps.nbody.NBody {
         };
     }
     
-    public Task<Void> $mainTask() {
+    private Task<Void> main$Task() {
         return new Task<Void>(new Object[]{this}, new Object[]{}) {
             @Override
             protected Void runRolez() {
@@ -165,7 +165,7 @@ public class NBodyRolezLazySlicing extends ch.trick17.rolezapps.nbody.NBody {
     }
     
     public static void main(final String[] args) {
-        TaskSystem.getDefault().run(new NBodyRolezLazySlicing(0L).$mainTask());
+        TaskSystem.getDefault().run(new NBodyRolezLazySlicing(0L).main$Task());
     }
     
     @Override

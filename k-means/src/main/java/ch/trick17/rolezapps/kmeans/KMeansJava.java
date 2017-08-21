@@ -22,7 +22,7 @@ public class KMeansJava extends KMeansRolez {
     }
     
     @Override
-    public GuardedArray<double[][]> kMeans(GuardedArray<double[][]> dataSet, int maxIterations,
+    public GuardedArray<double[][]> kMeans$Unguarded(GuardedArray<double[][]> dataSet, int maxIterations,
             long $task) {
         int n = dataSet.data.length;
         Random random = new Random();

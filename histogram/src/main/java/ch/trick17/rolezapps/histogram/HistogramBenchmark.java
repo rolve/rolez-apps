@@ -53,7 +53,7 @@ public class HistogramBenchmark {
     
     @Benchmark
     public void histogram() {
-        histogram.compute(tasks, currentTask().idBits());
+        histogram.compute$Unguarded(tasks, currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)

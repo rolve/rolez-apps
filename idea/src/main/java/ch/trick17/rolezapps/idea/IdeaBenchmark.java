@@ -41,17 +41,17 @@ public class IdeaBenchmark {
         Task.registerNewRootTask();
         idea = instantiateBenchmark(IdeaEncryption.class, impl, n, tasks,
                 Task.currentTask().idBits());
-        idea.buildTestData(new Random(136506717L), Task.currentTask().idBits());
+        idea.buildTestData$Unguarded(new Random(136506717L), Task.currentTask().idBits());
     }
     
     @Benchmark
     public void idea() {
-        idea.run(Task.currentTask().idBits());
+        idea.run$Unguarded(Task.currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)
     public void tearDown() {
-        idea.validate(Task.currentTask().idBits());
+        idea.validate$Unguarded(Task.currentTask().idBits());
         Task.unregisterRootTask();
     }
     

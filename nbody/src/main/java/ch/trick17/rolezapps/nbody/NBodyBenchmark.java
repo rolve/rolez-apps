@@ -42,12 +42,12 @@ public class NBodyBenchmark {
     public void setup() {
         Task.registerNewRootTask();
         nbody = instantiateBenchmark(NBody.class, impl, n, iterations, tasks, Task.currentTask().idBits());
-        nbody.createSystem(new Random(42), Task.currentTask().idBits());
+        nbody.createSystem$Unguarded(new Random(42), Task.currentTask().idBits());
     }
     
     @Benchmark
     public void nbody() {
-        nbody.simulate(Task.currentTask().idBits());
+        nbody.simulate$Unguarded(Task.currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)

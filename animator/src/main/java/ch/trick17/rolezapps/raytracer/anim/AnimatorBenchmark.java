@@ -44,7 +44,7 @@ public class AnimatorBenchmark {
     
     @Benchmark
     public void animator() {
-        setup.runAnimator(currentTask().idBits());
+        setup.runAnimator$Unguarded(currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)

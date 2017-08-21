@@ -23,7 +23,7 @@ public class RaytracerBenchmarkSetupJava extends RaytracerBenchmarkSetup {
         raytracer.scene = scene;
     }
     
-    public Scene createBenchmarkScene(Random random) {
+    private Scene createBenchmarkScene(Random random) {
         AnimatedScene scene = new AnimatedScene(30);
         AnimatorApp.buildScene(scene, random);
         for(int t = 1; t <= 8; t += 1)
@@ -32,7 +32,7 @@ public class RaytracerBenchmarkSetupJava extends RaytracerBenchmarkSetup {
     }
     
     @Override
-    public int runRaytracer(long task) {
+    public int runRaytracer$Unguarded(long task) {
         raytracer.render(image);
         return image[0][0];
     }

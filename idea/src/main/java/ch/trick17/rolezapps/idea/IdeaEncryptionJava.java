@@ -33,7 +33,7 @@ public class IdeaEncryptionJava extends IdeaEncryption {
      * Builds the data used for the test
      */
     @Override
-    public void buildTestData(Random random, long $task) {
+    public void buildTestData$Unguarded(Random random, long $task) {
         plain     = new byte[size];
         encrypted = new byte[size];
         decrypted = new byte[size];
@@ -154,7 +154,7 @@ public class IdeaEncryptionJava extends IdeaEncryption {
     }
     
     @Override
-    public void run(long $task) {
+    public void run$Unguarded(long $task) {
         // Encrypt
         List<Thread> threads = new ArrayList<>();
         for(int i = 1; i < tasks; i++) {

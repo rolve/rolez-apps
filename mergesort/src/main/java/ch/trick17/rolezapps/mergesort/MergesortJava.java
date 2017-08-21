@@ -9,7 +9,7 @@ public class MergesortJava extends Mergesort {
     }
     
     @Override
-    public void sort(GuardedArray<int[]> a, long $task) {
+    public void sort$Unguarded(GuardedArray<int[]> a, long $task) {
         int[] b = a.data.clone();
         doSort(b, a.data, 0, a.data.length, 0);
     }

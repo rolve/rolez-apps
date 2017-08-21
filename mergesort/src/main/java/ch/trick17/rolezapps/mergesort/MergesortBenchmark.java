@@ -48,16 +48,16 @@ public class MergesortBenchmark {
         Random random = new Random(42);
         int maxLevel = MathExtra.INSTANCE.log2(tasks, currentTask().idBits());
         mergesort = instantiateBenchmark(Mergesort.class, impl, maxLevel, currentTask().idBits());
-        data1 = mergesort.shuffledInts(n, random, currentTask().idBits());
-        data2 = mergesort.shuffledInts(n, random, currentTask().idBits());
-        data3 = mergesort.shuffledInts(n, random, currentTask().idBits());
+        data1 = mergesort.shuffledInts$Unguarded(n, random, currentTask().idBits());
+        data2 = mergesort.shuffledInts$Unguarded(n, random, currentTask().idBits());
+        data3 = mergesort.shuffledInts$Unguarded(n, random, currentTask().idBits());
     }
     
     @Benchmark
     public void mergesort() {
-        mergesort.sort(data1, currentTask().idBits());
-        mergesort.sort(data2, currentTask().idBits());
-        mergesort.sort(data3, currentTask().idBits());
+        mergesort.sort$Unguarded(data1, currentTask().idBits());
+        mergesort.sort$Unguarded(data2, currentTask().idBits());
+        mergesort.sort$Unguarded(data3, currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)

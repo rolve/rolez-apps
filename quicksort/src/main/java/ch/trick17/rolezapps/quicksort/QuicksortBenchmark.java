@@ -48,16 +48,16 @@ public class QuicksortBenchmark {
         Task.registerNewRootTask();
         int maxLevel = MathExtra.INSTANCE.log2(tasks, currentTask().idBits());
         quicksort = instantiateBenchmark(Quicksort.class, impl, maxLevel, currentTask().idBits());
-        data1 = quicksort.shuffledInts(n, random, currentTask().idBits());
-        data2 = quicksort.shuffledInts(n, random, currentTask().idBits());
-        data3 = quicksort.shuffledInts(n, random, currentTask().idBits());
+        data1 = quicksort.shuffledInts$Unguarded(n, random, currentTask().idBits());
+        data2 = quicksort.shuffledInts$Unguarded(n, random, currentTask().idBits());
+        data3 = quicksort.shuffledInts$Unguarded(n, random, currentTask().idBits());
     }
     
     @Benchmark
     public void quicksort() {
-        quicksort.sort(data1, currentTask().idBits());
-        quicksort.sort(data2, currentTask().idBits());
-        quicksort.sort(data3, currentTask().idBits());
+        quicksort.sort$Unguarded(data1, currentTask().idBits());
+        quicksort.sort$Unguarded(data2, currentTask().idBits());
+        quicksort.sort$Unguarded(data3, currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)

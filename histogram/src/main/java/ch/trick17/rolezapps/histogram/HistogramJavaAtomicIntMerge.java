@@ -27,7 +27,7 @@ public class HistogramJavaAtomicIntMerge extends Histogram {
     }
     
     @Override
-    public void compute(int numTasks, long $task) {
+    public void compute$Unguarded(int numTasks, long $task) {
         SliceRange[] ranges = ContiguousPartitioner.INSTANCE.partition(new SliceRange(0, image.length, 1), numTasks, 0);
         
         Thread[] threads = new Thread[numTasks - 1];
