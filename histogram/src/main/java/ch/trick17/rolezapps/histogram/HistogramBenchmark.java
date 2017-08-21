@@ -24,7 +24,7 @@ import rolez.lang.GuardedArray;
 import rolez.lang.Task;
 
 @BenchmarkMode(SingleShotTime)
-@Fork(value = 1, jvmArgsAppend = {"-XX:+UnlockExperimentalVMOptions", "-XX:+TrustFinalNonStaticFields"})
+@Fork(1)
 @State(Thread)
 public class HistogramBenchmark {
     
