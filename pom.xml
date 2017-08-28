@@ -19,5 +19,6 @@
         <module>idea</module>
         <module>histogram</module>
         <module>animator</module>
+        <module>nbody</module>
     </modules>
 </project>
