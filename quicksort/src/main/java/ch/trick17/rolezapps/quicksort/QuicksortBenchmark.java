@@ -19,6 +19,8 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import classes.QuicksortChecked;
+import rolez.checked.lang.CheckedArray;
 import rolez.lang.GuardedArray;
 import rolez.lang.MathExtra;
 import rolez.lang.Task;
@@ -31,10 +33,11 @@ public class QuicksortBenchmark {
     @Param({"300000", "1500000", "6000000"})
     int n;
     
-    @Param({"Rolez", "RolezL", "Java"})
+    @Param({"Checked", "Rolez", "Java"})
     String impl;
-    
-    @Param({"1", "2", "4", "8", "16", "32"})
+
+    //@Param({"1", "2", "4", "8", "16"})
+    @Param({"1", "2", "4"})
     int tasks;
     
     Quicksort quicksort;
@@ -42,32 +45,73 @@ public class QuicksortBenchmark {
     GuardedArray<int[]> data2;
     GuardedArray<int[]> data3;
     
+    QuicksortChecked quicksortC;
+    CheckedArray<int[]> cData1;
+    CheckedArray<int[]> cData2;
+    CheckedArray<int[]> cData3;
+    
     @Setup(Level.Iteration)
     public void setup() {
         Random random = new Random(42);
         Task.registerNewRootTask();
-        int maxLevel = MathExtra.INSTANCE.log2(tasks, currentTask().idBits());
-        quicksort = instantiateBenchmark(Quicksort.class, impl, maxLevel, currentTask().idBits());
-        data1 = quicksort.shuffledInts(n, random, currentTask().idBits());
-        data2 = quicksort.shuffledInts(n, random, currentTask().idBits());
-        data3 = quicksort.shuffledInts(n, random, currentTask().idBits());
+        int maxLevel = MathExtra.INSTANCE.log2(tasks, Task.currentTask().idBits());
+        if (impl.equals("Checked")) {
+            rolez.checked.lang.Task.registerNewRootTask();
+        	quicksortC = new QuicksortChecked(maxLevel, rolez.checked.lang.Task.currentTask().idBits());
+            cData1 = quicksortC.shuffledInts(n, random, rolez.checked.lang.Task.currentTask().idBits());
+            cData2 = quicksortC.shuffledInts(n, random, rolez.checked.lang.Task.currentTask().idBits());
+            cData3 = quicksortC.shuffledInts(n, random, rolez.checked.lang.Task.currentTask().idBits());
+        } else {
+        	quicksort = instantiateBenchmark(Quicksort.class, impl, maxLevel, currentTask().idBits());
+            data1 = quicksort.shuffledInts(n, random, currentTask().idBits());
+            data2 = quicksort.shuffledInts(n, random, currentTask().idBits());
+            data3 = quicksort.shuffledInts(n, random, currentTask().idBits());
+        }
+        	
     }
     
     @Benchmark
     public void quicksort() {
-        quicksort.sort(data1, currentTask().idBits());
-        quicksort.sort(data2, currentTask().idBits());
-        quicksort.sort(data3, currentTask().idBits());
+    	if (impl.equals("Checked")) {
+    		long idBits = rolez.checked.lang.Task.currentTask().idBits();
+    		quicksortC.sort(cData1, idBits);
+    		quicksortC.sort(cData2, idBits);
+    		quicksortC.sort(cData3, idBits);
+    	} else {
+	        quicksort.sort(data1, currentTask().idBits());
+	        quicksort.sort(data2, currentTask().idBits());
+	        quicksort.sort(data3, currentTask().idBits());
+    	}
     }
     
     @TearDown(Level.Iteration)
     public void tearDown() {
-        Task.unregisterRootTask();
+    	if (impl.equals("Checked")) {
+            rolez.checked.lang.Task.unregisterRootTask();
+            if (!isSorted(cData1.getUncheckedArrayRead()) || !isSorted(cData2.getUncheckedArrayRead()) || !isSorted(cData3.getUncheckedArrayRead())) {
+    	    	Task.unregisterRootTask();
+            	throw new AssertionError("Array not sorted!");
+            }
+        	Task.unregisterRootTask();
+    	} else {
+    		if (!isSorted(data1.data) || !isSorted(data2.data) || !isSorted(data3.data)) {
+    	    	Task.unregisterRootTask();
+            	throw new AssertionError("Array not sorted!");
+    		}
+    		Task.unregisterRootTask();
+    	}
+    }
+    
+    private boolean isSorted(int[] array) {
+    	for (int i : array) {
+    		if (array[i] != i) return false;
+    	}
+    	return true;
     }
     
     public static void main(String[] args) {
         Options options = new OptionsBuilder().include(QuicksortBenchmark.class.getSimpleName())
-                .warmupIterations(10).measurementIterations(30).build();
+                .warmupIterations(5).measurementIterations(10).build();
         runAndPlot(options);
     }
 }
