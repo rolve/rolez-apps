@@ -1,11 +1,14 @@
 #!/bin/bash
 
-benchmarks="animator histogram idea k-means mergesort montecarlo quicksort raytracer"
+benchmarks="idea mergesort quicksort"
 
 
 for b in $benchmarks
 do
-    cd $b
+	./clean.sh $b
+    cd $b/lib
+	./installJar.sh
+	cd ..
     mvn clean compile exec:java
     cp *.pdf ..
     cd ..
