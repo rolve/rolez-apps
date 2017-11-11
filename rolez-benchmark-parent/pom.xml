@@ -41,7 +41,6 @@
                 </file>
             </activation>
             <build>
-            <pluginManagement>
                 <plugins>
                     <plugin>
                         <artifactId>maven-dependency-plugin</artifactId>
@@ -76,7 +75,6 @@
                         </configuration>
                     </plugin>
                 </plugins>
-            </pluginManagement>
             </build>
         </profile>
     </profiles>
