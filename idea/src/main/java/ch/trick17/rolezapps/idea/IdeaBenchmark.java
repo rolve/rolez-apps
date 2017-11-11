@@ -18,6 +18,7 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import classes.IdeaChecked;
 import rolez.lang.Task;
 
 @BenchmarkMode(SingleShotTime)
@@ -28,16 +29,23 @@ public class IdeaBenchmark {
     @Param({"3000000", "20000000", "50000000"})
     int n;
     
-    @Param({"Rolez", "Java"})
+    @Param({"Checked", "Rolez", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16", "32"})
     int tasks;
     
     IdeaEncryption idea;
+    IdeaChecked ideaC;
     
     @Setup(Level.Iteration)
     public void setup() {
+    	if (impl.equals("Checked")) {
+    		rolez.checked.lang.Task.registerNewRootTask();
+    		ideaC = new IdeaChecked(n, tasks, rolez.checked.lang.Task.currentTask().idBits());
+    		ideaC.buildTestData(new Random(136506717L), rolez.checked.lang.Task.currentTask().idBits());
+    		return;
+    	}
         Task.registerNewRootTask();
         idea = instantiateBenchmark(IdeaEncryption.class, impl, n, tasks,
                 Task.currentTask().idBits());
@@ -46,11 +54,20 @@ public class IdeaBenchmark {
     
     @Benchmark
     public void idea() {
+    	if (impl.equals("Checked")) {
+    		ideaC.run(rolez.checked.lang.Task.currentTask().idBits());
+    		return;
+    	}
         idea.run(Task.currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)
     public void tearDown() {
+    	if (impl.equals("Checked")) {
+    		ideaC.validate(rolez.checked.lang.Task.currentTask().idBits());
+    		rolez.checked.lang.Task.unregisterRootTask();
+    		return;
+    	}
         idea.validate(Task.currentTask().idBits());
         Task.unregisterRootTask();
     }
