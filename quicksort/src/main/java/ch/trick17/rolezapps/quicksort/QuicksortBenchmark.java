@@ -19,7 +19,7 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import classes.QuicksortChecked;
+import classes.AppQuicksort;
 import rolez.checked.lang.CheckedArray;
 import rolez.lang.GuardedArray;
 import rolez.lang.MathExtra;
@@ -45,7 +45,7 @@ public class QuicksortBenchmark {
     GuardedArray<int[]> data2;
     GuardedArray<int[]> data3;
     
-    QuicksortChecked quicksortC;
+    AppQuicksort quicksortC;
     CheckedArray<int[]> cData1;
     CheckedArray<int[]> cData2;
     CheckedArray<int[]> cData3;
@@ -57,7 +57,7 @@ public class QuicksortBenchmark {
         int maxLevel = MathExtra.INSTANCE.log2(tasks, Task.currentTask().idBits());
         if (impl.equals("Checked")) {
             rolez.checked.lang.Task.registerNewRootTask();
-        	quicksortC = new QuicksortChecked(maxLevel, rolez.checked.lang.Task.currentTask().idBits());
+        	quicksortC = new AppQuicksort(maxLevel, rolez.checked.lang.Task.currentTask().idBits());
             cData1 = quicksortC.shuffledInts(n, random, rolez.checked.lang.Task.currentTask().idBits());
             cData2 = quicksortC.shuffledInts(n, random, rolez.checked.lang.Task.currentTask().idBits());
             cData3 = quicksortC.shuffledInts(n, random, rolez.checked.lang.Task.currentTask().idBits());

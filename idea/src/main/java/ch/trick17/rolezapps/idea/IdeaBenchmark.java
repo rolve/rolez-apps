@@ -18,7 +18,7 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import classes.IdeaChecked;
+import classes.AppIdea;
 import rolez.lang.Task;
 
 @BenchmarkMode(SingleShotTime)
@@ -36,13 +36,13 @@ public class IdeaBenchmark {
     int tasks;
     
     IdeaEncryption idea;
-    IdeaChecked ideaC;
+    AppIdea ideaC;
     
     @Setup(Level.Iteration)
     public void setup() {
     	if (impl.equals("Checked")) {
     		rolez.checked.lang.Task.registerNewRootTask();
-    		ideaC = new IdeaChecked(n, tasks, rolez.checked.lang.Task.currentTask().idBits());
+    		ideaC = new AppIdea(n, tasks, rolez.checked.lang.Task.currentTask().idBits());
     		ideaC.buildTestData(new Random(136506717L), rolez.checked.lang.Task.currentTask().idBits());
     		return;
     	}

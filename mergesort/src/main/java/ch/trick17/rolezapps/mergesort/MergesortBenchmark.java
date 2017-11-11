@@ -19,6 +19,8 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import classes.AppMergesort;
+import rolez.checked.lang.CheckedArray;
 import rolez.lang.GuardedArray;
 import rolez.lang.MathExtra;
 import rolez.lang.Task;
@@ -38,15 +40,27 @@ public class MergesortBenchmark {
     int tasks;
     
     Mergesort mergesort;
+    AppMergesort mergesortC;
     GuardedArray<int[]> data1;
     GuardedArray<int[]> data2;
     GuardedArray<int[]> data3;
+    CheckedArray<int[]> cData1;
+    CheckedArray<int[]> cData2;
+    CheckedArray<int[]> cData3;
     
     @Setup(Level.Iteration)
     public void setup() {
         Task.registerNewRootTask();
         Random random = new Random(42);
         int maxLevel = MathExtra.INSTANCE.log2(tasks, currentTask().idBits());
+        if (impl.equals("Checked")) {
+            rolez.checked.lang.Task.registerNewRootTask();
+            mergesortC = new AppMergesort(maxLevel, rolez.checked.lang.Task.currentTask().idBits());
+            cData1 = mergesortC.shuffledInts(n, random, rolez.checked.lang.Task.currentTask().idBits());
+            cData2 = mergesortC.shuffledInts(n, random, rolez.checked.lang.Task.currentTask().idBits());
+            cData3 = mergesortC.shuffledInts(n, random, rolez.checked.lang.Task.currentTask().idBits());
+            return;
+        }
         mergesort = instantiateBenchmark(Mergesort.class, impl, maxLevel, currentTask().idBits());
         data1 = mergesort.shuffledInts(n, random, currentTask().idBits());
         data2 = mergesort.shuffledInts(n, random, currentTask().idBits());
@@ -55,6 +69,12 @@ public class MergesortBenchmark {
     
     @Benchmark
     public void mergesort() {
+    	if (impl.equals("Checked")) {
+    		mergesortC.sort(cData1, rolez.checked.lang.Task.currentTask().idBits());
+    		mergesortC.sort(cData2, rolez.checked.lang.Task.currentTask().idBits());
+    		mergesortC.sort(cData3, rolez.checked.lang.Task.currentTask().idBits());
+    		return;
+    	}
         mergesort.sort(data1, currentTask().idBits());
         mergesort.sort(data2, currentTask().idBits());
         mergesort.sort(data3, currentTask().idBits());
@@ -62,7 +82,27 @@ public class MergesortBenchmark {
     
     @TearDown(Level.Iteration)
     public void tearDown() {
-        Task.unregisterRootTask();
+    	if (impl.equals("Checked")) {
+            rolez.checked.lang.Task.unregisterRootTask();
+            if (!isSorted(cData1.getUncheckedArrayRead()) || !isSorted(cData2.getUncheckedArrayRead()) || !isSorted(cData3.getUncheckedArrayRead())) {
+    	    	Task.unregisterRootTask();
+            	throw new AssertionError("Array not sorted!");
+            }
+        	Task.unregisterRootTask();
+    	} else {
+    		if (!isSorted(data1.data) || !isSorted(data2.data) || !isSorted(data3.data)) {
+    	    	Task.unregisterRootTask();
+            	throw new AssertionError("Array not sorted!");
+    		}
+    		Task.unregisterRootTask();
+    	}
+    }
+    
+    private boolean isSorted(int[] array) {
+    	for (int i : array) {
+    		if (array[i] != i) return false;
+    	}
+    	return true;
     }
     
     public static void main(String[] args) {
