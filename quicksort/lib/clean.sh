@@ -1,2 +1,2 @@
 rm -r quicksort
-rm -r classes.jar
+rm -r checked.jar
