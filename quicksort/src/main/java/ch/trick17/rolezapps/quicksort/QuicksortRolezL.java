@@ -12,7 +12,9 @@ public class QuicksortRolezL extends QuicksortRolez {
     
     @Override
     public void doSort(GuardedSlice<int[]> s, int begin, int end, int level, long $task) {
-        int pivot = this.pivot(s, begin, end, $task);
+    	final rolez.internal.Tasks $tasks = new rolez.internal.Tasks();
+    	try {
+    	int pivot = this.pivot(s, begin, end, $task);
         int left = begin;
         int right = end - 1;
         guardReadWrite(s, $task);
@@ -33,8 +35,7 @@ public class QuicksortRolezL extends QuicksortRolez {
         final boolean sortRight = left < (end - 1);
         if(level < this.maxLevel) {
             if(sortLeft)
-                TaskSystem.getDefault().start($doSortTask(s.slice(begin, right + 1, 1), begin, right
-                        + 1, level + 1));
+            	$tasks.addInline(rolez.lang.TaskSystem.getDefault().start(this.$doSortTask(s.slice(begin, right + 1), begin, right + 1, level + 1)));
             
             if(sortRight)
                 this.doSort(s.slice(left, end, 1), left, end, level + 1, $task);
@@ -45,6 +46,10 @@ public class QuicksortRolezL extends QuicksortRolez {
             
             if(sortRight)
                 this.doSort(s, left, end, level + 1, $task);
+        }
+    	}
+        finally {
+            $tasks.joinAll();
         }
     }
     
