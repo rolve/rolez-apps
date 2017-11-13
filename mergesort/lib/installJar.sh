@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cd ../../../lightweight-rolez/ch.trick17.rolez.checked.transformer/sootOutput/appMergesort/
 
 jar cvf checked.jar classes/*
