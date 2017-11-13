@@ -111,7 +111,7 @@ public class QuicksortBenchmark {
     
     public static void main(String[] args) {
         Options options = new OptionsBuilder().include(QuicksortBenchmark.class.getSimpleName())
-                .warmupIterations(5).measurementIterations(10).build();
+                .warmupIterations(10).measurementIterations(30).build();
         runAndPlot(options);
     }
 }
