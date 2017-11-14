@@ -36,7 +36,7 @@ public class QuicksortBenchmark {
     @Param({"Checked", "Rolez", "Java"})
     String impl;
 
-    @Param({"1", "2", "4", "8", "16", "32"})
+    @Param({"1", "2", "4", "8", "16"})
     int tasks;
     
     Quicksort quicksort;
