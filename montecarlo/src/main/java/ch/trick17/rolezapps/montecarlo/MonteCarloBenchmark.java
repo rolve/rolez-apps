@@ -21,6 +21,7 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import classes.AppMonteCarlo;
 import rolez.lang.Task;
 
 @BenchmarkMode(SingleShotTime)
@@ -39,34 +40,52 @@ public class MonteCarloBenchmark {
     @Param({"2000", "10000", "60000"})
     int n;
     
-    @Param({"1", "2", "4", "8", "16", "32"})
+    @Param({"1", "2", "4", "8", "16"})
     int tasks;
     
-    @Param({"Rolez", "Java"})
+    @Param({"Checked", "Rolez", "Java"})
     String impl;
     
     MonteCarloApp app;
+    AppMonteCarlo appC;
     
     @Setup(Level.Iteration)
     public void setup() {
-        Task.registerNewRootTask();
-        app = instantiateBenchmark(MonteCarloApp.class, impl, TIME_STEPS, n, tasks, FILE,
-                currentTask().idBits());
+    	if (impl.equals("Checked")) {
+    		rolez.checked.lang.Task.registerNewRootTask();
+    		appC = new AppMonteCarlo(TIME_STEPS, n, tasks, FILE, rolez.checked.lang.Task.currentTask().idBits());
+    	} else {
+	        Task.registerNewRootTask();
+	        app = instantiateBenchmark(MonteCarloApp.class, impl, TIME_STEPS, n, tasks, FILE,
+	                currentTask().idBits());
+    	}
     }
     
     @Benchmark
     public void monteCarlo() {
-        app.run(currentTask().idBits());
+    	if (impl.equals("Checked"))
+    		appC.run(rolez.checked.lang.Task.currentTask().idBits());
+    	else
+    		app.run(currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)
     public void tearDown() {
-        double expectedReturnRate = app.avgExpectedReturnRate(currentTask().idBits());
-        double dev = abs(expectedReturnRate - REF_VALS.get(n));
-        if(dev > 1.0e-12)
-            throw new AssertionError("Validation failed");
-        
-        Task.unregisterRootTask();
+    	if (impl.equals("Checked")) {
+    		double expectedReturnRate = appC.avgExpectedReturnRate(rolez.checked.lang.Task.currentTask().idBits());
+    		double dev = abs(expectedReturnRate - REF_VALS.get(n));
+    		if(dev > 1.0e-12)
+	            throw new AssertionError("Validation failed");
+    		
+    		rolez.checked.lang.Task.unregisterRootTask();
+    	} else {
+	        double expectedReturnRate = app.avgExpectedReturnRate(currentTask().idBits());
+	        double dev = abs(expectedReturnRate - REF_VALS.get(n));
+	        if(dev > 1.0e-12)
+	            throw new AssertionError("Validation failed");
+	        
+	        Task.unregisterRootTask();
+    	}
     }
 
     public static void main(String[] args) {

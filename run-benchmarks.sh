@@ -1,6 +1,6 @@
 #!/bin/bash
 
-benchmarks="idea mergesort quicksort"
+benchmarks="montecarlo idea mergesort quicksort"
 
 
 for b in $benchmarks
