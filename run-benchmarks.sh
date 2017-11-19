@@ -2,6 +2,9 @@
 
 benchmarks="histogram k-means montecarlo idea mergesort quicksort"
 
+cd ../lightweight-rolez/ch.trick17.rolez.checked.transformer
+mvn -Dtest=test.AppsTest test
+cd ../../rolez-apps
 
 for b in $benchmarks
 do
