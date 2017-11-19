@@ -19,6 +19,9 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import classes.AppKmeans;
+import rolez.checked.lang.CheckedArray;
+import rolez.checked.lang.Vector;
 import rolez.lang.GuardedArray;
 import rolez.lang.Task;
 
@@ -31,24 +34,32 @@ public class KMeansBenchmark {
     
     int dim = 10;
     
-    @Param({"20000", "50000", "100000"})
+    @Param({"20000"})
     int n;
     
-    @Param({"Rolez", "Java"})
+    @Param({"Checked", "Rolez", "Java"})
     String impl;
     
     int clusters;
     
-    @Param({"1", "2", "4", "8", "16", "32"})
+    @Param({"1"})
     int tasks;
     
     KMeans kMeans;
+    AppKmeans kMeansC;
     GuardedArray<double[][]> data;
+    CheckedArray<double[][]> cData;
     
     @Setup(Level.Iteration)
     public void setup() {
-        Task.registerNewRootTask();
         clusters = n / 100;
+    	if (impl.equals("Checked")) {
+    		rolez.checked.lang.Task.registerNewRootTask();
+    		kMeansC = new AppKmeans(dim, clusters, tasks, rolez.checked.lang.Task.currentTask().idBits());
+    		cData = kMeansC.createDataSet(n, new Random(42), rolez.checked.lang.Task.currentTask().idBits());
+    		return;
+    	}
+        Task.registerNewRootTask();
         kMeans = instantiateBenchmark(KMeans.class, impl, dim, clusters, tasks,
                 currentTask().idBits());
         data = kMeans.createDataSet(n, new Random(42), currentTask().idBits());
@@ -56,17 +67,23 @@ public class KMeansBenchmark {
     
     @Benchmark
     public Object kMeans() {
+    	if (impl.equals("Checked")) {
+    		return kMeansC.kMeans(cData, maxIters, rolez.checked.lang.Task.currentTask().idBits());
+    	}
         return kMeans.kMeans(data, maxIters, currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)
     public void tearDown() {
-        Task.unregisterRootTask();
+    	if (impl.equals("Checked"))
+    		rolez.checked.lang.Task.unregisterRootTask();
+    	else
+    		Task.unregisterRootTask();
     }
     
     public static void main(String[] args) {
         Options options = new OptionsBuilder().include(KMeansBenchmark.class.getSimpleName())
-                .warmupIterations(10).measurementIterations(30).build();
+                .warmupIterations(0).measurementIterations(5).build();
         runAndPlot(options);
     }
 }

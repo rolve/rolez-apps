@@ -1,6 +1,6 @@
 #!/bin/bash
 
-benchmarks="montecarlo idea mergesort quicksort"
+benchmarks="histogram k-means montecarlo idea mergesort quicksort"
 
 
 for b in $benchmarks

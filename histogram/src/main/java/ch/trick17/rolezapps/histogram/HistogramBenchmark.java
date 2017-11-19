@@ -20,6 +20,7 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import ch.trick17.rolezapps.histogram.util.ImageReaderJava;
+import rolez.checked.lang.CheckedArray;
 import rolez.lang.GuardedArray;
 import rolez.lang.Task;
 
@@ -31,33 +32,51 @@ public class HistogramBenchmark {
     @Param({"12000000", "50000000", "100000000"})
     int n;
     
-    @Param({"Rolez", "RolezL", "Java"})
+    @Param({"Checked", "Rolez", "Java"})
     String impl;
     
-    @Param({"1", "2", "4", "8", "16", "32"})
+    @Param({"1", "2", "4", "8", "16"})
     int tasks;
     
     GuardedArray<GuardedArray<int[]>[]> image;
+    CheckedArray<CheckedArray<int[]>[]> cImage;
     Histogram histogram;
+    classes.Histogram histogramC;
     
     @Setup(Level.Trial)
     public void readImage() throws IOException {
         image = ImageReaderJava.read(n + ".jpg");
+		rolez.checked.lang.Task.registerNewRootTask();
+        cImage = classes.ImageReader.read(n + ".jpg", rolez.checked.lang.Task.currentTask().idBits());
+        rolez.checked.lang.Task.unregisterRootTask();
     }
     
     @Setup(Level.Iteration)
     public void setup() {
+    	if (impl.equals("Checked")) {
+    		rolez.checked.lang.Task.registerNewRootTask();
+    		histogramC = new classes.Histogram(cImage, rolez.checked.lang.Task.currentTask().idBits());
+    		return;
+    	}
         Task.registerNewRootTask();
         histogram = instantiateBenchmark(Histogram.class, impl, image, currentTask().idBits());
     }
     
     @Benchmark
     public void histogram() {
+    	if (impl.equals("Checked")) {
+    		histogramC.compute(tasks, rolez.checked.lang.Task.currentTask().idBits());
+    		return;
+    	}
         histogram.compute(tasks, currentTask().idBits());
     }
     
     @TearDown(Level.Iteration)
     public void tearDown() {
+    	if (impl.equals("Checked")) {
+    		rolez.checked.lang.Task.unregisterRootTask();
+    		return;
+    	}
         Task.unregisterRootTask();
     }
     

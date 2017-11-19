@@ -12,4 +12,20 @@
     <properties>
         <benchmarkClass>ch.trick17.rolezapps.kmeans.KMeansBenchmark</benchmarkClass>
     </properties>
+    
+    <repositories>
+      <repository>
+          <id>in-project</id>
+          <name>In Project Repo</name>
+          <url>file://${project.basedir}/lib</url>
+      </repository>
+    </repositories>
+    
+    <dependencies>
+        <dependency>
+            <groupId>k-means</groupId>
+            <artifactId>k-means</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
 </project>
