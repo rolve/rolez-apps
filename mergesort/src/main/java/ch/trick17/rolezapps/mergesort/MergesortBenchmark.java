@@ -36,7 +36,7 @@ public class MergesortBenchmark {
     @Param({"Checked", "Rolez", "Java"})
     String impl;
     
-    @Param({"1", "2", "4", "8", "16"})
+    @Param({"1", "2", "4", "8"})
     int tasks;
     
     Mergesort mergesort;

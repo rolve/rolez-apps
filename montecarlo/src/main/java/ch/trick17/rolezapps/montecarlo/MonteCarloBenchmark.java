@@ -40,7 +40,7 @@ public class MonteCarloBenchmark {
     @Param({"2000", "10000", "60000"})
     int n;
     
-    @Param({"1", "2", "4", "8", "16"})
+    @Param({"1", "2", "4", "8"})
     int tasks;
     
     @Param({"Checked", "Rolez", "Java"})
