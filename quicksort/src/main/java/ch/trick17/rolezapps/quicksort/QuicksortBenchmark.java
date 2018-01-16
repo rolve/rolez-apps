@@ -31,7 +31,7 @@ public class QuicksortBenchmark {
     @Param({"300000", "1500000", "6000000"})
     int n;
     
-    @Param({"Rolez", "RolezL", "Java"})
+    @Param({"RolezEager", "Rolez", "RolezL", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16", "32"})

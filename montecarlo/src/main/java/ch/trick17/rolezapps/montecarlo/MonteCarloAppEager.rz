@@ -1,0 +1,34 @@
+package ch.trick17.rolezapps.montecarlo
+
+import rolez.io.File
+import rolez.util.ArrayList
+import rolez.util.Scanner
+
+
+class MonteCarloAppRolezEager extends MonteCarloAppRolez {
+    
+    new(steps: int, runs: int, numTasks: int, ratesFile: pure String) {
+        super(steps, runs, numTasks, ratesFile);
+    }
+    
+    override readwrite run: {
+        val partitions = this.seeds.partition(the ContiguousPartitioner, this.numTasks);
+        
+        val eagerResults: readwrite Slice[readwrite ArrayList[double]] = new Array[readwrite ArrayList[double]](this.numTasks);
+        
+//        for(var i = 1; i < this.numTasks; i++)
+//            tasks.add(this start simulate(partitions.get(i)));
+//		  this.results.addAll(this.simulate(partitions.get(0)));
+
+		parfor(var i = 0; i < this.numTasks; i++)
+			this.simulateEager(partitions.get(i), eagerResults.slice(i, i+1), i);
+        
+        
+        for(var i = 0; i < eagerResults.range.size; i++)
+            this.results.addAll(eagerResults.get(i));
+    }
+    
+    task pure simulateEager(seeds: readonly Slice[long], result: readwrite Slice[readwrite ArrayList[double]], index: int): {
+   		result.set(index, this.simulate(seeds));
+    }
+}

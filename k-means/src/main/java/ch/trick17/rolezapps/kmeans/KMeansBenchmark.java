@@ -34,7 +34,7 @@ public class KMeansBenchmark {
     @Param({"20000", "50000", "100000"})
     int n;
     
-    @Param({"Rolez", "Java"})
+    @Param({"RolezEager", "Rolez", "Java"})
     String impl;
     
     int clusters;

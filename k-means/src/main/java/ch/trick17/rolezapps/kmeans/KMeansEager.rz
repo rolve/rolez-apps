@@ -1,0 +1,77 @@
+package ch.trick17.rolezapps.kmeans
+
+import rolez.util.Random
+import rolez.util.Scanner
+import rolez.util.StopWatch
+
+class KMeansRolezEager extends KMeansRolez {
+    
+    new {}
+    
+    new(dim: int, clusters: int, numTasks: int) {
+        super(dim, clusters, numTasks);
+    }
+    
+    override pure kMeans(dataSet: readonly Array[pure Vector[double]], maxIterations: int):
+            readwrite Array[pure Vector[double]] {
+        /* Initialization */
+        val random = new Random;
+        val centroids = new Array[pure Vector[double]](this.clusters);
+        for(var i = 0; i < this.clusters; i++)
+            centroids.set(i, this.newRandomVector(random));
+        
+        val ranges = the ContiguousPartitioner.partition(dataSet.range, this.numTasks);
+        val assignments = new Array[readwrite Array[int]](this.numTasks);
+        for(var i = 0; i < this.numTasks; i++)
+            assignments.set(i, new Array[int](dataSet.length));
+        
+        /* Computation */
+        var iterations = 0;
+        var changed = true;
+        while(changed && iterations < maxIterations) {
+            val results: readwrite Slice[pure Result] = new Array[pure Result](this.numTasks);
+            
+//            for(var i = 0; i < tasks.length; i++)
+//                tasks.set(i, this start assignAndUpdate(dataSet, centroids, assignments.get(i), ranges.get(i)));
+            
+            parfor(var i = 0; i < results.range.size; i++)
+            	this.assignAndUpdateEager(dataSet, centroids, assignments.get(i), ranges.get(i), results.slice(i, i+1), i);
+            	
+            changed = false;
+            val newCentroids = new Array[readwrite VectorBuilder[double]](this.clusters);
+            for(var i = 0; i < newCentroids.length; i++)
+                newCentroids.set(i, new VectorBuilder[double](this.dim));
+            val counts = new Array[int](this.clusters);
+
+            for(var i = 0; i < results.range.size; i++) {
+                val result = results.get(i);
+                changed |= result.changed;
+                for(var c = 0; c < this.clusters; c++) {
+                    val newCentroid = newCentroids.get(c);
+                    val resultCentroid = result.centroids.get(c);
+                    for(var d = 0; d < this.dim; d++)
+                        newCentroid.set(d, newCentroid.get(d) + resultCentroid.get(d));
+                    counts.set(c, counts.get(c) + result.counts.get(c));
+                }
+            }
+            
+            for(var c = 0; c < this.clusters; c++) {
+                val centroid = newCentroids.get(c);
+                val count = counts.get(c);
+                for(var d = 0; d < this.dim; d++)
+                    centroid.set(d, centroid.get(d) / count);
+                centroids.set(c, centroid.build);
+            }
+            iterations++;
+        }
+        return centroids;
+    }
+    
+    task pure assignAndUpdateEager(dataSet: readonly Array[pure Vector[double]],
+            centroids: readonly Array[pure Vector[double]],
+            assignments: readwrite Array[int], range: pure SliceRange, 
+            result: readwrite Slice[pure Result], index: int): {
+        result.set(index, this.assignAndUpdate(dataSet, centroids, assignments, range));
+    }
+    
+}
