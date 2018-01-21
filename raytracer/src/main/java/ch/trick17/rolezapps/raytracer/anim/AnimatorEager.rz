@@ -33,7 +33,7 @@ class AnimatorEager extends Animator {
             parallel
             	this.writeFrame(this.writer, frame2);
             and
-            	this.animationStep(1.0 / this.writer.framerate);
+            	this.animationStep(1.0 / this.writer.framerate, this.scene);
             	
             if(this.printProgress)
                 the System.out.println(this.scene.time + "/" + this.scene.length);
@@ -41,8 +41,8 @@ class AnimatorEager extends Animator {
         this.writer.close;
     }
      
-    task readwrite animationStep(freq: double) : {
-    	this.scene.animationStep(freq);
+    task pure animationStep(freq: double, scene: readwrite AnimatedScene) : {
+    	scene.animationStep(freq);
     }
 
 }
