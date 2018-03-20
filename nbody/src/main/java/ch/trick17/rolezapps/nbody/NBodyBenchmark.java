@@ -30,7 +30,7 @@ public class NBodyBenchmark {
     
     int iterations = 1;
     
-    @Param({"Rolez", "RolezLazySlicing", "Java"})
+    @Param({"RolezEager", "Rolez", "RolezLazySlicing", "Java"})
     String impl;
     
     @Param({"1", "2", "4"})

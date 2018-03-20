@@ -1,0 +1,29 @@
+package ch.trick17.rolezapps.idea
+
+import rolez.util.Random
+import rolez.util.Arrays
+import rolez.util.Scanner
+import rolez.util.StopWatch
+
+class IdeaEncryptionRolezEager extends IdeaEncryptionRolez { 
+ 	
+ 	new(size: int, tasks: int) {
+        super(size, tasks);
+    }
+ 	
+ 	override readwrite run: {
+        val partitioner = new BlockPartitioner(8);
+        val plainSlices = this.plain.partition(partitioner, this.tasks);
+        val encryptedSlices = this.encrypted.partition(partitioner, this.tasks);
+        val decryptedSlices = this.decrypted.partition(partitioner, this.tasks);
+        
+        // encrypt
+        parfor(var i = 0; i < this.tasks; i++)
+            this.encryptDecrypt(plainSlices.get(i), encryptedSlices.get(i), this.encryptKey);
+        
+        // decrypt
+        parfor(var i = 0; i < this.tasks; i++)
+            this.encryptDecrypt(encryptedSlices.get(i), decryptedSlices.get(i), this.decryptKey);
+    }
+   
+ }

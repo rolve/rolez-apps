@@ -1,0 +1,12 @@
+package ch.trick17.rolezapps.raytracer
+
+class RaytracerEager extends Raytracer {
+	
+	override readonly render(image: readwrite Array[readwrite Array[int]]): {
+        val parts = image.partition(the StripedPartitioner, this.numTasks);
+        
+        parfor(var i = 0; i < parts.length; i++)
+            this.renderPart(parts.get(i));
+    }
+
+}
