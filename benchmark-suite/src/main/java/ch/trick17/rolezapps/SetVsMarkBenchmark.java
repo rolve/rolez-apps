@@ -2,7 +2,9 @@ package ch.trick17.rolezapps;
 
 import static java.util.Collections.newSetFromMap;
 
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -24,8 +26,8 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.SingleShotTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 20)
-@Measurement(iterations = 20)
+@Warmup(iterations = 100)
+@Measurement(iterations = 100)
 @Fork(1)
 public class SetVsMarkBenchmark {
 
@@ -35,6 +37,8 @@ public class SetVsMarkBenchmark {
 
     private Set<Object> set;
 
+    private List<Object> list;
+
     @Setup(Level.Iteration)
     public void setup() {
         objects = new Markable[N];
@@ -43,6 +47,8 @@ public class SetVsMarkBenchmark {
         }
 
         set = newSetFromMap(new IdentityHashMap<Object, Boolean>());
+        
+        list = new ArrayList<>();
     }
 
     @Benchmark
@@ -56,6 +62,13 @@ public class SetVsMarkBenchmark {
     public void addToSet() {
         for (int i = 0; i < N; i++) {
             set.add(objects[i]);
+        }
+    }
+
+    @Benchmark
+    public void addToList() {
+        for (int i = 0; i < N; i++) {
+            list.add(objects[i]);
         }
     }
 
