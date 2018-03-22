@@ -42,12 +42,12 @@ public class HistogramBenchmark {
     
     @Setup(Level.Trial)
     public void readImage() throws IOException {
+        Task.registerNewRootTask();
         image = ImageReaderJava.read(n + ".jpg");
     }
     
     @Setup(Level.Iteration)
     public void setup() {
-        Task.registerNewRootTask();
         histogram = instantiateBenchmark(Histogram.class, impl, image, currentTask().idBits());
     }
     
@@ -56,7 +56,7 @@ public class HistogramBenchmark {
         histogram.compute$Unguarded(tasks, currentTask().idBits());
     }
     
-    @TearDown(Level.Iteration)
+    @TearDown(Level.Trial)
     public void tearDown() {
         Task.unregisterRootTask();
     }
