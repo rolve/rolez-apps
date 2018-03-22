@@ -1,6 +1,7 @@
 package ch.trick17.rolezapps.mergesort;
 
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
+import static ch.trick17.rolezapps.BenchmarkUtils.intValueForParam;
 import static ch.trick17.rolezapps.BenchmarkUtils.runAndPlot;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
@@ -19,6 +20,7 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import ch.trick17.rolezapps.IntValues;
 import rolez.lang.GuardedArray;
 import rolez.lang.MathExtra;
 import rolez.lang.Task;
@@ -27,9 +29,10 @@ import rolez.lang.Task;
 @Fork(1)
 @State(Thread)
 public class MergesortBenchmark {
-    
-    @Param({"300000", "1500000", "6000000"})
-    int n;
+
+    @Param({"small", "medium", "large"})
+    @IntValues({300000, 1500000, 6000000})
+    String size;
     
     @Param({"Rolez", "RolezL", "Java", "RolezEager"})
     String impl;
@@ -48,6 +51,7 @@ public class MergesortBenchmark {
         Random random = new Random(42);
         int maxLevel = MathExtra.INSTANCE.log2(tasks, currentTask().idBits());
         mergesort = instantiateBenchmark(Mergesort.class, impl, maxLevel, currentTask().idBits());
+        int n = intValueForParam(this, "size");
         data1 = mergesort.shuffledInts$Unguarded(n, random, currentTask().idBits());
         data2 = mergesort.shuffledInts$Unguarded(n, random, currentTask().idBits());
         data3 = mergesort.shuffledInts$Unguarded(n, random, currentTask().idBits());

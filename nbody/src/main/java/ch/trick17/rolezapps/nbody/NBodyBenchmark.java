@@ -1,6 +1,7 @@
 package ch.trick17.rolezapps.nbody;
 
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
+import static ch.trick17.rolezapps.BenchmarkUtils.intValueForParam;
 import static ch.trick17.rolezapps.BenchmarkUtils.runAndPlot;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
@@ -18,15 +19,17 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import ch.trick17.rolezapps.IntValues;
 import rolez.lang.Task;
 
 @BenchmarkMode(SingleShotTime)
 @Fork(1)
 @State(Thread)
 public class NBodyBenchmark {
-    
-    @Param({"2000", "5000", "8000"})
-    int n;
+
+    @Param({"small", "medium", "large"})
+    @IntValues({2000, 5000, 8000})
+    String size;
     
     int iterations = 1;
     
@@ -41,7 +44,8 @@ public class NBodyBenchmark {
     @Setup(Level.Iteration)
     public void setup() {
         Task.registerNewRootTask();
-        nbody = instantiateBenchmark(NBody.class, impl, n, iterations, tasks, Task.currentTask().idBits());
+        nbody = instantiateBenchmark(NBody.class, impl, intValueForParam(this, "size"),
+                iterations, tasks, Task.currentTask().idBits());
         nbody.createSystem$Unguarded(new Random(42), Task.currentTask().idBits());
     }
     

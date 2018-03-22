@@ -2,6 +2,7 @@ package ch.trick17.rolezapps.histogram;
 
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
 import static ch.trick17.rolezapps.BenchmarkUtils.runAndPlot;
+import static ch.trick17.rolezapps.BenchmarkUtils.intValueForParam;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
 import static rolez.lang.Task.currentTask;
@@ -19,6 +20,7 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import ch.trick17.rolezapps.IntValues;
 import ch.trick17.rolezapps.histogram.util.ImageReaderJava;
 import rolez.lang.GuardedArray;
 import rolez.lang.Task;
@@ -28,8 +30,9 @@ import rolez.lang.Task;
 @State(Thread)
 public class HistogramBenchmark {
     
-    @Param({"12000000", "50000000", "100000000"})
-    int n;
+    @Param({"small", "medium", "large"})
+    @IntValues({12000000, 50000000, 100000000})
+    String size;
     
     @Param({"RolezEager", "Rolez", "RolezL", "Java"})
     String impl;
@@ -43,7 +46,7 @@ public class HistogramBenchmark {
     @Setup(Level.Trial)
     public void readImage() throws IOException {
         Task.registerNewRootTask();
-        image = ImageReaderJava.read(n + ".jpg");
+        image = ImageReaderJava.read(intValueForParam(this, "size") + ".jpg");
     }
     
     @Setup(Level.Iteration)

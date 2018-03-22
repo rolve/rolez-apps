@@ -1,6 +1,7 @@
 package ch.trick17.rolezapps.kmeans;
 
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
+import static ch.trick17.rolezapps.BenchmarkUtils.intValueForParam;
 import static ch.trick17.rolezapps.BenchmarkUtils.runAndPlot;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
@@ -19,6 +20,7 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import ch.trick17.rolezapps.IntValues;
 import rolez.lang.GuardedArray;
 import rolez.lang.Task;
 
@@ -31,8 +33,9 @@ public class KMeansBenchmark {
     
     int dim = 10;
     
-    @Param({"20000", "50000", "100000"})
-    int n;
+    @Param({"small", "medium", "large"})
+    @IntValues({20000, 40000, 60000})
+    String size;
     
     @Param({"RolezEager", "Rolez", "Java"})
     String impl;
@@ -48,7 +51,8 @@ public class KMeansBenchmark {
     @Setup(Level.Iteration)
     public void setup() {
         Task.registerNewRootTask();
-        clusters = n / 100;
+        int n = intValueForParam(this, "size");
+        clusters = n  / 100;
         kMeans = instantiateBenchmark(KMeans.class, impl, dim, clusters, tasks,
                 currentTask().idBits());
         data = kMeans.createDataSet$Unguarded(n, new Random(42), currentTask().idBits());

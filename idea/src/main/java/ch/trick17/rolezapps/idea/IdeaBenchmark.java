@@ -1,6 +1,7 @@
 package ch.trick17.rolezapps.idea;
 
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
+import static ch.trick17.rolezapps.BenchmarkUtils.intValueForParam;
 import static ch.trick17.rolezapps.BenchmarkUtils.runAndPlot;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
@@ -18,6 +19,7 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import ch.trick17.rolezapps.IntValues;
 import rolez.lang.Task;
 
 @BenchmarkMode(SingleShotTime)
@@ -25,10 +27,11 @@ import rolez.lang.Task;
 @State(Thread)
 public class IdeaBenchmark {
     
-    @Param({"3000000", "20000000", "50000000"})
-    int n;
+    @Param({"small", "medium", "large"})
+    @IntValues({3000000, 20000000, 50000000})
+    String size;
     
-    @Param({"RolezEager", "Rolez", "RolezNoSlices", "Java"})
+    @Param({"RolezEager", "Rolez", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16", "32"})
@@ -39,8 +42,8 @@ public class IdeaBenchmark {
     @Setup(Level.Iteration)
     public void setup() {
         Task.registerNewRootTask();
-        idea = instantiateBenchmark(IdeaEncryption.class, impl, n, tasks,
-                Task.currentTask().idBits());
+        idea = instantiateBenchmark(IdeaEncryption.class, impl,
+                intValueForParam(this, "size"), tasks, Task.currentTask().idBits());
         idea.buildTestData$Unguarded(new Random(136506717L), Task.currentTask().idBits());
     }
     

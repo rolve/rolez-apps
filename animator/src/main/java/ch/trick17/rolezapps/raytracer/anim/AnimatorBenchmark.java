@@ -1,6 +1,7 @@
 package ch.trick17.rolezapps.raytracer.anim;
 
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
+import static ch.trick17.rolezapps.BenchmarkUtils.intValueForParam;
 import static ch.trick17.rolezapps.BenchmarkUtils.runAndPlot;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
@@ -17,6 +18,7 @@ import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import ch.trick17.rolezapps.IntValues;
 import rolez.lang.Task;
 
 @BenchmarkMode(SingleShotTime)
@@ -24,10 +26,11 @@ import rolez.lang.Task;
 @State(Thread)
 public class AnimatorBenchmark {
 
-    @Param({"45", "90", "180"})
-    int n; //height
+    @Param({"small", "medium", "large"})
+    @IntValues({30, 60, 90})
+    String size;
     
-    @Param({"RolezEager", "Rolez", "RolezNoSlices", "Java"})
+    @Param({"RolezEager", "Rolez", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16", "32"})
@@ -38,8 +41,8 @@ public class AnimatorBenchmark {
     @Setup(Level.Iteration)
     public void setup() {
         Task.registerNewRootTask();
-        setup = instantiateBenchmark(AnimatorBenchmarkSetup.class, impl, n, tasks,
-                currentTask().idBits());
+        setup = instantiateBenchmark(AnimatorBenchmarkSetup.class, impl,
+                intValueForParam(this, "size"), tasks, currentTask().idBits());
     }
     
     @Benchmark

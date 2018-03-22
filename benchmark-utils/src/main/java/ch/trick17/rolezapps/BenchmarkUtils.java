@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.util.Collection;
 
+import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.results.BenchmarkResult;
 import org.openjdk.jmh.results.IterationResult;
 import org.openjdk.jmh.results.RunResult;
@@ -111,6 +113,36 @@ public final class BenchmarkUtils {
         while(len != -1) {
             out.write(buffer, 0, len);
             len = in.read(buffer);
+        }
+    }
+    
+    public static int intValueForParam(Object container, String fieldName) {
+        try {
+            Field field = getField(container.getClass(), fieldName);
+            field.setAccessible(true);
+            
+            String[] surrogates = field.getAnnotation(Param.class).value();
+            int[] values = field.getAnnotation(IntValues.class).value();
+            assert surrogates.length == values.length;
+            
+            Object currentSurrogate = field.get(container);
+            for(int i = 0; i < surrogates.length; i++)
+                if(surrogates[i].equals(currentSurrogate))
+                    return values[i];
+            
+            throw new AssertionError("no match");
+        } catch(IllegalAccessException e) {
+            throw new AssertionError(e);
+        }
+    }
+
+    private static Field getField(Class<?> clazz, String fieldName) {
+        try {
+            return clazz.getDeclaredField(fieldName);
+        } catch(NoSuchFieldException e) {
+            return getField(clazz.getSuperclass(), fieldName);
+        } catch (NullPointerException e) {
+            throw new AssertionError("field " + fieldName + " not found");
         }
     }
 }
