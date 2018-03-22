@@ -109,6 +109,15 @@ public class AtomicBenchmark {
         }
     }
 
+    @Benchmark
+    public void manySynchronized() {
+        for(int i = 0; i < as.length; i++) {
+            synchronized(as[i]) {
+                as[i].i = 1;
+            }
+        }
+    }
+
     static class A {
         static final AtomicIntegerFieldUpdater<A> updater = newUpdater(A.class, "i");
         volatile int i;
