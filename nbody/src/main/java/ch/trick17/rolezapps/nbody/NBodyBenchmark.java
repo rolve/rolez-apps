@@ -33,10 +33,10 @@ public class NBodyBenchmark {
     
     int iterations = 1;
     
-    @Param({"RolezEager", "Rolez", "RolezLazySlicing", "Java"})
+    @Param({"RolezEager", "Rolez", "Java"})
     String impl;
     
-    @Param({"1", "2", "4"})
+    @Param({"1", "2", "4", "8", "16", "32"})
     int tasks;
     
     NBody nbody;
