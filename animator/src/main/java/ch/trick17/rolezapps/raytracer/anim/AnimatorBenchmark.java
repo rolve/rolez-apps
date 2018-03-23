@@ -27,7 +27,7 @@ import rolez.lang.Task;
 public class AnimatorBenchmark {
 
     @Param({"small", "medium", "large"})
-    @IntValues({30, 60, 90})
+    @IntValues({32, 64, 96})
     String size;
     
     @Param({"RolezEager", "Rolez", "Java"})

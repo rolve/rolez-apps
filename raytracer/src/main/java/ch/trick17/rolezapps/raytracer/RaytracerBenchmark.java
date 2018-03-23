@@ -27,9 +27,9 @@ import rolez.lang.Task;
 @Fork(1)
 @State(Thread)
 public class RaytracerBenchmark {
-
+    
     @Param({"small", "medium", "large"})
-    @IntValues({30, 60, 90})
+    @IntValues({32, 64, 96})
     String size;
     
     @Param({"1", "2", "4", "8", "16", "32"})
