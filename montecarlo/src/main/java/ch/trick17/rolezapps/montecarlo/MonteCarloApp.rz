@@ -43,12 +43,10 @@ class MonteCarloAppRolez extends MonteCarloApp {
         val partitions = this.seeds.partition(the ContiguousPartitioner, this.numTasks);
         
         val tasks = new ArrayList[pure Task[readwrite ArrayList[double]]];
-        for(var i = 1; i < this.numTasks; i++)
+        for(var i = 0; i < this.numTasks; i++)
             tasks.add(this start simulate(partitions.get(i)));
         
-        this.results.addAll(this.simulate(partitions.get(0)));
-        
-        for(var i = 0; i < tasks.size; i++)
+        for(var i = 0; i < this.numTasks; i++)
             this.results.addAll(tasks.get(i).get);
     }
     
