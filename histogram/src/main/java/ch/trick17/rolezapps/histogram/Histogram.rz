@@ -75,7 +75,7 @@ class HistPart {
 object HistogramApp {
     
     task pure main: {
-        val image = the ImageReader.read("6mpx.jpg");
+        val image = the ImageReader.read("6000000.jpg");
         val histogram = new HistogramRolez(image);
         
         histogram.compute(8);

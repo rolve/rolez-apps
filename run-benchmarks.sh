@@ -1,6 +1,6 @@
 #!/bin/bash
 
-benchmarks="animator histogram idea k-means mergesort montecarlo quicksort raytracer"
+benchmarks="animator histogram idea k-means mergesort montecarlo nbody quicksort raytracer"
 
 
 for b in $benchmarks
