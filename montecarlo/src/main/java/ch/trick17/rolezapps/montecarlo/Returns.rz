@@ -12,7 +12,7 @@ class Returns extends Path {
         returnPathValues.set(0, 0.0);
         for(var i = 1; i < ratePath.pathValues.length; i++)
             returnPathValues.set(i,
-                    the Math.log(ratePath.pathValues.get(i) / ratePath.pathValues.get(i - 1)));
+                    Math.log(ratePath.pathValues.get(i) / ratePath.pathValues.get(i - 1)));
         
         var mean = 0.0;
         for(var i = 1; i < returnPathValues.length; i++)
@@ -25,7 +25,7 @@ class Returns extends Path {
         variance /= returnPathValues.length - 1;
         
         val volatility2 = variance / ratePath.dTime;
-        this.volatility = the Math.sqrt(volatility2);
+        this.volatility = Math.sqrt(volatility2);
         this.expectedReturnRate = mean / ratePath.dTime + 0.5 * volatility2;
     }
 }

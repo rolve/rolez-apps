@@ -29,7 +29,7 @@ class RaytracerBenchmarkSetupRolez extends RaytracerBenchmarkSetup {
     
     def pure createBenchmarkScene(random: readwrite Random): readwrite Scene {
         val scene = new AnimatedScene(30.0);
-        the AnimatorApp.buildScene(scene, random);
+        AnimatorApp.buildScene(scene, random);
         for(var t = 1; t <= 8; t++)
             scene.animationStep(1.0);
         return scene;
@@ -63,7 +63,7 @@ class RaytracerBenchmarkSetupRolezEager extends RaytracerBenchmarkSetup {
     
     def pure createBenchmarkScene(random: readwrite Random): readwrite Scene {
         val scene = new AnimatedScene(30.0);
-        the AnimatorApp.buildScene(scene, random);
+        AnimatorApp.buildScene(scene, random);
         for(var t = 1; t <= 8; t++)
             scene.animationStep(1.0);
         return scene;

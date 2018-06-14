@@ -22,22 +22,22 @@ class KMeans {
         this.numTasks = numTasks;
     }
     
-    def pure createDataSet(n: int, random: readwrite Random): readwrite Array[pure Vector[double]] {
-        val dataSet = new Array[pure Vector[double]](n);
+    def pure createDataSet(n: int, random: readwrite Random): readwrite Array[Vector[double]] {
+        val dataSet = new Array[Vector[double]](n);
         for(var i = 0; i < n; i++)
             dataSet.set(i, this.newRandomVector(random));
         return dataSet;
     }
     
-    def pure newRandomVector(random: readwrite Random): pure Vector[double] {
+    def pure newRandomVector(random: readwrite Random): Vector[double] {
         val vec = new VectorBuilder[double](this.dim);
         for(var d = 0; d < this.dim; d++)
             vec.set(d, random.nextDouble);
         return vec.build;
     }
     
-    def pure kMeans(dataSet: readonly Array[pure Vector[double]], maxIterations: int):
-            readwrite Array[pure Vector[double]] {
+    def pure kMeans(dataSet: readonly Array[Vector[double]], maxIterations: int):
+            readwrite Array[Vector[double]] {
         return null;
     }
 }
@@ -50,15 +50,15 @@ class KMeansRolez extends KMeans {
         super(dim, clusters, numTasks);
     }
     
-    override pure kMeans(dataSet: readonly Array[pure Vector[double]], maxIterations: int):
-            readwrite Array[pure Vector[double]] {
+    override pure kMeans(dataSet: readonly Array[Vector[double]], maxIterations: int):
+            readwrite Array[Vector[double]] {
         /* Initialization */
         val random = new Random;
-        val centroids = new Array[pure Vector[double]](this.clusters);
+        val centroids = new Array[Vector[double]](this.clusters);
         for(var i = 0; i < this.clusters; i++)
             centroids.set(i, this.newRandomVector(random));
         
-        val ranges = the ContiguousPartitioner.partition(dataSet.range, this.numTasks);
+        val ranges = ContiguousPartitioner.partition(dataSet.range, this.numTasks);
         val assignments = new Array[readwrite Array[int]](this.numTasks);
         for(var i = 0; i < this.numTasks; i++)
             assignments.set(i, new Array[int](dataSet.length));
@@ -67,7 +67,7 @@ class KMeansRolez extends KMeans {
         var iterations = 0;
         var changed = true;
         while(changed && iterations < maxIterations) {
-            val tasks = new Array[pure Task[pure Result]](this.numTasks);
+            val tasks = new Array[Task[Result]](this.numTasks);
             for(var i = 0; i < tasks.length; i++)
                 tasks.set(i, this start assignAndUpdate(dataSet, centroids,
                     assignments.get(i), ranges.get(i)));
@@ -102,9 +102,9 @@ class KMeansRolez extends KMeans {
         return centroids;
     }
     
-    task pure assignAndUpdate(dataSet: readonly Array[pure Vector[double]],
-            centroids: readonly Array[pure Vector[double]],
-            assignments: readwrite Array[int], range: pure SliceRange): pure Result {
+    task pure assignAndUpdate(dataSet: readonly Array[Vector[double]],
+            centroids: readonly Array[Vector[double]],
+            assignments: readwrite Array[int], range: SliceRange): Result {
         var changed = false;
         val newCentroids = new Array[readwrite VectorBuilder[double]](this.clusters);
         for(var i = 0; i < this.clusters; i++)
@@ -113,7 +113,7 @@ class KMeansRolez extends KMeans {
         
         for(var i = range.begin; i < range.end; i += range.step) {
             val vector = dataSet.get(i);
-            var min = the Double.POSITIVE_INFINITY;
+            var min = Double.POSITIVE_INFINITY;
             var cluster = -1;
             for(var c = 0; c < centroids.length; c++) {
                 val distance2 = this.distance2(vector, centroids.get(c));
@@ -134,7 +134,7 @@ class KMeansRolez extends KMeans {
         return new Result(changed, newCentroids, counts.build);
     }
     
-    def pure distance2(v1: pure Vector[double], v2: pure Vector[double]): double {
+    def pure distance2(v1: Vector[double], v2: Vector[double]): double {
         var sum = 0.0;
         for(var d = 0; d < this.dim; d++) {
             val diff = v1.get(d) - v2.get(d);
@@ -143,34 +143,34 @@ class KMeansRolez extends KMeans {
         return sum;
     }
     
-    task pure main(args: readonly Array[pure String]): {
-        val n = the Int.parseInt(args.get(0));
-        val maxIterations = the Int.parseInt(args.get(1));
+    task pure main(args: readonly Array[String]): {
+        val n = Int.parseInt(args.get(0));
+        val maxIterations = Int.parseInt(args.get(1));
         val repetitions = 100;
         val watch = new StopWatch;
         
-        val dataSets = new Array[readwrite Array[pure Vector[double]]](repetitions);
+        val dataSets = new Array[readwrite Array[Vector[double]]](repetitions);
         for(var i = 0; i < repetitions; i++)
             dataSets.set(i, this.createDataSet(n, new Random));
         
-        the System.out.println("Press Enter to start");
-        new Scanner(the System.in).nextLine;
+        System.out.println("Press Enter to start");
+        new Scanner(System.in).nextLine;
         for(var i = 0; i < repetitions; i++) {
             watch.go;
             this.kMeans(dataSets.get(i), maxIterations);
-            the System.out.println(watch.get);
+            System.out.println(watch.get);
         }
     }
 }
 
 pure class Result {
     val changed: boolean
-    val centroids: pure Vector[pure Vector[double]]
-    val counts: pure Vector[int]
+    val centroids: Vector[Vector[double]]
+    val counts: Vector[int]
     
-    new(changed: boolean, centroids: readwrite Array[readwrite VectorBuilder[double]], counts: pure Vector[int]) {
+    new(changed: boolean, centroids: readwrite Array[readwrite VectorBuilder[double]], counts: Vector[int]) {
         this.changed = changed;
-        val centroidsBuilder = new VectorBuilder[pure Vector[double]](centroids.length);
+        val centroidsBuilder = new VectorBuilder[Vector[double]](centroids.length);
         for(var c = 0; c < centroids.length; c++)
             centroidsBuilder.set(c, centroids.get(c).build);
         this.centroids = centroidsBuilder.build;

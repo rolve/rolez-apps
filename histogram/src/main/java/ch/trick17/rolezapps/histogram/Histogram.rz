@@ -21,9 +21,9 @@ class HistogramRolez extends Histogram {
     
     override readwrite compute(numTasks: int): {
         // partition
-        val ranges = the ContiguousPartitioner.partition(this.image.range, numTasks);
+        val ranges = ContiguousPartitioner.partition(this.image.range, numTasks);
         
-        val tasks = new Array[pure Task[readwrite HistPart]](numTasks);
+        val tasks = new Array[Task[readwrite HistPart]](numTasks);
         for(var i = 0; i < numTasks; i++)
             tasks.set(i, this start computePart(ranges.get(i)));
         
@@ -34,7 +34,7 @@ class HistogramRolez extends Histogram {
             this.merge(tasks.get(i).get);
     }
     
-    task readonly computePart(range: pure SliceRange): readwrite HistPart {
+    task readonly computePart(range: SliceRange): readwrite HistPart {
         val r: readwrite Array[int] = new Array[int](256);
         val g: readwrite Array[int] = new Array[int](256);
         val b: readwrite Array[int] = new Array[int](256);
@@ -75,29 +75,29 @@ class HistPart {
 object HistogramApp {
     
     task pure main: {
-        val image = the ImageReader.read("6000000.jpg");
+        val image = ImageReader.read("6000000.jpg");
         val histogram = new HistogramRolez(image);
         
         histogram.compute(8);
-        this.print(histogram, 80, 8, the System.out);
+        this.print(histogram, 80, 8, System.out);
     }
     
     def pure print(hist: readonly HistogramRolez, width: int, binSize: int,
             out: readonly PrintStream): {
         var max = 0;
         for(var c = 0; c < 256; c++) {
-           max = the Math.max(max, hist.rHist.get(c));
-           max = the Math.max(max, hist.gHist.get(c));
-           max = the Math.max(max, hist.bHist.get(c));
+           max = Math.max(max, hist.rHist.get(c));
+           max = Math.max(max, hist.gHist.get(c));
+           max = Math.max(max, hist.bHist.get(c));
         }
         
         val scaleWidth = width as double / max;
         
         out.println("Red:");
         this.printChannel(hist.rHist, scaleWidth, binSize, out);
-        the System.out.println("Green:");
+        System.out.println("Green:");
         this.printChannel(hist.gHist, scaleWidth, binSize, out);
-        the System.out.println("Blue:");
+        System.out.println("Blue:");
         this.printChannel(hist.bHist, scaleWidth, binSize, out);
     }
     

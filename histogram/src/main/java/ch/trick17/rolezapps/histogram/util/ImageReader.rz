@@ -4,5 +4,5 @@ import rolez.io.File
 
 object ImageReader mapped to ImageReaderJava {
     
-    mapped def pure read(file: pure String): readwrite Array[readwrite Array[int]]
+    mapped def pure read(file: String): readwrite Array[readwrite Array[int]]
 }

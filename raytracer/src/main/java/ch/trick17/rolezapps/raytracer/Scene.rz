@@ -8,9 +8,9 @@ class Scene {
     val objects: readwrite ArrayList[readwrite Primitive] = new ArrayList[readwrite Primitive]
     val lights: readwrite ArrayList[readwrite Light] = new ArrayList[readwrite Light]
     var ambientLight: double
-    var background: pure Color
+    var background: Color
     
-    def readonly intersect(ray: pure Ray): readonly Intersection {
+    def readonly intersect(ray: Ray): readonly Intersection {
         var closest: readonly Intersection = null;
         for(var i = 0; i < this.objects.size; i++) {
             val intersection = this.objects.get(i).intersect(ray);
@@ -22,29 +22,29 @@ class Scene {
 }
 
 class View extends Moveable {
-    var from: pure Vector3D
-    var at:   pure Vector3D
-    var up:   pure Vector3D
+    var from: Vector3D
+    var at:   Vector3D
+    var up:   Vector3D
     
     var distance: double
     var angle:    double
     var aspect:   double
     
-    override readwrite move(delta: pure Vector3D): {
+    override readwrite move(delta: Vector3D): {
         this.from = this.from.plus(delta);
     }
 }
 
 class Light extends Moveable {
-    var position: pure Vector3D
+    var position: Vector3D
     var brightness: double
     
-    new(position: pure Vector3D, brightness: double) {
+    new(position: Vector3D, brightness: double) {
         this.position = position;
         this.brightness = brightness;
     }
     
-    override readwrite move(delta: pure Vector3D): {
+    override readwrite move(delta: Vector3D): {
         this.position = this.position.plus(delta);
     }
 }

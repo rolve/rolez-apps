@@ -11,7 +11,7 @@ class AnimatorBenchmarkSetupRolezNoSlices extends AnimatorBenchmarkSetup {
     
     new(height: int, numTasks: int) {
         val scene = this.instantiateScene;
-        the AnimatorApp.buildScene(scene, new Random(42L));
+        AnimatorApp.buildScene(scene, new Random(42L));
         val width = (height * scene.view.aspect) as int;
         val writer = new VideoWriter(this.movieFile, width, height, 12, 12);
         

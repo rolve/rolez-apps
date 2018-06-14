@@ -4,7 +4,7 @@ class RaytracerNoSlices extends Raytracer {
     
     override readonly render(image: readwrite Array[readwrite Array[int]]): {
         val width = image.get(0).length;
-        val ranges = the StripedPartitioner.partition(image.range, this.numTasks);
+        val ranges = StripedPartitioner.partition(image.range, this.numTasks);
         val imageCopies = new Array[readwrite Array[readwrite Array[int]]](this.numTasks);
         for(var i = 0; i < this.numTasks; i++) {
             val copy = new Array[readwrite Array[int]](image.length);
@@ -20,12 +20,12 @@ class RaytracerNoSlices extends Raytracer {
         this.merge(imageCopies, image, ranges);
     }
     
-    task readonly renderPart(image: readwrite Array[readwrite Array[int]], range: pure SliceRange): {
+    task readonly renderPart(image: readwrite Array[readwrite Array[int]], range: SliceRange): {
         val view = this.scene.view;
         val width = image.get(range.begin).length;
         val height = image.arrayLength;
         
-        val frustrumHeight = view.distance * the Math.tan(view.angle);
+        val frustrumHeight = view.distance * Math.tan(view.angle);
 
         val viewDir = view.at.minus(view.from).normalize;
         val viewLeft = view.up.cross(viewDir).normalize.scale(view.aspect * frustrumHeight);
@@ -40,7 +40,7 @@ class RaytracerNoSlices extends Raytracer {
     }
     
     def pure merge(srcs: readwrite Array[readwrite Array[readwrite Array[int]]],
-            dst: readwrite Array[readwrite Array[int]], ranges: pure Vector[pure SliceRange]): {
+            dst: readwrite Array[readwrite Array[int]], ranges: Vector[SliceRange]): {
         // dummy access to prevent guarding in loop:
         dst.set(0, dst.get(0));
         for(var r = 0; r < ranges.length; r++) {

@@ -2,12 +2,12 @@ package ch.trick17.rolezapps.histogram
 
 class HistogramRolezImmutable extends HistogramRolez {
     
-    val image: pure Vector[pure Vector[int]]
+    val image: Vector[Vector[int]]
     
     new(image: readwrite Array[readwrite Array[int]]) {
         super(image);
         
-        val immutable = new VectorBuilder[pure Vector[int]](image.length);
+        val immutable = new VectorBuilder[Vector[int]](image.length);
         for(var y = 0; y < image.length; y++) {
             val row = image.get(y);
             val immutableRow = new VectorBuilder[int](row.length);
@@ -19,7 +19,7 @@ class HistogramRolezImmutable extends HistogramRolez {
         this.image = immutable.build;
     }
     
-    override pure computePart(range: pure SliceRange): readwrite HistPart {
+    override pure computePart(range: SliceRange): readwrite HistPart {
         val r: readwrite Array[int] = new Array[int](256);
         val g: readwrite Array[int] = new Array[int](256);
         val b: readwrite Array[int] = new Array[int](256);

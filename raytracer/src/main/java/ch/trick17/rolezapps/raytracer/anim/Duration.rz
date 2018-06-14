@@ -6,12 +6,12 @@ pure class Duration {
     
     new {
         this.begin = 0.0;
-        this.end = the Double.POSITIVE_INFINITY;
+        this.end = Double.POSITIVE_INFINITY;
     }
     
     new (begin: double) {
         this.begin = begin;
-        this.end = the Double.POSITIVE_INFINITY;
+        this.end = Double.POSITIVE_INFINITY;
     }
     
     new(begin: double, end: double) {

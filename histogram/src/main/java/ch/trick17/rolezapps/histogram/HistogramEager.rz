@@ -17,7 +17,7 @@ class HistogramRolezEager extends Histogram {
     
     override readwrite compute(numTasks: int): {
         // partition
-        val ranges = the ContiguousPartitioner.partition(this.image.range, numTasks);
+        val ranges = ContiguousPartitioner.partition(this.image.range, numTasks);
         
         val parts = new Array[readwrite HistPart](numTasks);
         
@@ -35,7 +35,7 @@ class HistogramRolezEager extends Histogram {
     }
     
     // workaround because the returning of results is not yet implemented in  parfor
-    task readonly computePart(range: pure SliceRange, results: readwrite Slice[readwrite HistPart], index: int): {
+    task readonly computePart(range: SliceRange, results: readwrite Slice[readwrite HistPart], index: int): {
         val r: readwrite Array[int] = new Array[int](256);
         val g: readwrite Array[int] = new Array[int](256);
         val b: readwrite Array[int] = new Array[int](256);

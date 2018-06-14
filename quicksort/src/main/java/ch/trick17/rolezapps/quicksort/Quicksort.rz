@@ -97,8 +97,8 @@ class QuicksortRolez extends Quicksort {
         }
     }
     
-    task pure main(args: readonly Array[pure String]): {
-        val n = the Int.parseInt(args.get(0));
+    task pure main(args: readonly Array[String]): {
+        val n = Int.parseInt(args.get(0));
         val iterations = 20;
         val watch = new StopWatch;
         
@@ -108,12 +108,12 @@ class QuicksortRolez extends Quicksort {
         for(var i = 0; i < iterations; i++)
             arrays.set(i, this.shuffledInts(n, random));
         
-        the System.out.println("Press Enter to start");
-        new Scanner(the System.in).nextLine;
+        System.out.println("Press Enter to start");
+        new Scanner(System.in).nextLine;
         for(var i = 0; i < iterations; i++) {
             watch.go;
             this.sort(arrays.get(i));
-            the System.out.println(watch.get);
+            System.out.println(watch.get);
         }
     }
 }

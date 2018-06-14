@@ -3,5 +3,5 @@ package ch.trick17.rolezapps.raytracer.anim
 import ch.trick17.rolezapps.raytracer.Vector3D
 
 class Moveable {
-    def readwrite move(delta: pure Vector3D): { /* to be implemented by subclasses */}
+    def readwrite move(delta: Vector3D): { /* to be implemented by subclasses */}
 }

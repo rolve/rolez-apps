@@ -8,13 +8,13 @@ class RatePath extends Path {
     
     val pathValues: readwrite Array[double]
     
-    new(name: pure String, startDate: int, endDate: int, dTime: double,
+    new(name: String, startDate: int, endDate: int, dTime: double,
             pathValues: readwrite Array[double]) {
         super(name, startDate, endDate, dTime);
         this.pathValues = pathValues;
     }
     
-    new(other: pure Path, pathValues: readwrite Array[double]) {
+    new(other: Path, pathValues: readwrite Array[double]) {
         super(other);
         this.pathValues = pathValues;
     }
@@ -24,12 +24,12 @@ object RatePathReader {
     
     val datumField: int = 4
     val minDate: int = 19000101
-    val epsilon: double = 10.0 * the Double.MIN_VALUE
+    val epsilon: double = 10.0 * Double.MIN_VALUE
     
-    def pure readRatesFile(ratesFile: pure String): readwrite RatePath {
+    def pure readRatesFile(ratesFile: String): readwrite RatePath {
         val scanner = new Scanner(new FileInputStream(ratesFile));
         
-        val lines = new ArrayList[pure String];
+        val lines = new ArrayList[String];
         while(scanner.hasNextLine)
             lines.add(scanner.nextLine);
         
@@ -38,11 +38,11 @@ object RatePathReader {
         
         for(var i = 0; i < lines.size; i++) {
             val fields = lines.get(i).split(",");
-            val date = the Int.parseInt("19" + fields.get(0));
+            val date = Int.parseInt("19" + fields.get(0));
             
-            val value = the Double.parseDouble(fields.get(this.datumField));
-            if(date <= this.minDate || the Math.abs(value) < this.epsilon)
-                the System.exit(1);
+            val value = Double.parseDouble(fields.get(this.datumField));
+            if(date <= this.minDate || Math.abs(value) < this.epsilon)
+                System.exit(1);
             
             pathValues.set(i, value);
             pathDates.set(i, date);

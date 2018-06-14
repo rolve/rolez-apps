@@ -33,7 +33,7 @@ class IdeaEncryptionRolezNoSlices extends IdeaEncryptionRolez {
     }
     
     task pure encryptDecrypt(src: readonly Array[byte], dst: readwrite Array[byte],
-            range: pure SliceRange, key: pure Vector[int]): {
+            range: SliceRange, key: Vector[int]): {
         val xFF = 255;
         val xFFFF = 65535;
         val x10001L = 65537L;
@@ -139,7 +139,7 @@ class IdeaEncryptionRolezNoSlices extends IdeaEncryptionRolez {
     }
     
     def pure merge(arrays: readwrite Array[readwrite Array[byte]],
-            ranges: pure Vector[pure SliceRange]): readwrite Array[byte] {
+            ranges: Vector[SliceRange]): readwrite Array[byte] {
         val result = new Array[byte](ranges.get(arrays.length - 1).end);
         for(var r = 0; r < ranges.length; r++) {
             val range = ranges.get(r);

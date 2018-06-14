@@ -9,12 +9,12 @@ class Animation {
 
 class SimpleAnimation extends Animation {
     
-    val duration: pure Duration
+    val duration: Duration
     
     var    begun: boolean = false
     var finished: boolean = false
     
-    new(duration: pure Duration) {
+    new(duration: Duration) {
         this.duration = duration;
     }
     

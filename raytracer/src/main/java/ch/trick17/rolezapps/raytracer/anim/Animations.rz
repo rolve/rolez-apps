@@ -8,9 +8,9 @@ import ch.trick17.rolezapps.raytracer.Vector3D
 class LinearMovement extends SimpleAnimation {
     
     val obj: readwrite Moveable
-    val deltaPerS: pure Vector3D
+    val deltaPerS: Vector3D
     
-    new(duration: pure Duration, obj: readwrite Moveable, deltaPerS: pure Vector3D) {
+    new(duration: Duration, obj: readwrite Moveable, deltaPerS: Vector3D) {
         super(duration);
         this.obj = obj;
         this.deltaPerS = deltaPerS;
@@ -24,11 +24,11 @@ class LinearMovement extends SimpleAnimation {
 class CircularMovement extends SimpleAnimation {
     
     val obj: readwrite Moveable
-    val u1: pure Vector3D
-    val u2: pure Vector3D
+    val u1: Vector3D
+    val u2: Vector3D
     val thetaPerS: double
     
-    new(duration: pure Duration, obj: readwrite Moveable, toCenter: pure Vector3D, up: pure Vector3D,
+    new(duration: Duration, obj: readwrite Moveable, toCenter: Vector3D, up: Vector3D,
             thetaPerS: double) {
         super(duration);
         this.obj = obj;
@@ -40,8 +40,8 @@ class CircularMovement extends SimpleAnimation {
     override readwrite animationStep(time: double, timeStep: double): {
         val oldTheta = (time - this.duration.begin - timeStep) * this.thetaPerS;
         val newTheta = (time - this.duration.begin) * this.thetaPerS;
-        val delta = this.u1.scale(the Math.cos(newTheta) - the Math.cos(oldTheta))
-                .plus(this.u2.scale(the Math.sin(newTheta) - the Math.sin(oldTheta)));
+        val delta = this.u1.scale(Math.cos(newTheta) - Math.cos(oldTheta))
+                .plus(this.u2.scale(Math.sin(newTheta) - Math.sin(oldTheta)));
         this.obj.move(delta);
     }
 }
@@ -51,14 +51,14 @@ class BrightnessChange extends SimpleAnimation {
     val light: readwrite Light
     val changePerS: double
     
-    new(duration: pure Duration, light: readwrite Light, changePerS: double) {
+    new(duration: Duration, light: readwrite Light, changePerS: double) {
         super(duration);
         this.light = light;
         this.changePerS = changePerS;
     }
     
     override readwrite animationStep(time: double, timeStep: double): {
-        this.light.brightness = the Math.max(0.0, this.light.brightness + this.changePerS * timeStep);
+        this.light.brightness = Math.max(0.0, this.light.brightness + this.changePerS * timeStep);
     }
 }
 
@@ -67,7 +67,7 @@ class AmbientLightChange extends SimpleAnimation {
     val scene: readwrite Scene
     val changePerS: double
     
-    new(duration: pure Duration, scene: readwrite Scene, changePerS: double) {
+    new(duration: Duration, scene: readwrite Scene, changePerS: double) {
         super(duration);
         this.scene = scene;
         this.changePerS = changePerS;
@@ -85,7 +85,7 @@ class BackgroundChange extends SimpleAnimation {
     val gChangePerS: double
     val bChangePerS: double
     
-    new(duration: pure Duration, scene: readwrite Scene,
+    new(duration: Duration, scene: readwrite Scene,
             rChangePerS: double, gChangePerS: double, bChangePerS: double) {
         super(duration);
         this.scene = scene;

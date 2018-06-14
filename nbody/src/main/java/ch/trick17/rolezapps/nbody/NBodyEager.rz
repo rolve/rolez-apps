@@ -16,11 +16,11 @@ class NBodyRolezEager extends NBodyRolez {
             velocities.set(i, this.system.get(i) slice velocity);
         }
         
-        val vSlices = velocities.partition(the ContiguousPartitioner, this.tasks);
+        val vSlices = velocities.partition(ContiguousPartitioner, this.tasks);
         parfor(var t = 0; t < this.tasks; t++)
             this.updateVelocity(vSlices.get(t), positions);
         
-        val bodiesSlices = this.system.partition(the ContiguousPartitioner, this.tasks);
+        val bodiesSlices = this.system.partition(ContiguousPartitioner, this.tasks);
         parfor(var t = 0; t < this.tasks; t++)
             this.updatePosition(bodiesSlices.get(t));
     }

@@ -53,7 +53,7 @@ class NBodyRolez extends NBody {
         }
         
         // Offset momentum
-        val s = the Constants.solarMass;
+        val s = Constants.solarMass;
         system.set(0, new Body(0.0, 0.0, 0.0, -px/s, -py/s, -pz/s, s));
         
         this.system = system;
@@ -72,11 +72,11 @@ class NBodyRolez extends NBody {
             velocities.set(i, this.system.get(i) slice velocity);
         }
         
-        val vSlices = velocities.partition(the ContiguousPartitioner, this.tasks);
+        val vSlices = velocities.partition(ContiguousPartitioner, this.tasks);
         for(var t = 0; t < this.tasks; t++)
             this start updateVelocity(vSlices.get(t), positions);
         
-        val bodiesSlices = this.system.partition(the ContiguousPartitioner, this.tasks);
+        val bodiesSlices = this.system.partition(ContiguousPartitioner, this.tasks);
         for(var t = 0; t < this.tasks; t++)
             this start updatePosition(bodiesSlices.get(t));
     }
@@ -94,7 +94,7 @@ class NBodyRolez extends NBody {
                     val dz = p1.z - p2.z;
                     
                     val d2 = dx*dx + dy*dy + dz*dz;
-                    val mag = the Constants.dt / d2;
+                    val mag = Constants.dt / d2;
                     
                     v1.vx -= dx * p2.mass * mag;
                     v1.vy -= dy * p2.mass * mag;
@@ -107,21 +107,21 @@ class NBodyRolez extends NBody {
     task pure updatePosition(bodies: readwrite Slice[readwrite Body]): {
         for(var i = bodies.range.begin; i < bodies.range.end; i += bodies.range.step) {
             val body = bodies.get(i);
-            body.x += the Constants.dt * body.vx;
-            body.y += the Constants.dt * body.vy;
-            body.z += the Constants.dt * body.vz;
+            body.x += Constants.dt * body.vx;
+            body.y += Constants.dt * body.vy;
+            body.z += Constants.dt * body.vz;
         }
     }
     
     task readwrite main: {
-        this.out = the System.out;
+        this.out = System.out;
         this.createSystem(new Random);
         
-        the System.out.println("Warming up...");
+        System.out.println("Warming up...");
         this.simulate;
 
-        the System.out.println("Press Enter to start");
-        new Scanner(the System.in).nextLine;
+        System.out.println("Press Enter to start");
+        new Scanner(System.in).nextLine;
         
         this.simulate;
     }
@@ -168,11 +168,11 @@ class Body {
     }
     
     def pure randomVelocity(random: readwrite Random): double {
-        return (2 * random.nextDouble - 1) * 0.01 * the Constants.daysPerYear;
+        return (2 * random.nextDouble - 1) * 0.01 * Constants.daysPerYear;
     }
     
     def pure randomMass(random: readwrite Random): double {
-        return random.nextDouble * 0.001 * the Constants.solarMass;
+        return random.nextDouble * 0.001 * Constants.solarMass;
     }
     
     override readonly toString: readonly String {
@@ -183,7 +183,7 @@ class Body {
 }
 
 object Constants {
-    val solarMass: double = 4 * the Math.PI * the Math.PI
+    val solarMass: double = 4 * Math.PI * Math.PI
     val daysPerYear: double = 365.24
     val dt: double = 0.01
 }

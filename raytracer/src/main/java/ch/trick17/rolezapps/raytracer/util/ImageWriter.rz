@@ -4,5 +4,5 @@ import rolez.io.File
 
 object ImageWriter mapped to ImageWriterJava {
     
-    mapped def pure write(image: readonly Array[readwrite Array[int]], formatName: pure String, file: pure String):
+    mapped def pure write(image: readonly Array[readwrite Array[int]], formatName: String, file: String):
 }

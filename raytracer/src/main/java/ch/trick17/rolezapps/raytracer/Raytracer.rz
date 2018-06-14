@@ -10,7 +10,7 @@ class Raytracer {
     var scene: readonly Scene
     
     def readonly render(image: readwrite Array[readwrite Array[int]]): {
-        val parts = image.partition(the StripedPartitioner, this.numTasks);
+        val parts = image.partition(StripedPartitioner, this.numTasks);
         for(var i = 0; i < parts.length; i++)
             this start renderPart(parts.get(i));
     }
@@ -20,7 +20,7 @@ class Raytracer {
         val width = imagePart.get(imagePart.range.begin).length;
         val height = imagePart.arrayLength;
         
-        val frustrumHeight = view.distance * the Math.tan(view.angle);
+        val frustrumHeight = view.distance * Math.tan(view.angle);
 
         val viewDir = view.at.minus(view.from).normalize;
         val viewLeft = view.up.cross(viewDir).normalize.scale(view.aspect * frustrumHeight);
@@ -35,7 +35,7 @@ class Raytracer {
     }
     
     def readonly renderPixel(x: int, y: int, width: int, height: int,
-            viewDir: pure Vector3D, viewLeft: pure Vector3D, viewDown: pure Vector3D): pure Color {
+            viewDir: Vector3D, viewLeft: Vector3D, viewDown: Vector3D): Color {
         val samples = this.oversample;
         val color = new ColorBuilder;
         for(var ySample = 0; ySample < samples; ySample++) {
@@ -55,9 +55,9 @@ class Raytracer {
         return color.build;
     }
     
-    def readonly trace(ray: pure Ray, intensity: double, recursion: int): pure Color {
+    def readonly trace(ray: Ray, intensity: double, recursion: int): Color {
         if(recursion == this.maxRecursions)
-            return the Colors.black;
+            return Colors.black;
         
         val intersection = this.scene.intersect(ray);
         if(intersection != null)
@@ -66,8 +66,8 @@ class Raytracer {
             return this.scene.background;
     }
     
-    def readonly shade(intersection: readonly Intersection, ray: pure Ray,
-            intensity: double, recursion: int): pure Color {
+    def readonly shade(intersection: readonly Intersection, ray: Ray,
+            intensity: double, recursion: int): Color {
         val mat = intersection.primitive.mat;
         
         val point = ray.point(intersection.t);
@@ -109,8 +109,8 @@ class Raytracer {
         return color.build;
     }
     
-    def readonly light(mat: readonly Material, light: readonly Light, lightVec: pure Vector3D,
-            normal: pure Vector3D, reflectDir: pure Vector3D, color: readwrite ColorBuilder): {
+    def readonly light(mat: readonly Material, light: readonly Light, lightVec: Vector3D,
+            normal: Vector3D, reflectDir: Vector3D, color: readwrite ColorBuilder): {
         val lightDir = lightVec.normalize;
         val intensity = light.brightness / lightVec.length;
         val shade = intensity * mat.kd * normal.dot(lightDir);
@@ -118,11 +118,11 @@ class Raytracer {
         if(mat.shine > 0.000001) {
             val spec = reflectDir.dot(lightDir);
             if(spec > 0.000001)
-                color.add(the Math.pow(spec, mat.shine / intensity));
+                color.add(Math.pow(spec, mat.shine / intensity));
         }
     }
     
-    def readonly renderLight(ray: pure Ray, light: readonly Light, color: readwrite ColorBuilder): {
+    def readonly renderLight(ray: Ray, light: readonly Light, color: readwrite ColorBuilder): {
         // Basically the same as specular highlights on a surface. It kind of would make
         // sense to put this in the trace method and let it also handle specular highlights
         // on surfaces, but only kind of...
@@ -132,7 +132,7 @@ class Raytracer {
             val intensity = light.brightness / lightVec.length;
             val spec = ray.direction.dot(lightVec.normalize);
             if(spec > 0.000001)
-                color.add(the Math.pow(spec, 50 / intensity));
+                color.add(Math.pow(spec, 50 / intensity));
         }
     }
 }

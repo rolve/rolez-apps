@@ -42,7 +42,7 @@ class Animator {
             
             this.scene.animationStep(1.0 / this.writer.framerate);
             if(this.printProgress)
-                the System.out.println(this.scene.time + "/" + this.scene.length);
+                System.out.println(this.scene.time + "/" + this.scene.length);
         }
         this.writer.close;
     }

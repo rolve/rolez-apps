@@ -1,15 +1,15 @@
 package ch.trick17.rolezapps.raytracer
 
 pure class Ray {
-    val origin: pure Vector3D
-    val direction: pure Vector3D
+    val origin: Vector3D
+    val direction: Vector3D
     
-    new(origin: pure Vector3D, direction: pure Vector3D) {
+    new(origin: Vector3D, direction: Vector3D) {
         this.origin = origin;
         this.direction = direction.normalize;
     }
     
-    def pure point(t: double): pure Vector3D {
+    def pure point(t: double): Vector3D {
         return this.origin.plus(this.direction.scale(t));
     }
     

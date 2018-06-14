@@ -7,7 +7,7 @@ import ch.trick17.rolezapps.raytracer.RaytracerEager
 import ch.trick17.rolezapps.raytracer.util.VideoWriter
 
 class AnimatorBenchmarkSetup {
-    val movieFile: pure String = "movie.mp4"
+    val movieFile: String = "movie.mp4"
     def readwrite runAnimator: {}
 }
 
@@ -17,7 +17,7 @@ class AnimatorBenchmarkSetupRolez extends AnimatorBenchmarkSetup {
     
     new(height: int, numTasks: int) {
         val scene = this.instantiateScene;
-        the AnimatorApp.buildScene(scene, new Random(42L));
+        AnimatorApp.buildScene(scene, new Random(42L));
         val width = (height * scene.view.aspect) as int;
         val writer = new VideoWriter(this.movieFile, width, height, 12, 12);
         
@@ -44,7 +44,7 @@ class AnimatorBenchmarkSetupRolezEager extends AnimatorBenchmarkSetup {
     
     new(height: int, numTasks: int) {
         val scene = this.instantiateScene;
-        the AnimatorApp.buildScene(scene, new Random(42L));
+        AnimatorApp.buildScene(scene, new Random(42L));
         val width = (height * scene.view.aspect) as int;
         val writer = new VideoWriter(this.movieFile, width, height, 12, 12);
         

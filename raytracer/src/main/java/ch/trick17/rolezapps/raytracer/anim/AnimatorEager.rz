@@ -36,7 +36,7 @@ class AnimatorEager extends Animator {
             	this.animationStep(1.0 / this.writer.framerate, this.scene);
             	
             if(this.printProgress)
-                the System.out.println(this.scene.time + "/" + this.scene.length);
+                System.out.println(this.scene.time + "/" + this.scene.length);
         }
         this.writer.close;
     }

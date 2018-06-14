@@ -21,7 +21,7 @@ class MonteCarloPath extends RatePath {
         val random = new Random(randomSeed);
         
         val mean = (this.expectedReturnRate - 0.5 * this.volatility * this.volatility) * this.dTime;
-        val stdDev = this.volatility * the Math.sqrt(this.dTime);
+        val stdDev = this.volatility * Math.sqrt(this.dTime);
         
         for(var i = 0; i < this.fluctuations.length; i++)
             this.fluctuations.set(i, mean + stdDev * random.nextGaussian);
@@ -30,6 +30,6 @@ class MonteCarloPath extends RatePath {
     def readwrite computePathValues(startValue: double): {
         this.pathValues.set(0, startValue);
         for(var i = 1; i < this.pathValues.length; i++)
-            this.pathValues.set(i, this.pathValues.get(i - 1) * the Math.exp(this.fluctuations.get(i)));
+            this.pathValues.set(i, this.pathValues.get(i - 1) * Math.exp(this.fluctuations.get(i)));
     }
 }

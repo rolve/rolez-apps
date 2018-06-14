@@ -10,14 +10,14 @@ class Primitive extends Moveable {
     }
     
     /* To be implemented by subclasses */
-    def readonly normal(point: pure Vector3D): pure Vector3D { return null; }
+    def readonly normal(point: Vector3D): Vector3D { return null; }
     
     /* To be implemented by subclasses */
-    def readonly intersect(ray: pure Ray): readonly Intersection { return null; }
+    def readonly intersect(ray: Ray): readonly Intersection { return null; }
 }
 
 class Material {
-    var color: pure Color
+    var color: Color
     var kd   : double
     var shine: double
     var ks   : double
@@ -26,24 +26,24 @@ class Material {
 }
 
 class Sphere extends Primitive {
-    var center: pure Vector3D
+    var center: Vector3D
     var radius: double
     
-    new(center: pure Vector3D, radius: double, mat: readwrite Material) {
+    new(center: Vector3D, radius: double, mat: readwrite Material) {
         super(mat);
         this.center = center;
         this.radius = radius;
     }
     
-    override readwrite move(delta: pure Vector3D): {
+    override readwrite move(delta: Vector3D): {
         this.center = this.center.plus(delta);
     }
     
-    override readonly normal(point: pure Vector3D): pure Vector3D {
+    override readonly normal(point: Vector3D): Vector3D {
         return point.minus(this.center).normalize;
     }
     
-    override readonly intersect(ray: pure Ray): readonly Intersection {
+    override readonly intersect(ray: Ray): readonly Intersection {
         val diff = this.center.minus(ray.origin);
         val b = diff.dot(ray.direction);
         val r2 = this.radius * this.radius;
@@ -51,7 +51,7 @@ class Sphere extends Primitive {
         if(discr2 < 0)
             return null;
         
-        val discr = the Math.sqrt(discr2);
+        val discr = Math.sqrt(discr2);
         var t: double;
         if(b - discr < 0.000001)
             t = b + discr;
@@ -65,24 +65,24 @@ class Sphere extends Primitive {
 }
 
 class Plane extends Primitive {
-    var normal: pure Vector3D
+    var normal: Vector3D
     var distance: double
     
-    new(normal: pure Vector3D, distance: double, mat: readwrite Material) {
+    new(normal: Vector3D, distance: double, mat: readwrite Material) {
         super(mat);
         this.normal = normal;
         this.distance = distance;
     }
     
-    override readwrite move(delta: pure Vector3D): {
+    override readwrite move(delta: Vector3D): {
         // TODO: not supported yet (too lazy)
     }
     
-    override readonly normal(point: pure Vector3D): pure Vector3D {
+    override readonly normal(point: Vector3D): Vector3D {
         return this.normal.normalize;
     }
     
-    override readonly intersect(ray: pure Ray): readonly Intersection {
+    override readonly intersect(ray: Ray): readonly Intersection {
         val n = this.normal.normalize;
         val divisor = ray.direction.dot(n);
         if(divisor < 0.000001 && divisor > -0.000001)

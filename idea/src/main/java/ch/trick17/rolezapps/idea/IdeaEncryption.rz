@@ -37,9 +37,9 @@ class IdeaEncryptionRolez extends IdeaEncryption {
     var encrypted: readwrite Array[byte]
     var decrypted: readwrite Array[byte]
     
-    var userKey: pure Vector[short]
-    var encryptKey: pure Vector[int]
-    var decryptKey: pure Vector[int]
+    var userKey: Vector[short]
+    var encryptKey: Vector[int]
+    var decryptKey: Vector[int]
     
     override readwrite buildTestData(random: readwrite Random): {
         val userKey = new VectorBuilder[short](8);
@@ -58,7 +58,7 @@ class IdeaEncryptionRolez extends IdeaEncryption {
             this.plain.set(i, i as byte);
     }
     
-    def pure calcEncryptKey(userKey: pure Vector[short]): pure Vector[int] {
+    def pure calcEncryptKey(userKey: Vector[short]): Vector[int] {
         val xFFFF = 65535; // :D
         
         var key = new VectorBuilder[int](52);
@@ -83,7 +83,7 @@ class IdeaEncryptionRolez extends IdeaEncryption {
         return key.build;
     }
     
-    def pure calcDecryptKey(encryptKey: pure Vector[int]): pure Vector[int] {
+    def pure calcDecryptKey(encryptKey: Vector[int]): Vector[int] {
         val xFFFF = 65535;
         
         var key = new VectorBuilder[int](52);
@@ -165,7 +165,7 @@ class IdeaEncryptionRolez extends IdeaEncryption {
     }
     
     task pure encryptDecrypt(src: readonly Slice[byte], dst: readwrite Slice[byte],
-            key: pure Vector[int]): {
+            key: Vector[int]): {
         val xFF = 255;
         val xFFFF = 65535;
         val x10001L = 65537L;
@@ -271,20 +271,20 @@ class IdeaEncryptionRolez extends IdeaEncryption {
     }
     
     override readonly validate: {
-        new Assertion(the Arrays.equals(this.plain, this.decrypted));
+        new Assertion(Arrays.equals(this.plain, this.decrypted));
     }
     
     task readwrite main: {
         this.buildTestData(new Random(42L));
         
-        the System.out.println("Press Enter to start");
-        new Scanner(the System.in).nextLine;
+        System.out.println("Press Enter to start");
+        new Scanner(System.in).nextLine;
         
         val watch = new StopWatch;
         for(var i = 0; i < 20; i++) {
             watch.go;
             this.run;
-            the System.out.println(watch.get);
+            System.out.println(watch.get);
         }
     }
 }

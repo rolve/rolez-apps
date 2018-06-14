@@ -6,7 +6,7 @@ class VideoWriter mapped to VideoWriterJava {
     mapped val height: int
     mapped val framerate: int
     
-    mapped new(file: pure String, width: int, height: int, framerate: int, qp: int)
+    mapped new(file: String, width: int, height: int, framerate: int, qp: int)
     
     mapped def readwrite writeFrame(image: readonly Array[readwrite Array[int]]):
     mapped def readwrite close:
