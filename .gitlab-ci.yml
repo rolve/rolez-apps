@@ -1,0 +1,13 @@
+image: maven:3-jdk-8
+
+variables:
+  MAVEN_REPO: $CI_PROJECT_DIR/maven-repo
+
+cache:
+  paths:
+    - $MAVEN_REPO/
+
+build:
+  stage: build
+  script:
+    - mvn install -B -DskipTests -Dmaven.repo.local=$MAVEN_REPO
