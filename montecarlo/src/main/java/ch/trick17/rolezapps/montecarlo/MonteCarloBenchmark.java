@@ -2,7 +2,7 @@ package ch.trick17.rolezapps.montecarlo;
 
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
 import static ch.trick17.rolezapps.BenchmarkUtils.intValueForParam;
-import static ch.trick17.rolezapps.BenchmarkUtils.runAndPlot;
+import static ch.trick17.rolezapps.BenchmarkUtils.runAndStoreResults;
 import static java.lang.Math.abs;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
@@ -75,6 +75,6 @@ public class MonteCarloBenchmark {
     public static void main(String[] args) {
         Options options = new OptionsBuilder().include(MonteCarloBenchmark.class.getSimpleName())
                 .warmupIterations(10).measurementIterations(30).build();
-        runAndPlot(options);
+        runAndStoreResults(options);
     }
 }

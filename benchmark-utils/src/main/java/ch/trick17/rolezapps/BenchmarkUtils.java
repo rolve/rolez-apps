@@ -1,10 +1,6 @@
 package ch.trick17.rolezapps;
 
-import static java.lang.ProcessBuilder.Redirect.INHERIT;
-
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -69,7 +65,7 @@ public final class BenchmarkUtils {
             return c;
     }
     
-    public static void runAndPlot(Options options) {
+    public static void runAndStoreResults(Options options) {
         try {
             try(PrintStream out = new PrintStream("results.tsv")) {
                 Collection<RunResult> runs = new Runner(options).run();
@@ -94,25 +90,8 @@ public final class BenchmarkUtils {
                     }
                 }
             }
-            
-            Process r = new ProcessBuilder("R", "--no-save")
-                    .redirectOutput(INHERIT).redirectError(INHERIT).start();
-            try(InputStream script = BenchmarkUtils.class.getResourceAsStream("plot.R");
-                    OutputStream rShell = r.getOutputStream()) {
-                copy(script, rShell);
-            }
-            r.waitFor();
-        } catch(IOException | RunnerException | InterruptedException e) {
+        } catch(IOException | RunnerException e) {
             throw new AssertionError(e);
-        }
-    }
-    
-    private static void copy(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[1024];
-        int len = in.read(buffer);
-        while(len != -1) {
-            out.write(buffer, 0, len);
-            len = in.read(buffer);
         }
     }
     

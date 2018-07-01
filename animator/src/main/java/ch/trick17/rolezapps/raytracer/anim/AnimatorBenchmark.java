@@ -2,7 +2,7 @@ package ch.trick17.rolezapps.raytracer.anim;
 
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
 import static ch.trick17.rolezapps.BenchmarkUtils.intValueForParam;
-import static ch.trick17.rolezapps.BenchmarkUtils.runAndPlot;
+import static ch.trick17.rolezapps.BenchmarkUtils.runAndStoreResults;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
 import static rolez.lang.Task.currentTask;
@@ -58,6 +58,6 @@ public class AnimatorBenchmark {
     public static void main(String[] args) {
         Options options = new OptionsBuilder().include(AnimatorBenchmark.class.getSimpleName())
                 .warmupIterations(5).measurementIterations(30).build();
-        runAndPlot(options);
+        runAndStoreResults(options);
     }
 }
