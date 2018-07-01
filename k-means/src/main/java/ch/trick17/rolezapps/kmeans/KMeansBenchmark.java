@@ -37,7 +37,7 @@ public class KMeansBenchmark {
     @IntValues({20000, 40000, 60000})
     String size;
     
-    @Param({"RolezEager", "Rolez", "Java"})
+    @Param({"Rolez", "Java"})
     String impl;
     
     int clusters;
