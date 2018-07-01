@@ -34,7 +34,7 @@ public class HistogramBenchmark {
     @IntValues({12000000, 50000000, 100000000})
     String size;
     
-    @Param({"RolezEager", "Rolez", "Java"})
+    @Param({"Rolez", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16", "32"})
