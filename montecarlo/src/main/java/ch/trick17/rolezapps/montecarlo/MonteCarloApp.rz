@@ -41,16 +41,16 @@ class MonteCarloAppRolez extends MonteCarloApp {
     
     override readwrite run: {
         val partitions = this.seeds.partition(ContiguousPartitioner, this.numTasks);
+        val results: readwrite Slice[readwrite ArrayList[double]] = new Array[readwrite ArrayList[double]](this.numTasks);
         
-        val tasks = new ArrayList[Task[readwrite ArrayList[double]]];
-        for(var i = 0; i < this.numTasks; i++)
-            tasks.add(this start simulate(partitions.get(i)));
+        parfor(var i = 0; i < this.numTasks; i++)
+            this.simulate(partitions.get(i), results.slice(i, i+1), i);
         
-        for(var i = 0; i < this.numTasks; i++)
-            this.results.addAll(tasks.get(i).get);
+        for(var i = 0; i < results.range.size; i++)
+            this.results.addAll(results.get(i));
     }
     
-    task pure simulate(seeds: readonly Slice[long]): readwrite ArrayList[double] {
+    task pure simulate(seeds: readonly Slice[long], result: readwrite Slice[readwrite ArrayList[double]], index: int): {
         val results = new ArrayList[double];
         for(var i = seeds.range.begin; i < seeds.range.end; i += seeds.range.step) {
             val mcPath = new MonteCarloPath(this.returns, this.steps);
@@ -58,7 +58,7 @@ class MonteCarloAppRolez extends MonteCarloApp {
             mcPath.computePathValues(this.pathStartValue);
             results.add(new Returns(mcPath).expectedReturnRate);
         }
-        return results;
+        result.set(index, results);
     }
     
     override readonly avgExpectedReturnRate: double {
