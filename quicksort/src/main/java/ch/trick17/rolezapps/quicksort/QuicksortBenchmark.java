@@ -34,7 +34,7 @@ public class QuicksortBenchmark {
     @IntValues({300000, 1500000, 6000000})
     String size;
     
-    @Param({"RolezEager", "Rolez", "Java"})
+    @Param({"Rolez", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16", "32"})

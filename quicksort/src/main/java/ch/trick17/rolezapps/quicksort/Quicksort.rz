@@ -1,8 +1,6 @@
 package ch.trick17.rolezapps.quicksort
 
 import rolez.util.Random
-import rolez.util.StopWatch
-import rolez.util.Scanner
 
 /* To inspect JITed code, run with
  * -XX:+UnlockDiagnosticVMOptions -XX:+LogCompilation -XX:+TraceClassLoading -XX:+PrintAssembly */
@@ -70,9 +68,17 @@ class QuicksortRolez extends Quicksort {
         
         // TODO: Switch to optimized version when maxLevel is reached
         if(level < this.maxLevel) {
-            // create slices and do left side in parallel
-            if(sortLeft)  this start doSort(s.slice(begin, right + 1), begin, right + 1, level + 1);
-            if(sortRight) this   .   doSort(s.slice( left,       end),  left,       end, level + 1);
+            // create slices and do in parallel if both need doing
+            if(sortLeft && sortRight) {
+            	parallel
+            		this.doSort(s.slice(begin, right + 1), begin, right + 1, level + 1);
+            	and
+            		this.doSort(s.slice( left,       end),  left,       end, level + 1);
+            } else if(sortLeft) {
+            	this.doSort(s.slice(begin, right + 1), begin, right + 1, level + 1);
+            } else if(sortRight) {
+            	this.doSort(s.slice( left,       end),  left,       end, level + 1);
+            }
         }
         else {
             if(sortLeft)  this.doSort(s, begin, right + 1, level + 1);
