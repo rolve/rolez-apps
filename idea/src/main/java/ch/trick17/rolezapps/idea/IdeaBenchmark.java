@@ -31,7 +31,7 @@ public class IdeaBenchmark {
     @IntValues({3000000, 20000000, 50000000})
     String size;
     
-    @Param({"RolezEager", "Rolez", "Java"})
+    @Param({"Rolez", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16", "32"})
