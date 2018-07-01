@@ -11,8 +11,8 @@ class Raytracer {
     
     def readonly render(image: readwrite Array[readwrite Array[int]]): {
         val parts = image.partition(StripedPartitioner, this.numTasks);
-        for(var i = 0; i < parts.length; i++)
-            this start renderPart(parts.get(i));
+        parfor(var i = 0; i < parts.length; i++)
+            this.renderPart(parts.get(i));
     }
     
     task readonly renderPart(imagePart: readwrite Slice[readwrite Array[int]]): {

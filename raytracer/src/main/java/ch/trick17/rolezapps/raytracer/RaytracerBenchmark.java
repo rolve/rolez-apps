@@ -35,7 +35,7 @@ public class RaytracerBenchmark {
     @Param({"1", "2", "4", "8", "16", "32"})
     int tasks;
     
-    @Param({"RolezEager", "Rolez", "Java"})
+    @Param({"Rolez", "Java"})
     String impl;
     
     RaytracerBenchmarkSetup setup;
