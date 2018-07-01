@@ -1,6 +1,8 @@
 package ch.trick17.rolezapps.quicksort
 
 import rolez.util.Random
+import rolez.util.StopWatch
+import rolez.util.Scanner
 
 /* To inspect JITed code, run with
  * -XX:+UnlockDiagnosticVMOptions -XX:+LogCompilation -XX:+TraceClassLoading -XX:+PrintAssembly */
