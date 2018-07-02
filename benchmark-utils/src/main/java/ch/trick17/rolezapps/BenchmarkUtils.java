@@ -74,6 +74,7 @@ public final class BenchmarkUtils {
         ChainedOptionsBuilder builder = new OptionsBuilder().parent(options);
         Optional.ofNullable(getInteger("warmupIterations")).ifPresent(i -> builder.warmupIterations(i));
         Optional.ofNullable(getInteger("measurementIterations")).ifPresent(i -> builder.measurementIterations(i));
+        Optional.ofNullable(getInteger("forks")).ifPresent(i -> builder.forks(i));
         options = builder.build();
         
         try {
