@@ -1,9 +1,12 @@
 package ch.trick17.rolezapps;
 
+import static java.lang.Integer.getInteger;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.results.BenchmarkResult;
@@ -11,7 +14,9 @@ import org.openjdk.jmh.results.IterationResult;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 public final class BenchmarkUtils {
     
@@ -66,6 +71,11 @@ public final class BenchmarkUtils {
     }
     
     public static void runAndStoreResults(Options options) {
+        ChainedOptionsBuilder builder = new OptionsBuilder().parent(options);
+        Optional.ofNullable(getInteger("warmupIterations")).ifPresent(i -> builder.warmupIterations(i));
+        Optional.ofNullable(getInteger("measurementIterations")).ifPresent(i -> builder.measurementIterations(i));
+        options = builder.build();
+        
         try {
             try(PrintStream out = new PrintStream("results.tsv")) {
                 Collection<RunResult> runs = new Runner(options).run();
