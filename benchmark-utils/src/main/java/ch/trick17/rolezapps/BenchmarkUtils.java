@@ -1,13 +1,12 @@
 package ch.trick17.rolezapps;
 
-import static java.lang.ProcessBuilder.Redirect.INHERIT;
+import static java.lang.Integer.getInteger;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.results.BenchmarkResult;
@@ -15,7 +14,9 @@ import org.openjdk.jmh.results.IterationResult;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 public final class BenchmarkUtils {
     
@@ -69,7 +70,13 @@ public final class BenchmarkUtils {
             return c;
     }
     
-    public static void runAndPlot(Options options) {
+    public static void runAndStoreResults(Options options) {
+        ChainedOptionsBuilder builder = new OptionsBuilder().parent(options);
+        Optional.ofNullable(getInteger("warmupIterations")).ifPresent(i -> builder.warmupIterations(i));
+        Optional.ofNullable(getInteger("measurementIterations")).ifPresent(i -> builder.measurementIterations(i));
+        Optional.ofNullable(getInteger("forks")).ifPresent(i -> builder.forks(i));
+        options = builder.build();
+        
         try {
             try(PrintStream out = new PrintStream("results.tsv")) {
                 Collection<RunResult> runs = new Runner(options).run();
@@ -94,25 +101,8 @@ public final class BenchmarkUtils {
                     }
                 }
             }
-            
-            Process r = new ProcessBuilder("R", "--no-save")
-                    .redirectOutput(INHERIT).redirectError(INHERIT).start();
-            try(InputStream script = BenchmarkUtils.class.getResourceAsStream("plot.R");
-                    OutputStream rShell = r.getOutputStream()) {
-                copy(script, rShell);
-            }
-            r.waitFor();
-        } catch(IOException | RunnerException | InterruptedException e) {
+        } catch(IOException | RunnerException e) {
             throw new AssertionError(e);
-        }
-    }
-    
-    private static void copy(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[1024];
-        int len = in.read(buffer);
-        while(len != -1) {
-            out.write(buffer, 0, len);
-            len = in.read(buffer);
         }
     }
     

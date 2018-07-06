@@ -73,12 +73,12 @@ class NBodyRolez extends NBody {
         }
         
         val vSlices = velocities.partition(ContiguousPartitioner, this.tasks);
-        for(var t = 0; t < this.tasks; t++)
-            this start updateVelocity(vSlices.get(t), positions);
+        parfor(var t = 0; t < this.tasks; t++)
+            this.updateVelocity(vSlices.get(t), positions);
         
         val bodiesSlices = this.system.partition(ContiguousPartitioner, this.tasks);
-        for(var t = 0; t < this.tasks; t++)
-            this start updatePosition(bodiesSlices.get(t));
+        parfor(var t = 0; t < this.tasks; t++)
+            this.updatePosition(bodiesSlices.get(t));
     }
     
     task pure updateVelocity(velocities: readwrite Slice[readwrite Body\velocity],

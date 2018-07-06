@@ -67,10 +67,10 @@ class KMeansRolez extends KMeans {
         var iterations = 0;
         var changed = true;
         while(changed && iterations < maxIterations) {
-            val tasks = new Array[Task[Result]](this.numTasks);
-            for(var i = 0; i < tasks.length; i++)
-                tasks.set(i, this start assignAndUpdate(dataSet, centroids,
-                    assignments.get(i), ranges.get(i)));
+            val results: readwrite Slice[Result] = new Array[Result](this.numTasks);
+            
+            parfor(var i = 0; i < results.range.size; i++)
+                this.assignAndUpdate(dataSet, centroids, assignments.get(i), ranges.get(i), results.slice(i, i+1), i);
             
             changed = false;
             val newCentroids = new Array[readwrite VectorBuilder[double]](this.clusters);
@@ -78,8 +78,8 @@ class KMeansRolez extends KMeans {
                 newCentroids.set(i, new VectorBuilder[double](this.dim));
             val counts = new Array[int](this.clusters);
 
-            for(var i = 0; i < tasks.length; i++) {
-                val result = tasks.get(i).get;
+            for(var i = 0; i < results.range.size; i++) {
+                val result = results.get(i);
                 changed |= result.changed;
                 for(var c = 0; c < this.clusters; c++) {
                     val newCentroid = newCentroids.get(c);
@@ -104,7 +104,8 @@ class KMeansRolez extends KMeans {
     
     task pure assignAndUpdate(dataSet: readonly Array[Vector[double]],
             centroids: readonly Array[Vector[double]],
-            assignments: readwrite Array[int], range: SliceRange): Result {
+            assignments: readwrite Array[int], range: SliceRange, 
+            results: readwrite Slice[Result], index: int): {
         var changed = false;
         val newCentroids = new Array[readwrite VectorBuilder[double]](this.clusters);
         for(var i = 0; i < this.clusters; i++)
@@ -131,7 +132,7 @@ class KMeansRolez extends KMeans {
                 newCentroid.set(d, newCentroid.get(d) + vector.get(d));
             counts.set(cluster, counts.get(cluster) + 1);
         }
-        return new Result(changed, newCentroids, counts.build);
+        results.set(index, new Result(changed, newCentroids, counts.build));
     }
     
     def pure distance2(v1: Vector[double], v2: Vector[double]): double {

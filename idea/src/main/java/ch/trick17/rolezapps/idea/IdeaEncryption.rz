@@ -156,12 +156,12 @@ class IdeaEncryptionRolez extends IdeaEncryption {
         val decryptedSlices = this.decrypted.partition(partitioner, this.tasks);
         
         // encrypt
-        for(var i = 0; i < this.tasks; i++)
-            this start encryptDecrypt(plainSlices.get(i), encryptedSlices.get(i), this.encryptKey);
+        parfor(var i = 0; i < this.tasks; i++)
+            this.encryptDecrypt(plainSlices.get(i), encryptedSlices.get(i), this.encryptKey);
         
         // decrypt
-        for(var i = 0; i < this.tasks; i++)
-            this start encryptDecrypt(encryptedSlices.get(i), decryptedSlices.get(i), this.decryptKey);
+        parfor(var i = 0; i < this.tasks; i++)
+            this.encryptDecrypt(encryptedSlices.get(i), decryptedSlices.get(i), this.decryptKey);
     }
     
     task pure encryptDecrypt(src: readonly Slice[byte], dst: readwrite Slice[byte],

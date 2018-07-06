@@ -2,7 +2,7 @@ package ch.trick17.rolezapps.mergesort;
 
 import static ch.trick17.rolezapps.BenchmarkUtils.instantiateBenchmark;
 import static ch.trick17.rolezapps.BenchmarkUtils.intValueForParam;
-import static ch.trick17.rolezapps.BenchmarkUtils.runAndPlot;
+import static ch.trick17.rolezapps.BenchmarkUtils.runAndStoreResults;
 import static org.openjdk.jmh.annotations.Mode.SingleShotTime;
 import static org.openjdk.jmh.annotations.Scope.Thread;
 import static rolez.lang.Task.currentTask;
@@ -34,7 +34,7 @@ public class MergesortBenchmark {
     @IntValues({300000, 1500000, 6000000})
     String size;
     
-    @Param({"RolezEager", "Rolez", "Java"})
+    @Param({"Rolez", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16", "32"})
@@ -72,6 +72,6 @@ public class MergesortBenchmark {
     public static void main(String[] args) {
         Options options = new OptionsBuilder().include(MergesortBenchmark.class.getSimpleName())
                 .warmupIterations(10).measurementIterations(30).build();
-        runAndPlot(options);
+        runAndStoreResults(options);
     }
 }
