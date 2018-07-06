@@ -7,7 +7,6 @@
     <packaging>pom</packaging>
     
     <modules>
-        <module>rolez-parent</module>
         <module>rolez-benchmark-parent</module>
         <module>benchmark-utils</module>
         <module>quicksort</module>

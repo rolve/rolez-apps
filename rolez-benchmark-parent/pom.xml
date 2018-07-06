@@ -2,28 +2,38 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>ch.trick17.rolez-apps</groupId>
+        <groupId>ch.trick17.rolez</groupId>
         <artifactId>rolez-parent</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../rolez-parent/pom.xml</relativePath>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath/>
     </parent>
+    <groupId>ch.trick17.rolez-apps</groupId>
     <artifactId>rolez-benchmark-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <repositories>
+        <repository>
+            <id>rolez-maven-repo</id>
+            <url>https://rolve.gitlab.io/rolez/maven/</url>
+            <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+    </repositories>
+
     <properties>
-        <jmh.version>1.12</jmh.version>
+        <jmhVersion>1.12</jmhVersion>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-core</artifactId>
-            <version>${jmh.version}</version>
+            <version>${jmhVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-generator-annprocess</artifactId>
-            <version>${jmh.version}</version>
+            <version>${jmhVersion}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
