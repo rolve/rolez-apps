@@ -27,11 +27,11 @@ import rolez.lang.Task;
 @State(Thread)
 public class IdeaBenchmark {
     
-    @Param({"small", "medium", "large"})
+    @Param({"small"})
     @IntValues({3000000, 20000000, 50000000})
     String size;
     
-    @Param({"Rolez", "Java"})
+    @Param({"Rolez", "RolezOpt", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16", "32"})

@@ -27,13 +27,13 @@ import rolez.lang.Task;
 @State(Thread)
 public class NBodyBenchmark {
 
-    @Param({"small", "medium", "large"})
+    @Param({"small"})
     @IntValues({2000, 5000, 8000})
     String size;
     
     int iterations = 1;
     
-    @Param({"Rolez", "Java"})
+    @Param({"Rolez", "RolezOpt", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16", "32"})

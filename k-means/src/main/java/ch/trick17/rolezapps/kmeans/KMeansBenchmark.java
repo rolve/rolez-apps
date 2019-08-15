@@ -33,11 +33,11 @@ public class KMeansBenchmark {
     
     int dim = 10;
     
-    @Param({"small", "medium", "large"})
+    @Param({"small"})
     @IntValues({20000, 40000, 60000})
     String size;
     
-    @Param({"Rolez", "Java"})
+    @Param({"Rolez", "RolezOpt", "Java"})
     String impl;
     
     int clusters;

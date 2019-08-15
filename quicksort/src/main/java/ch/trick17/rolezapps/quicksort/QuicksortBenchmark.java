@@ -30,11 +30,11 @@ import rolez.lang.Task;
 @State(Thread)
 public class QuicksortBenchmark {
 
-    @Param({"small", "medium", "large"})
+    @Param({"small"})
     @IntValues({300000, 1500000, 6000000})
     String size;
     
-    @Param({"Rolez", "Java"})
+    @Param({"Rolez", "RolezOpt", "Java"})
     String impl;
     
     @Param({"1", "2", "4", "8", "16", "32"})
