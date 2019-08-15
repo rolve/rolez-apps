@@ -66,7 +66,7 @@ public class HistogramBenchmark {
     
     public static void main(String[] args) {
         Options options = new OptionsBuilder().include(HistogramBenchmark.class.getSimpleName())
-                .warmupIterations(10).measurementIterations(30).build();
+                .warmupIterations(15).measurementIterations(30).build();
         runAndStoreResults(options);
     }
 }

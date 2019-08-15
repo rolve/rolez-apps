@@ -60,7 +60,7 @@ public class RaytracerBenchmark {
 
     public static void main(String[] args) {
         Options options = new OptionsBuilder().include(RaytracerBenchmark.class.getSimpleName())
-                .warmupIterations(10).measurementIterations(30).build();
+                .warmupIterations(15).measurementIterations(30).build();
         runAndStoreResults(options);
     }
 }
