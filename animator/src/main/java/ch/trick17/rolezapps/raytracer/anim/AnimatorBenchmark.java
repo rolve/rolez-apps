@@ -25,9 +25,9 @@ import rolez.lang.Task;
 @Fork(1)
 @State(Thread)
 public class AnimatorBenchmark {
-
+    
     @Param({"small", "medium", "large"})
-    @IntValues({32, 64, 96})
+    @IntValues({30, 50, 80})
     String size;
     
     @Param({"Rolez", "Java"})

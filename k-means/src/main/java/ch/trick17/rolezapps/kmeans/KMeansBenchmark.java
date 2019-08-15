@@ -34,7 +34,7 @@ public class KMeansBenchmark {
     int dim = 10;
     
     @Param({"small", "medium", "large"})
-    @IntValues({20000, 40000, 60000})
+    @IntValues({20000, 30000, 40000})
     String size;
     
     @Param({"Rolez", "Java"})
