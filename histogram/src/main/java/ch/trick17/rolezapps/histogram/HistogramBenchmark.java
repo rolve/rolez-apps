@@ -30,8 +30,8 @@ import rolez.lang.Task;
 @State(Thread)
 public class HistogramBenchmark {
     
-    @Param({"small", "medium", "large"})
-    @IntValues({12000000})
+    @Param({"small"})
+    @IntValues({12000000, 50000000, 100000000})
     String size;
     
     @Param({"Rolez", "RolezOpt", "Java"})
